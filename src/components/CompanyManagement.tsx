@@ -257,7 +257,7 @@ function CompanyForm({ company, onSave, onCancel }: CompanyFormProps) {
   const [formData, setFormData] = useState({
     name: company?.name || '',
     ticker: company?.ticker || '',
-    website: company?.website || '',
+    website: (company as any)?.website || '',
     ethHoldings: company?.ethHoldings || 0,
     ethAddresses: company?.ethAddresses || '',
     marketCap: company?.marketCap || '',
