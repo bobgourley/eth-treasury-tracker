@@ -22,7 +22,7 @@ async function checkAuth(): Promise<boolean> {
     
     console.log('✅ checkAuth - Admin authenticated:', session.user.email)
     return true
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ checkAuth - Error:', error)
     return false
   }
@@ -58,7 +58,7 @@ export async function GET() {
       }))
     })
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch companies:', error)
     return NextResponse.json({
       success: false,
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to create company:', error)
     return NextResponse.json({
       success: false,
@@ -195,7 +195,7 @@ export async function PUT(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to update company:', error)
     return NextResponse.json({
       success: false,
@@ -246,7 +246,7 @@ export async function DELETE(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to delete company:', error)
     return NextResponse.json({
       success: false,

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import AdminDashboard from '@/components/AdminDashboard'
 import CompanyManagement from '@/components/CompanyManagement'
 
@@ -49,12 +50,9 @@ export default function AdminPage() {
               </span>
             </div>
             <div className="flex items-center space-x-4">
-              <a
-                href="/"
-                className="text-blue-600 hover:text-blue-700 font-medium"
-              >
+              <Link href="/" className="text-blue-600 hover:text-blue-800 mb-6 inline-block">
                 ← Back to Dashboard
-              </a>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"

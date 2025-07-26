@@ -16,7 +16,7 @@ export async function GET() {
     }))
 
     return NextResponse.json(serializedCompanies)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching companies:', error)
     return NextResponse.json(
       { error: 'Failed to fetch companies' },
