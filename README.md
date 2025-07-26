@@ -1,5 +1,8 @@
 # Ethereum Treasury Tracker
 
+<!-- Deployment trigger: Force latest commit -->
+
+
 A modern web application that tracks corporate Ethereum holdings and provides comprehensive financial metrics for companies with significant ETH treasuries.
 
 ![Next.js](https://img.shields.io/badge/Next.js-15.4.4-black?style=flat-square&logo=next.js)
