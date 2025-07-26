@@ -29,7 +29,7 @@ export async function storeApiKey(name: string, key: string, description?: strin
 /**
  * Get all API keys (disabled - using environment variables)
  */
-export async function getAllApiKeys(): Promise<any[]> {
+export async function getAllApiKeys(): Promise<never[]> {
   console.log('API key listing disabled - using environment variables')
   return []
 }
