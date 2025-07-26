@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 interface AdminLoginProps {
   onLogin: () => void
@@ -109,12 +110,12 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
           </div>
 
           <div className="text-center">
-            <a
+            <Link
               href="/"
               className="text-blue-600 hover:text-blue-700 text-sm font-medium"
             >
               ← Back to Dashboard
-            </a>
+            </Link>
           </div>
         </form>
 

@@ -25,7 +25,7 @@ interface UpdateStatus {
 export default function AdminDashboard() {
   const [isUpdating, setIsUpdating] = useState(false)
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus | null>(null)
-  const [lastCheck, setLastCheck] = useState<any>(null)
+  const [lastCheck, setLastCheck] = useState<unknown>(null)
 
   const triggerDataUpdate = async () => {
     setIsUpdating(true)
