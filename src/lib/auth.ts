@@ -74,26 +74,31 @@ export function generateSessionToken(): string {
 }
 
 /**
- * Validate session token (basic implementation)
- * In production, implement proper session storage and validation
+ * Simple but robust session storage for development
+ * In production, use Redis or database-backed sessions
  */
 const activeSessions = new Set<string>()
 
 export function createSession(token: string): void {
   activeSessions.add(token)
+  console.log('✅ Session created:', token.substring(0, 8) + '...')
   
-  // Auto-expire sessions after 1 hour
+  // Auto-expire sessions after 4 hours (longer for development)
   setTimeout(() => {
     activeSessions.delete(token)
-  }, 60 * 60 * 1000)
+    console.log('⏰ Session expired:', token.substring(0, 8) + '...')
+  }, 4 * 60 * 60 * 1000)
 }
 
 export function validateSession(token: string): boolean {
-  return activeSessions.has(token)
+  const isValid = activeSessions.has(token)
+  console.log('🔐 Session validation:', token.substring(0, 8) + '...', isValid ? 'VALID' : 'INVALID')
+  return isValid
 }
 
 export function destroySession(token: string): void {
   activeSessions.delete(token)
+  console.log('🗑️ Session destroyed:', token.substring(0, 8) + '...')
 }
 
 /**

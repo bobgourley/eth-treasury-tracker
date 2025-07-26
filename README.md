@@ -20,7 +20,7 @@ The Ethereum Treasury Tracker provides transparency into corporate Ethereum hold
 ## ✨ Features
 
 ### 📊 Comprehensive Dashboard
-- **Enhanced Stats Banner**: ETH price, total ETH value, total market cap, % of ETH supply held
+- **Enhanced Stats Banner**: Live ETH price, total ETH value, total market cap, % of ETH supply held
 - **Company Rankings**: Ordered by ETH holdings with intuitive ranking system
 - **Collapsible Cards**: Clean summary view with expandable detailed metrics
 - **Responsive Design**: Optimized for desktop, tablet, and mobile devices
@@ -28,15 +28,25 @@ The Ethereum Treasury Tracker provides transparency into corporate Ethereum hold
 ### 💰 Financial Metrics
 - **ETH Holdings**: Total Ethereum held by each company
 - **ETH Value**: USD value of ETH holdings (ETH × current price)
+- **Live Stock Prices**: Real-time stock price data via Alpha Vantage API
 - **Market Cap**: Company's total market capitalization
+- **Shares Outstanding**: Current shares outstanding data
 - **ETH per Share**: ETH holdings divided by shares outstanding
 - **mNAV Ratio**: Market cap to net asset value ratio
 - **Staking Yield**: Annual staking rewards percentage
 
 ### 🔗 External Integration
 - **Yahoo Finance Links**: Direct access to stock information
-- **Real Company Data**: Tracks 6 major ETH treasury companies
-- **Live Data Ready**: Architecture prepared for API integration
+- **Company Websites**: Official company website links
+- **Live Data APIs**: CoinGecko (ETH price), Alpha Vantage (stock data), Etherscan (blockchain data)
+- **Daily Rate Limiting**: Smart API usage with manual override capabilities
+
+### 🔐 Admin Backend
+- **Secure Authentication**: Password-protected admin interface
+- **Company Management**: Full CRUD operations for company data
+- **Manual Data Updates**: Override capabilities for ETH holdings and stock prices
+- **Force Data Refresh**: Manual triggers for stock price and ETH data updates
+- **Session Management**: Secure HTTP-only cookie sessions
 
 ## 🚀 Getting Started
 
@@ -125,21 +135,24 @@ eth-treasury-tracker/
 
 ## 📊 Tracked Companies
 
-Currently tracking 6 major Ethereum treasury companies:
+Currently tracking 9 major Ethereum treasury companies:
 
-1. **BitMine Immersion Technologies** (BMNR) - 433,716.5 ETH
-2. **SharpLink Gaming** (SBET) - 360,807 ETH
-3. **Coinbase Global, Inc** (COIN) - 137,300 ETH
-4. **Bit Digital, Inc** (BTBT) - 120,306 ETH
-5. **BTCS Inc.** (BTCS) - 55,788 ETH
-6. **GameSquare Holdings** (GAME) - 10,170 ETH
+1. **BitMine Immersion Technologies** (BMNR) - 300,600 ETH - [bitminetech.io](https://bitminetech.io)
+2. **SharpLink Gaming** (SBET) - 360,807 ETH - [sharplink.com](https://www.sharplink.com)
+3. **Bit Digital, Inc** (BTBT) - 120,306 ETH - [bit-digital.com](https://bit-digital.com)
+4. **BTCS Inc.** (BTCS) - 55,788 ETH - [btcs.com](https://www.btcs.com)
+5. **GameSquare Holdings** (GAME) - 10,170 ETH - [gamesquare.com](https://www.gamesquare.com)
+6. **Intchains Group Limited** (ICG) - 7,000 ETH - [intchains.com](https://www.intchains.com)
+7. **KR1 plc** (KR1:AQSE) - 5,500 ETH - [kr1.io](https://kr1.io)
+8. **Exodus Movement** (EXOD) - 2,500 ETH - [exodus.com](https://www.exodus.com)
+9. **BTC Digital Ltd** (BTCT) - 2,100 ETH - [btct.investorroom.com](https://btct.investorroom.com)
 
-**Total Tracked**: 1,118,087.5 ETH (~$4.11B at $3,680/ETH)
+**Total Tracked**: 864,771 ETH (~$3.18B at current ETH prices)
 
 ## 🔧 API Endpoints
 
 ### GET `/api/companies`
-Returns all active companies ordered by ETH holdings (descending)
+Returns all active companies ordered by ETH holdings (descending) with live stock prices and website links
 
 ### GET `/api/metrics`
 Returns system-wide metrics including:
@@ -149,6 +162,16 @@ Returns system-wide metrics including:
 - Percentage of total ETH supply held
 - Current ETH price
 - Number of companies tracked
+
+### POST `/api/update-data`
+Triggers live data updates for ETH price, stock prices, and system metrics
+- Supports `?forceStockUpdate=true` parameter for manual stock data refresh
+- Implements daily rate limiting for stock API calls
+
+### Admin Endpoints (Authentication Required)
+- `GET/POST/PUT/DELETE /api/admin/companies` - Company management
+- `POST /api/admin/login` - Admin authentication
+- `POST /api/admin/logout` - Session termination
 
 ## 🚀 Deployment
 
@@ -163,9 +186,13 @@ Returns system-wide metrics including:
 # Database
 DATABASE_URL="your-database-url"
 
-# API Keys (for future live data integration)
+# API Keys (for live data integration)
 ETHERSCAN_API_KEY="your-etherscan-key"
 COINGECKO_API_KEY="your-coingecko-key"
+ALPHA_VANTAGE_API_KEY="your-alpha-vantage-key"
+
+# Admin Authentication
+ADMIN_PASSWORD_HASH="your-hashed-admin-password"
 ```
 
 ## 🛣️ Roadmap
@@ -177,17 +204,21 @@ COINGECKO_API_KEY="your-coingecko-key"
 - [x] ETH value calculations
 - [x] Yahoo Finance integration
 
-### Phase 2: Live Data Integration 🚧
-- [ ] Etherscan API integration
-- [ ] CoinGecko API integration
-- [ ] Automated daily data updates
-- [ ] Real-time ETH price feeds
+### Phase 2: Live Data Integration ✅
+- [x] Etherscan API integration
+- [x] CoinGecko API integration
+- [x] Alpha Vantage stock price integration
+- [x] Automated daily data updates with rate limiting
+- [x] Real-time ETH price feeds
+- [x] Manual override capabilities
 
-### Phase 3: Admin Backend
-- [ ] Secure admin authentication
-- [ ] Company management interface
-- [ ] Data validation and monitoring
-- [ ] Manual data override capabilities
+### Phase 3: Admin Backend ✅
+- [x] Secure admin authentication
+- [x] Company management interface
+- [x] Data validation and monitoring
+- [x] Manual data override capabilities
+- [x] Website field management
+- [x] Stock price manual updates
 
 ### Phase 4: Advanced Features
 - [ ] Sorting and filtering options

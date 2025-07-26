@@ -11,6 +11,7 @@ interface Company {
   ethAddresses: string | null
   marketCap: string | null
   sharesOutstanding: string | null
+  stockPrice: number | null
   ethPerShare: number | null
   mnavRatio: number | null
   stakingYield: number | null
@@ -35,15 +36,33 @@ export default function CompanyManagement() {
 
   const fetchCompanies = async () => {
     try {
-      const response = await fetch('/api/admin/companies')
+      console.log('🔍 Fetching companies...')
+      
+      // First, let's check authentication status
+      const authResponse = await fetch('/api/admin/auth', {
+        credentials: 'include'
+      })
+      const authResult = await authResponse.json()
+      console.log('🔐 Auth status:', authResult)
+      
+      const response = await fetch('/api/admin/companies', {
+        credentials: 'include' // Ensure cookies are sent
+      })
+      
+      console.log('📡 Response status:', response.status)
+      console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()))
+      
       const result = await response.json()
+      console.log('📊 Companies fetch result:', JSON.stringify(result, null, 2))
 
       if (result.success) {
         setCompanies(result.companies)
+        setError('') // Clear any previous errors
       } else {
         setError(result.error || 'Failed to fetch companies')
       }
     } catch (error) {
+      console.error('❌ Fetch companies error:', error)
       setError('Network error')
     } finally {
       setIsLoading(false)
@@ -58,6 +77,7 @@ export default function CompanyManagement() {
 
       const response = await fetch(url, {
         method,
+        credentials: 'include', // Ensure cookies are sent
         headers: {
           'Content-Type': 'application/json'
         },
@@ -88,7 +108,8 @@ export default function CompanyManagement() {
 
     try {
       const response = await fetch(`/api/admin/companies?id=${companyId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include' // Ensure cookies are sent
       })
 
       const result = await response.json()
@@ -141,6 +162,12 @@ export default function CompanyManagement() {
                 ETH Holdings
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Stock Price
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Shares Outstanding
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Market Cap
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -166,6 +193,12 @@ export default function CompanyManagement() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {formatEth(company.ethHoldings || 0)}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {company.stockPrice ? `$${formatNumber(company.stockPrice)}` : 'N/A'}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {company.sharesOutstanding ? formatNumber(BigInt(company.sharesOutstanding)) : 'N/A'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {company.marketCap ? formatNumber(BigInt(company.marketCap)) : 'N/A'}
@@ -224,10 +257,12 @@ function CompanyForm({ company, onSave, onCancel }: CompanyFormProps) {
   const [formData, setFormData] = useState({
     name: company?.name || '',
     ticker: company?.ticker || '',
+    website: company?.website || '',
     ethHoldings: company?.ethHoldings || 0,
     ethAddresses: company?.ethAddresses || '',
     marketCap: company?.marketCap || '',
     sharesOutstanding: company?.sharesOutstanding || '',
+    stockPrice: company?.stockPrice || 0,
     ethPerShare: company?.ethPerShare || 0,
     mnavRatio: company?.mnavRatio || 0,
     stakingYield: company?.stakingYield || 0,
@@ -275,6 +310,17 @@ function CompanyForm({ company, onSave, onCancel }: CompanyFormProps) {
             </div>
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Website</label>
+            <input
+              type="url"
+              value={formData.website}
+              onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+              placeholder="https://company.com"
+              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">ETH Holdings</label>
@@ -283,6 +329,28 @@ function CompanyForm({ company, onSave, onCancel }: CompanyFormProps) {
                 step="0.000001"
                 value={formData.ethHoldings}
                 onChange={(e) => setFormData({ ...formData, ethHoldings: parseFloat(e.target.value) || 0 })}
+                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Stock Price (USD)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.stockPrice}
+                onChange={(e) => setFormData({ ...formData, stockPrice: parseFloat(e.target.value) || 0 })}
+                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Shares Outstanding</label>
+              <input
+                type="number"
+                value={formData.sharesOutstanding}
+                onChange={(e) => setFormData({ ...formData, sharesOutstanding: e.target.value })}
                 className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
             </div>

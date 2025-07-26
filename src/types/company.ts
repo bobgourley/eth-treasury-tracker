@@ -2,10 +2,12 @@ export interface Company {
   id: number
   name: string
   ticker?: string
+  website?: string
   ethHoldings?: number
   ethAddresses?: string
   marketCap?: bigint
   sharesOutstanding?: bigint
+  stockPrice?: number
   ethPerShare?: number
   mnavRatio?: number
   stakingYield?: number
@@ -26,6 +28,7 @@ export interface SystemMetrics {
   totalMarketCap?: number
   ethSupplyPercent?: number
   lastUpdate: Date
+  lastStockUpdate?: Date
 }
 
 export interface CompanyWithMetrics extends Company {

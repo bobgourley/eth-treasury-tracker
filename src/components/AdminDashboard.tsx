@@ -52,6 +52,31 @@ export default function AdminDashboard() {
     }
   }
 
+  const triggerStockUpdate = async () => {
+    setIsUpdating(true)
+    setUpdateStatus(null)
+
+    try {
+      const response = await fetch('/api/update-data?forceStockUpdate=true', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const result = await response.json()
+      setUpdateStatus(result)
+    } catch (error) {
+      setUpdateStatus({
+        success: false,
+        message: 'Failed to trigger stock data update',
+        timestamp: new Date().toISOString()
+      })
+    } finally {
+      setIsUpdating(false)
+    }
+  }
+
   const checkUpdateStatus = async () => {
     try {
       const response = await fetch('/api/update-data')
@@ -70,7 +95,7 @@ export default function AdminDashboard() {
         </h2>
 
         {/* Control Panel */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="flex flex-wrap gap-4 mb-6">
           <button
             onClick={triggerDataUpdate}
             disabled={isUpdating}
@@ -81,6 +106,18 @@ export default function AdminDashboard() {
             }`}
           >
             {isUpdating ? 'Updating Data...' : 'Trigger Data Update'}
+          </button>
+
+          <button
+            onClick={triggerStockUpdate}
+            disabled={isUpdating}
+            className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+              isUpdating
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-orange-600 hover:bg-orange-700 text-white'
+            }`}
+          >
+            {isUpdating ? 'Updating Stock Data...' : 'Force Stock Update'}
           </button>
 
           <button
@@ -123,7 +160,7 @@ export default function AdminDashboard() {
               <div className="mt-3">
                 <p className="text-sm font-medium text-red-600 mb-2">API Issues:</p>
                 <ul className="text-sm text-red-600 space-y-1">
-                  {(updateStatus?.apiHealth?.errors || lastCheck?.apiHealth?.errors || []).map((error, index) => (
+                  {(updateStatus?.apiHealth?.errors || lastCheck?.apiHealth?.errors || []).map((error: string, index: number) => (
                     <li key={index}>• {error}</li>
                   ))}
                 </ul>
@@ -208,21 +245,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Instructions */}
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <h3 className="text-lg font-semibold text-yellow-800 mb-2">Setup Instructions</h3>
-          <div className="text-yellow-700 text-sm space-y-2">
-            <p>To enable live data integration:</p>
-            <ol className="list-decimal list-inside space-y-1 ml-4">
-              <li>Copy <code>env.example</code> to <code>.env</code></li>
-              <li>Get a free API key from <a href="https://etherscan.io/apis" className="underline" target="_blank">Etherscan</a></li>
-              <li>Get a free API key from <a href="https://coingecko.com/en/api/pricing" className="underline" target="_blank">CoinGecko</a></li>
-              <li>Add your API keys to the <code>.env</code> file</li>
-              <li>Restart the development server</li>
-              <li>Click "Trigger Data Update" to test the integration</li>
-            </ol>
-          </div>
-        </div>
+
       </div>
     </div>
   )

@@ -7,13 +7,14 @@ import {
   getTotalEthSupply,
   checkApiHealth 
 } from '@/lib/api'
+import { updateMultipleStockData, checkStockApiHealth } from '@/lib/stock-api'
 
 /**
  * POST /api/update-data
  * Manually trigger data update from external APIs
  * This will be used for testing and can be called by cron jobs
  */
-export async function POST() {
+export async function POST(request: Request) {
   try {
     console.log('Starting live data update...')
     
@@ -33,7 +34,12 @@ export async function POST() {
     console.log(`Found ${companies.length} active companies to update`)
     
     let updatedCount = 0
-    let ethPrice = 3680 // Default fallback price
+    
+    // Get last saved ETH price from database as fallback (safer than hardcoded)
+    const lastMetrics = await prisma.systemMetrics.findFirst({
+      orderBy: { lastUpdate: 'desc' }
+    })
+    let ethPrice = lastMetrics?.ethPrice || 3500 // Use last saved price, or conservative fallback
     let totalEthSupply = 120500000 // Default fallback supply
     
     // Update ETH price if CoinGecko is available
@@ -56,27 +62,75 @@ export async function POST() {
       }
     }
     
-    // Update company ETH holdings if we have API access
-    if (healthCheck.etherscan) {
+    // Skip automatic ETH holdings updates for MVP - use manual admin updates instead
+    // This is safer and more accurate since real company treasury addresses are:
+    // 1. Hard to find publicly
+    // 2. Change frequently 
+    // 3. Often use multiple addresses or cold storage
+    // 4. Require manual verification for accuracy
+    console.log('Skipping automatic ETH holdings update - using manual admin values')
+    
+    // Update stock data for companies with tickers (with rate limiting)
+    const stockApiHealthy = await checkStockApiHealth()
+    console.log('Stock API Health:', stockApiHealthy)
+    
+    if (stockApiHealthy) {
       try {
-        const updatedCompanies = await updateCompanyEthHoldings(companies)
+        // Check if stock data was updated in the last 24 hours
+        const currentMetrics = await prisma.systemMetrics.findFirst({
+          orderBy: { lastUpdate: 'desc' }
+        })
         
-        // Save updated data to database
-        for (const company of updatedCompanies) {
-          await prisma.company.update({
-            where: { id: company.id },
-            data: {
-              ethHoldings: company.ethHoldings,
-              lastUpdated: new Date()
+        const now = new Date()
+        const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+        const url = new URL(request.url)
+        const forceStockUpdate = url.searchParams.get('forceStockUpdate') === 'true'
+        
+        const shouldUpdateStock = forceStockUpdate || 
+          !currentMetrics?.lastStockUpdate || 
+          currentMetrics.lastStockUpdate < twentyFourHoursAgo
+        
+        if (shouldUpdateStock) {
+          const companiesWithTickers = companies.filter(company => company.ticker)
+          const tickers = companiesWithTickers.map(company => company.ticker!)
+          
+          if (tickers.length > 0) {
+            console.log(`Updating stock data for ${tickers.length} companies... ${forceStockUpdate ? '(FORCED)' : '(24h elapsed)'}`)
+            const stockDataMap = await updateMultipleStockData(tickers)
+            
+            // Update companies with stock data
+            for (const company of companiesWithTickers) {
+              const stockData = stockDataMap.get(company.ticker!)
+              if (stockData) {
+                await prisma.company.update({
+                  where: { id: company.id },
+                  data: {
+                    stockPrice: stockData.quote.price,
+                    marketCap: BigInt(stockData.overview.marketCap || 0),
+                    sharesOutstanding: BigInt(stockData.overview.sharesOutstanding || 0),
+                    lastUpdated: new Date()
+                  }
+                })
+                updatedCount++
+                console.log(`Updated stock data for ${company.ticker}: $${stockData.quote.price}`)
+              }
             }
-          })
-          updatedCount++
+            
+            // Update the last stock update timestamp
+            await prisma.systemMetrics.updateMany({
+              data: {
+                lastStockUpdate: now
+              }
+            })
+          }
+        } else {
+          console.log('Stock data was updated within the last 24 hours - skipping stock update')
         }
-        
-        console.log(`Successfully updated ${updatedCount} companies`)
       } catch (error) {
-        console.error('Failed to update company holdings:', error)
+        console.error('Failed to update stock data:', error)
       }
+    } else {
+      console.log('Stock API not available - skipping stock data update')
     }
     
     // Calculate and update system metrics

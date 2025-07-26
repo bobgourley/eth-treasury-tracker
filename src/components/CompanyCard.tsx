@@ -2,18 +2,20 @@
 
 import { useState } from 'react'
 import { Company } from '@/types/company'
-import { formatNumber, formatEth, formatPercentage } from '@/lib/utils'
+import { formatNumber, formatEth, formatPercentage, formatShares } from '@/lib/utils'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
 
 interface CompanyCardProps {
   company: Company & {
     marketCap?: string
     sharesOutstanding?: string
+    stockPrice?: number
   }
   rank: number
+  ethPrice?: number
 }
 
-export default function CompanyCard({ company, rank }: CompanyCardProps) {
+export default function CompanyCard({ company, rank, ethPrice }: CompanyCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   const getYahooFinanceUrl = (ticker: string) => {
@@ -45,12 +47,19 @@ export default function CompanyCard({ company, rank }: CompanyCardProps) {
           </div>
         </div>
         
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-4">
           <div className="text-right">
             <p className="text-xl font-bold text-blue-600">
               {formatEth(company.ethHoldings)}
             </p>
             <p className="text-xs text-gray-500">ETH Holdings</p>
+          </div>
+          
+          <div className="text-right">
+            <p className="text-lg font-bold text-green-600">
+              {company.ethHoldings && ethPrice ? formatNumber(company.ethHoldings * ethPrice) : 'N/A'}
+            </p>
+            <p className="text-xs text-gray-500">ETH Value</p>
           </div>
           
           <button
@@ -72,7 +81,21 @@ export default function CompanyCard({ company, rank }: CompanyCardProps) {
         <div className="px-4 pb-4 border-t border-gray-100">
           <div className="pt-4">
             {/* Key Metrics Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm mb-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-sm mb-4">
+              <div>
+                <p className="text-gray-600">Stock Price</p>
+                <p className="font-semibold text-green-600">
+                  {company.stockPrice ? `$${company.stockPrice.toFixed(2)}` : 'N/A'}
+                </p>
+              </div>
+              
+              <div>
+                <p className="text-gray-600">Shares Outstanding</p>
+                <p className="font-semibold">
+                  {company.sharesOutstanding ? formatShares(BigInt(company.sharesOutstanding)) : 'N/A'}
+                </p>
+              </div>
+              
               <div>
                 <p className="text-gray-600">Market Cap</p>
                 <p className="font-semibold">
@@ -82,7 +105,7 @@ export default function CompanyCard({ company, rank }: CompanyCardProps) {
               
               <div>
                 <p className="text-gray-600">ETH Value</p>
-                <p className="font-semibold text-green-600">
+                <p className="font-semibold text-blue-600">
                   {company.ethHoldings ? formatNumber(company.ethHoldings * 3680) : 'N/A'}
                 </p>
               </div>
@@ -95,13 +118,6 @@ export default function CompanyCard({ company, rank }: CompanyCardProps) {
               </div>
               
               <div>
-                <p className="text-gray-600">mNAV Ratio</p>
-                <p className="font-semibold">
-                  {company.mnavRatio ? `${company.mnavRatio.toFixed(2)}x` : 'N/A'}
-                </p>
-              </div>
-              
-              <div>
                 <p className="text-gray-600">Staking Yield</p>
                 <p className="font-semibold">
                   {formatPercentage(company.stakingYield)}
@@ -110,9 +126,23 @@ export default function CompanyCard({ company, rank }: CompanyCardProps) {
             </div>
 
             {/* Detailed Information */}
-            {(company.yieldSources || company.capitalStructure || company.fundingSources) && (
+            {(company.website || company.yieldSources || company.capitalStructure || company.fundingSources) && (
               <div className="pt-4 border-t border-gray-200">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  {company.website && (
+                    <div>
+                      <p className="text-gray-600 font-medium mb-1">Website</p>
+                      <a 
+                        href={company.website.startsWith('http') ? company.website : `https://${company.website}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 hover:underline break-all"
+                      >
+                        {company.website}
+                      </a>
+                    </div>
+                  )}
+                  
                   {company.yieldSources && (
                     <div>
                       <p className="text-gray-600 font-medium mb-1">Yield Sources</p>

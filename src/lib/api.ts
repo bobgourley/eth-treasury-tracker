@@ -1,10 +1,13 @@
 // API service utilities for external data sources
 import { Company } from '@/types/company'
-import { getApiKey } from '@/lib/apiKeys'
 
-// API base URLs
+// Etherscan API configuration
 const ETHERSCAN_BASE_URL = 'https://api.etherscan.io/api'
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
+
+// CoinGecko API configuration  
 const COINGECKO_BASE_URL = 'https://api.coingecko.com/api/v3'
+const COINGECKO_API_KEY = process.env.COINGECKO_API_KEY
 
 // Rate limiting and retry configuration
 const RATE_LIMIT_DELAY = 200 // ms between requests
@@ -41,12 +44,11 @@ async function fetchWithRetry(url: string, options: RequestInit = {}, retries = 
  * Get ETH balance for a specific address using Etherscan API
  */
 export async function getEthBalance(address: string): Promise<number> {
-  const etherscanApiKey = await getApiKey('etherscan')
-  if (!etherscanApiKey) {
+  if (!ETHERSCAN_API_KEY) {
     throw new Error('Etherscan API key not configured')
   }
 
-  const url = `${ETHERSCAN_BASE_URL}?module=account&action=balance&address=${address}&tag=latest&apikey=${etherscanApiKey}`
+  const url = `${ETHERSCAN_BASE_URL}?module=account&action=balance&address=${address}&tag=latest&apikey=${ETHERSCAN_API_KEY}`
   
   try {
     const response = await fetchWithRetry(url)
@@ -95,11 +97,11 @@ export async function getBatchEthBalances(addresses: string[]): Promise<Record<s
  * Get current ETH price in USD using CoinGecko API
  */
 export async function getEthPrice(): Promise<number> {
-  const coingeckoApiKey = await getApiKey('coingecko')
   const url = `${COINGECKO_BASE_URL}/simple/price?ids=ethereum&vs_currencies=usd`
+  
   const headers: HeadersInit = {}
-  if (coingeckoApiKey) {
-    headers['x-cg-demo-api-key'] = coingeckoApiKey
+  if (COINGECKO_API_KEY) {
+    headers['x-cg-demo-api-key'] = COINGECKO_API_KEY
   }
   
   try {
@@ -139,12 +141,11 @@ export function isValidEthAddress(address: string): boolean {
  * Get total ETH supply from Etherscan
  */
 export async function getTotalEthSupply(): Promise<number> {
-  const etherscanApiKey = await getApiKey('etherscan')
-  if (!etherscanApiKey) {
+  if (!ETHERSCAN_API_KEY) {
     throw new Error('Etherscan API key not configured')
   }
 
-  const url = `${ETHERSCAN_BASE_URL}?module=stats&action=ethsupply&apikey=${etherscanApiKey}`
+  const url = `${ETHERSCAN_BASE_URL}?module=stats&action=ethsupply&apikey=${ETHERSCAN_API_KEY}`
   
   try {
     const response = await fetchWithRetry(url)
@@ -232,8 +233,7 @@ export async function checkApiHealth(): Promise<{
   
   // Test Etherscan API
   try {
-    const etherscanApiKey = await getApiKey('etherscan')
-    if (etherscanApiKey) {
+    if (ETHERSCAN_API_KEY) {
       await getTotalEthSupply()
       etherscanHealthy = true
     } else {

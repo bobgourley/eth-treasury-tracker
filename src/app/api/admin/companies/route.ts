@@ -10,11 +10,17 @@ async function checkAuth(): Promise<boolean> {
   const cookieStore = await cookies()
   const sessionToken = cookieStore.get('admin_session')?.value
   
+  console.log('🔍 checkAuth - sessionToken:', sessionToken ? 'exists' : 'missing')
+  
   if (!sessionToken) {
+    console.log('❌ checkAuth - No session token found')
     return false
   }
   
-  return validateSession(sessionToken)
+  const isValid = validateSession(sessionToken)
+  console.log('🔐 checkAuth - validateSession result:', isValid)
+  
+  return isValid
 }
 
 /**
@@ -25,7 +31,10 @@ export async function GET() {
   try {
     const isAuthenticated = await checkAuth()
     
+    console.log('🔍 GET /api/admin/companies - isAuthenticated:', isAuthenticated)
+    
     if (!isAuthenticated) {
+      console.log('❌ GET /api/admin/companies - Returning 401 Unauthorized')
       return NextResponse.json({
         error: 'Unauthorized'
       }, { status: 401 })
@@ -93,10 +102,12 @@ export async function POST(request: NextRequest) {
       data: {
         name: data.name,
         ticker: data.ticker,
+        website: data.website || null,
         ethHoldings: data.ethHoldings || 0,
         ethAddresses: data.ethAddresses || null,
         marketCap: data.marketCap ? BigInt(data.marketCap) : null,
         sharesOutstanding: data.sharesOutstanding ? BigInt(data.sharesOutstanding) : null,
+        stockPrice: data.stockPrice || null,
         ethPerShare: data.ethPerShare || null,
         mnavRatio: data.mnavRatio || null,
         stakingYield: data.stakingYield || null,
@@ -153,10 +164,12 @@ export async function PUT(request: NextRequest) {
       data: {
         name: data.name,
         ticker: data.ticker,
+        website: data.website,
         ethHoldings: data.ethHoldings,
         ethAddresses: data.ethAddresses,
         marketCap: data.marketCap ? BigInt(data.marketCap) : null,
         sharesOutstanding: data.sharesOutstanding ? BigInt(data.sharesOutstanding) : null,
+        stockPrice: data.stockPrice,
         ethPerShare: data.ethPerShare,
         mnavRatio: data.mnavRatio,
         stakingYield: data.stakingYield,

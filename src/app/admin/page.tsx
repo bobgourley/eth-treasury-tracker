@@ -4,12 +4,11 @@ import { useState, useEffect } from 'react'
 import AdminLogin from '@/components/AdminLogin'
 import AdminDashboard from '@/components/AdminDashboard'
 import CompanyManagement from '@/components/CompanyManagement'
-import ApiKeyManagement from '@/components/ApiKeyManagement'
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'companies' | 'api-keys'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'companies'>('dashboard')
 
   useEffect(() => {
     checkAuthStatus()
@@ -105,16 +104,7 @@ export default function AdminPage() {
               >
                 Company Management
               </button>
-              <button
-                onClick={() => setActiveTab('api-keys')}
-                className={`px-4 py-2 font-medium text-sm rounded-t-lg ${
-                  activeTab === 'api-keys'
-                    ? 'bg-white text-blue-600 border-b-2 border-blue-600'
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                API Key Management
-              </button>
+
             </nav>
           </div>
         </div>
@@ -124,7 +114,6 @@ export default function AdminPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {activeTab === 'dashboard' && <AdminDashboard />}
           {activeTab === 'companies' && <CompanyManagement />}
-          {activeTab === 'api-keys' && <ApiKeyManagement />}
         </div>
       </main>
 

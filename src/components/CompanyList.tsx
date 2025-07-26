@@ -6,7 +6,7 @@ import CompanyCard from './CompanyCard'
 import { formatEth, formatNumber } from '@/lib/utils'
 
 export default function CompanyList() {
-  const [companies, setCompanies] = useState<(Company & { marketCap?: string; sharesOutstanding?: string })[]>([])
+  const [companies, setCompanies] = useState<(Company & { marketCap?: string; sharesOutstanding?: string; stockPrice?: number })[]>([])
   const [metrics, setMetrics] = useState<SystemMetrics | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -120,6 +120,7 @@ export default function CompanyList() {
               key={company.id} 
               company={company} 
               rank={index + 1}
+              ethPrice={metrics?.ethPrice}
             />
           ))
         )}

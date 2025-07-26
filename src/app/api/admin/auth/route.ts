@@ -103,10 +103,12 @@ export async function GET() {
       })
     }
 
-    // In a real app, you'd validate the session against a database
-    // For now, we'll just check if it exists in memory
+    // Import validateSession here to avoid circular imports
+    const { validateSession } = await import('@/lib/auth')
+    const isValid = validateSession(sessionToken)
+
     return NextResponse.json({
-      authenticated: true
+      authenticated: isValid
     })
 
   } catch (error) {
