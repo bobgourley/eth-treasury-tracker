@@ -1,20 +1,9 @@
 import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
 async function main() {
-  // Create admin user
-  const hashedPassword = await bcrypt.hash('admin123', 10)
-  await prisma.admin.upsert({
-    where: { username: 'admin' },
-    update: {},
-    create: {
-      username: 'admin',
-      password: hashedPassword,
-    },
-  })
-  console.log('✅ Admin user created successfully!')
+  console.log('🌱 Starting database seed...')
 
   // Real Ethereum treasury companies data (updated with accurate holdings)
   const companies = [
@@ -178,7 +167,6 @@ async function main() {
   console.log('🌱 Database seeded successfully!')
   console.log(`Created ${companies.length} companies`)
   console.log('System metrics calculated and stored')
-  console.log('Admin user created: username=admin, password=admin123')
 }
 
 main()
