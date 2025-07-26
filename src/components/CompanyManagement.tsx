@@ -257,7 +257,7 @@ function CompanyForm({ company, onSave, onCancel }: CompanyFormProps) {
   const [formData, setFormData] = useState({
     name: company?.name || '',
     ticker: company?.ticker || '',
-    website: (company as any)?.website || '',
+    // website: temporarily disabled for deployment
     ethHoldings: company?.ethHoldings || 0,
     ethAddresses: company?.ethAddresses || '',
     marketCap: company?.marketCap || '',
@@ -310,6 +310,7 @@ function CompanyForm({ company, onSave, onCancel }: CompanyFormProps) {
             </div>
           </div>
 
+          {/* Website field temporarily disabled for deployment
           <div>
             <label className="block text-sm font-medium text-gray-700">Website</label>
             <input
@@ -320,6 +321,7 @@ function CompanyForm({ company, onSave, onCancel }: CompanyFormProps) {
               className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
+          */}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
