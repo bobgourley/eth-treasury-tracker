@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
+// Updated DATABASE_URL to use Session Pooler - testing connection
+
 export async function GET() {
   try {
     // Test basic database connection
