@@ -1,7 +1,5 @@
 import { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { prisma } from "./db"
 
 // List of allowed admin email addresses
 const ALLOWED_ADMIN_EMAILS = [
@@ -9,7 +7,6 @@ const ALLOWED_ADMIN_EMAILS = [
 ].filter(Boolean) as string[]
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -50,22 +47,9 @@ export const authOptions: NextAuthOptions = {
 /**
  * Helper function to check if user is admin
  */
-export async function isUserAdmin(email: string): Promise<boolean> {
-  if (!email || !ALLOWED_ADMIN_EMAILS.includes(email)) {
-    return false
-  }
-  
-  try {
-    const user = await prisma.user.findUnique({
-      where: { email },
-      select: { isAdmin: true },
-    })
-    
-    return user?.isAdmin || false
-  } catch (error) {
-    console.error('Error checking admin status:', error)
-    return false
-  }
+// Simple admin check using environment variable (no database dependency)
+export function isUserAdmin(email: string): boolean {
+  return ALLOWED_ADMIN_EMAILS.includes(email)
 }
 
 /**
