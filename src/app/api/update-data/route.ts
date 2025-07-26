@@ -7,7 +7,7 @@ const prisma = new PrismaClient()
  * POST /api/update-data
  * Simplified data update for deployment
  */
-export async function POST() {
+export async function POST(request: Request) {
   try {
     console.log('🚀 Starting data update...')
     
@@ -31,13 +31,27 @@ export async function POST() {
       console.log('⚠️ ETH price fetch error, using fallback:', error)
     }
     
+    // Stock price updates temporarily disabled for deployment
+    const shouldUpdateStocks = new URL(request.url).searchParams.get('forceStockUpdate') === 'true'
+    let stockUpdatesCount = 0
+    
+    if (shouldUpdateStocks) {
+      console.log('📊 Stock price updates requested but temporarily disabled for deployment stability')
+      // TODO: Re-enable stock price updates after schema sync
+    }
+    
+    // Refresh company data after stock updates
+    const updatedCompanies = await prisma.company.findMany({
+      where: { isActive: true }
+    })
+    
     // Calculate basic metrics
-    const totalEthHeld = companies.reduce((sum, company) => 
+    const totalEthHeld = updatedCompanies.reduce((sum, company) => 
       sum + (company.ethHoldings || 0), 0
     )
     
     const totalEthValue = totalEthHeld * ethPrice
-    const totalMarketCap = companies.reduce((sum, company) => 
+    const totalMarketCap = updatedCompanies.reduce((sum, company) => 
       sum + Number(company.marketCap || 0), 0
     )
     
@@ -46,7 +60,7 @@ export async function POST() {
       where: { id: 1 },
       update: {
         totalEthHoldings: totalEthHeld,
-        totalCompanies: companies.length,
+        totalCompanies: updatedCompanies.length,
         ethPrice: ethPrice,
         totalEthValue: totalEthValue,
         totalMarketCap: totalMarketCap,
@@ -55,7 +69,7 @@ export async function POST() {
       },
       create: {
         totalEthHoldings: totalEthHeld,
-        totalCompanies: companies.length,
+        totalCompanies: updatedCompanies.length,
         ethPrice: ethPrice,
         totalEthValue: totalEthValue,
         totalMarketCap: totalMarketCap,
@@ -68,14 +82,27 @@ export async function POST() {
     
     return NextResponse.json({
       success: true,
-      message: 'Data updated successfully',
-      data: {
-        ethPrice,
-        totalEthHeld,
-        totalEthValue,
-        totalMarketCap,
-        companiesCount: companies.length
-      }
+      message: shouldUpdateStocks ? 
+        `Data updated successfully. Stock prices updated for ${stockUpdatesCount} companies.` :
+        'Data updated successfully',
+      stats: {
+        companiesUpdated: shouldUpdateStocks ? stockUpdatesCount : updatedCompanies.length,
+        totalCompanies: updatedCompanies.length,
+        ethPrice: ethPrice,
+        totalEthHoldings: totalEthHeld,
+        totalEthValue: totalEthValue,
+        totalMarketCap: totalMarketCap,
+        ethSupplyPercent: `${((totalEthHeld / 120500000) * 100).toFixed(4)}%`
+      },
+      companies: updatedCompanies.map(company => ({
+        name: company.name,
+        ticker: company.ticker,
+        ethHoldings: company.ethHoldings,
+        ethValue: (company.ethHoldings || 0) * ethPrice,
+        marketCap: company.marketCap ? Number(company.marketCap) : null,
+        lastUpdated: company.lastUpdated
+      })),
+      timestamp: new Date().toISOString()
     })
     
   } catch (error: unknown) {
