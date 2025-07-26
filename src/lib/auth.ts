@@ -24,14 +24,20 @@ export const authOptions: NextAuthOptions = {
       console.log(`✅ Authorized admin login: ${user.email}`)
       return true
     },
-    async session({ session, user }) {
-      // Add isAdmin flag to session (without database dependency for MVP)
+    async session({ session, token }) {
+      // Add isAdmin flag to session using JWT token
       if (session.user?.email && ALLOWED_ADMIN_EMAILS.includes(session.user.email)) {
-        // Add admin flag to session
         session.user.isAdmin = true
       }
       
       return session
+    },
+    async jwt({ token, user, account }) {
+      // Store user info in JWT token
+      if (user) {
+        token.isAdmin = ALLOWED_ADMIN_EMAILS.includes(user.email || '')
+      }
+      return token
     },
   },
   pages: {
@@ -39,7 +45,7 @@ export const authOptions: NextAuthOptions = {
     error: '/admin/login',
   },
   session: {
-    strategy: 'database',
+    strategy: 'jwt',
     maxAge: 4 * 60 * 60, // 4 hours
   },
 }

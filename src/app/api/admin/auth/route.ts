@@ -1,19 +1,40 @@
 import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
 
 /**
  * GET /api/admin/auth
- * Simple auth check for localStorage-based authentication
- * For MVP, we'll just return authenticated: true since the admin page
- * already handles authentication via localStorage
+ * Check NextAuth.js session for admin authentication
  */
 export async function GET() {
   try {
-    // For MVP with simple localStorage auth, we assume if they reached
-    // the admin page, they're authenticated
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({
+        success: false,
+        authenticated: false,
+        message: 'No session found'
+      }, { status: 401 })
+    }
+    
+    if (!session.user.isAdmin) {
+      return NextResponse.json({
+        success: false,
+        authenticated: false,
+        message: 'User is not admin'
+      }, { status: 403 })
+    }
+    
     return NextResponse.json({
       success: true,
       authenticated: true,
-      message: 'Simple auth active'
+      user: {
+        email: session.user.email,
+        name: session.user.name,
+        isAdmin: session.user.isAdmin
+      },
+      message: 'Admin authenticated'
     })
   } catch (error) {
     console.error('Auth check error:', error)
