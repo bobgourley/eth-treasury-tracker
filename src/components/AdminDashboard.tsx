@@ -34,7 +34,6 @@ interface UpdateStatus {
 export default function AdminDashboard() {
   const [isUpdating, setIsUpdating] = useState(false)
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus | null>(null)
-  const [lastCheck, setLastCheck] = useState<unknown>(null)
 
   const triggerDataUpdate = async () => {
     setIsUpdating(true)
@@ -86,15 +85,7 @@ export default function AdminDashboard() {
     }
   }
 
-  const handleUpdateData = async () => {
-    try {
-      const response = await fetch('/api/update-data')
-      const result = await response.json()
-      setLastCheck(result)
-    } catch (error) {
-      console.error('Failed to check update status:', error)
-    }
-  }
+
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
@@ -129,12 +120,7 @@ export default function AdminDashboard() {
             {isUpdating ? 'Updating Stock Data...' : 'Force Stock Update'}
           </button>
 
-          <button
-            onClick={handleUpdateData}
-            className="px-6 py-3 rounded-lg font-semibold bg-green-600 hover:bg-green-700 text-white transition-colors"
-          >
-            Check Status
-          </button>
+
         </div>
 
         {/* API Health Status - Temporarily disabled for MVP deployment */}
@@ -184,7 +170,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Company Details Table */}
-                {(updateStatus as any).companies && (
+                {updateStatus.companies && (
                   <div className="bg-white rounded border">
                     <h4 className="text-lg font-semibold p-4 border-b">Company Details</h4>
                     <div className="overflow-x-auto">
@@ -200,7 +186,7 @@ export default function AdminDashboard() {
                           </tr>
                         </thead>
                         <tbody>
-                          {(updateStatus as any).companies.map((company: any, index: number) => (
+                          {updateStatus.companies.map((company, index) => (
                             <tr key={index} className="border-t hover:bg-gray-50">
                               <td className="p-3 font-medium">{company.name}</td>
                               <td className="p-3 text-blue-600">{company.ticker || 'N/A'}</td>

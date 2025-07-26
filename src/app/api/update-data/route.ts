@@ -11,11 +11,6 @@ export async function POST(request: Request) {
   try {
     console.log('🚀 Starting data update...')
     
-    // Get all active companies
-    const companies = await prisma.company.findMany({
-      where: { isActive: true }
-    })
-    
     // Get live ETH price from CoinGecko API
     let ethPrice = 3680.0 // fallback
     try {
@@ -33,7 +28,7 @@ export async function POST(request: Request) {
     
     // Stock price updates temporarily disabled for deployment
     const shouldUpdateStocks = new URL(request.url).searchParams.get('forceStockUpdate') === 'true'
-    let stockUpdatesCount = 0
+    const stockUpdatesCount = 0
     
     if (shouldUpdateStocks) {
       console.log('📊 Stock price updates requested but temporarily disabled for deployment stability')
