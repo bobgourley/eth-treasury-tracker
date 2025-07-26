@@ -16,8 +16,20 @@ export async function POST() {
       where: { isActive: true }
     })
     
-    // Simple ETH price (hardcoded for now)
-    const ethPrice = 3680.0
+    // Get live ETH price from CoinGecko API
+    let ethPrice = 3680.0 // fallback
+    try {
+      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')
+      if (response.ok) {
+        const data = await response.json()
+        ethPrice = data.ethereum?.usd || ethPrice
+        console.log('✅ Live ETH price fetched:', ethPrice)
+      } else {
+        console.log('⚠️ CoinGecko API failed, using fallback price')
+      }
+    } catch (error) {
+      console.log('⚠️ ETH price fetch error, using fallback:', error)
+    }
     
     // Calculate basic metrics
     const totalEthHeld = companies.reduce((sum, company) => 
