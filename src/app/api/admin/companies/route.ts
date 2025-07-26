@@ -51,7 +51,7 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      companies: companies.map((company: any) => ({
+      companies: companies.map((company) => ({
         ...company,
         marketCap: company.marketCap?.toString(),
         sharesOutstanding: company.sharesOutstanding?.toString()

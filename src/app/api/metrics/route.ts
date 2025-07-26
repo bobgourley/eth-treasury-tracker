@@ -13,16 +13,16 @@ export async function GET() {
         where: { isActive: true },
       })
 
-      const totalEth = companies.reduce((sum: number, company: any) => sum + (company.ethHoldings || 0), 0)
+      const totalEthHeld = companies.reduce((sum: number, company) => sum + (company.ethHoldings || 0), 0)
       const ethPrice = 3680.0 // Current ETH price in USD (approximate)
-      const totalEthValue = totalEth * ethPrice
-      const totalMarketCap = companies.reduce((sum: number, company: any) => sum + Number(company.marketCap || 0), 0)
+      const totalEthValue = totalEthHeld * ethPrice
+      const totalMarketCap = companies.reduce((sum: number, company) => sum + Number(company.marketCap || 0), 0)
       const totalEthSupply = 120500000 // Approximate total ETH supply
-      const ethSupplyPercent = (totalEth / totalEthSupply) * 100
+      const ethSupplyPercent = (totalEthHeld / totalEthSupply) * 100
       
       const newMetrics = await prisma.systemMetrics.create({
         data: {
-          totalEthHoldings: totalEth,
+          totalEthHoldings: totalEthHeld,
           totalCompanies: companies.length,
           ethPrice: ethPrice,
           totalEthValue: totalEthValue,

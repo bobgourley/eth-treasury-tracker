@@ -9,7 +9,7 @@ export async function GET() {
     })
 
     // Convert BigInt to string for JSON serialization
-    const serializedCompanies = companies.map((company: any) => ({
+    const serializedCompanies = companies.map((company) => ({
       ...company,
       marketCap: company.marketCap?.toString(),
       sharesOutstanding: company.sharesOutstanding?.toString(),

@@ -77,7 +77,7 @@ export default function AdminDashboard() {
     }
   }
 
-  const checkUpdateStatus = async () => {
+  const handleUpdateData = async () => {
     try {
       const response = await fetch('/api/update-data')
       const result = await response.json()
@@ -121,7 +121,7 @@ export default function AdminDashboard() {
           </button>
 
           <button
-            onClick={checkUpdateStatus}
+            onClick={handleUpdateData}
             className="px-6 py-3 rounded-lg font-semibold bg-green-600 hover:bg-green-700 text-white transition-colors"
           >
             Check Status
