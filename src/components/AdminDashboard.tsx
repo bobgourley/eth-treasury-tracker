@@ -128,46 +128,7 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        {/* API Health Status */}
-        {(updateStatus?.apiHealth || lastCheck?.apiHealth) && (
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h3 className="text-lg font-semibold mb-3">API Health Status</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center space-x-2">
-                <div
-                  className={`w-3 h-3 rounded-full ${
-                    (updateStatus?.apiHealth?.etherscan || lastCheck?.apiHealth?.etherscan)
-                      ? 'bg-green-500'
-                      : 'bg-red-500'
-                  }`}
-                />
-                <span>Etherscan API</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div
-                  className={`w-3 h-3 rounded-full ${
-                    (updateStatus?.apiHealth?.coingecko || lastCheck?.apiHealth?.coingecko)
-                      ? 'bg-green-500'
-                      : 'bg-red-500'
-                  }`}
-                />
-                <span>CoinGecko API</span>
-              </div>
-            </div>
-            
-            {/* API Errors */}
-            {(updateStatus?.apiHealth?.errors?.length || lastCheck?.apiHealth?.errors?.length) && (
-              <div className="mt-3">
-                <p className="text-sm font-medium text-red-600 mb-2">API Issues:</p>
-                <ul className="text-sm text-red-600 space-y-1">
-                  {(updateStatus?.apiHealth?.errors || lastCheck?.apiHealth?.errors || []).map((error: string, index: number) => (
-                    <li key={index}>• {error}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        )}
+        {/* API Health Status - Temporarily disabled for MVP deployment */}
 
         {/* Update Results */}
         {updateStatus && (
@@ -216,34 +177,7 @@ export default function AdminDashboard() {
         )}
 
         {/* Last Check Status */}
-        {lastCheck && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-blue-800 mb-3">System Status</h3>
-            
-            {lastCheck.lastUpdate && (
-              <p className="text-blue-700 mb-3">
-                Last Update: {new Date(lastCheck.lastUpdate).toLocaleString()}
-              </p>
-            )}
-
-            {lastCheck.metrics && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                <div>
-                  <p className="font-medium">Total Companies</p>
-                  <p className="text-lg">{lastCheck.metrics.totalCompanies}</p>
-                </div>
-                <div>
-                  <p className="font-medium">ETH Price</p>
-                  <p className="text-lg">${formatNumber(lastCheck.metrics.ethPrice || 0)}</p>
-                </div>
-                <div>
-                  <p className="font-medium">Total ETH Holdings</p>
-                  <p className="text-lg">{formatEth(lastCheck.metrics.totalEthHoldings)}</p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+        {/* System Status - Temporarily disabled for MVP deployment */}
 
 
       </div>
