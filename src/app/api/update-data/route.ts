@@ -26,13 +26,54 @@ export async function POST(request: Request) {
       console.log('⚠️ ETH price fetch error, using fallback:', error)
     }
     
-    // Stock price updates temporarily disabled for deployment
+    // Stock price updates re-enabled with Alpha Vantage API
     const shouldUpdateStocks = new URL(request.url).searchParams.get('forceStockUpdate') === 'true'
     const stockUpdatesCount = 0
     
     if (shouldUpdateStocks) {
-      console.log('📊 Stock price updates requested but temporarily disabled for deployment stability')
-      // TODO: Re-enable stock price updates after schema sync
+      console.log('📊 Stock price updates requested')
+      
+      // Update stock prices using Alpha Vantage API
+      const companies = await prisma.company.findMany({
+        where: { isActive: true }
+      })
+      
+      for (const company of companies) {
+        if (!company.ticker) continue
+        
+        try {
+          const alphaVantageKey = process.env.ALPHA_VANTAGE_API_KEY
+          if (!alphaVantageKey) {
+            console.log('⚠️ Alpha Vantage API key not found')
+            continue
+          }
+          
+          const response = await fetch(
+            `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${company.ticker}&apikey=${alphaVantageKey}`
+          )
+          
+          if (response.ok) {
+            const data = await response.json()
+            const quote = data['Global Quote']
+            const stockPrice = parseFloat(quote?.['05. price']) || null
+            
+            if (stockPrice) {
+              await prisma.company.update({
+                where: { id: company.id },
+                data: { 
+                  stockPrice,
+                  lastUpdated: new Date()
+                }
+              })
+              console.log(`✅ Updated stock price for ${company.name}: $${stockPrice}`)
+            }
+          } else {
+            console.log(`⚠️ Failed to fetch stock price for ${company.name}`)
+          }
+        } catch (error) {
+          console.log(`⚠️ Error updating stock price for ${company.name}:`, error)
+        }
+      }
     }
     
     // Refresh company data after stock updates

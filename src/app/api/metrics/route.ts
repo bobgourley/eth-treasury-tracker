@@ -25,14 +25,14 @@ export async function GET() {
     const ethSupplyPercentage = (totalEthHeld / totalEthSupply) * 100
 
     const metrics = {
-      totalEthHeld,
+      totalEthHoldings: totalEthHeld,
       totalEthValue,
       totalMarketCap: totalMarketCap.toString(),
       ethPrice,
-      ethSupplyPercentage,
+      ethSupplyPercent: ethSupplyPercentage,
       totalEthSupply,
-      companyCount: companies.length,
-      lastUpdated: systemMetrics?.lastUpdate || new Date(),
+      totalCompanies: companies.length,
+      lastUpdate: systemMetrics?.lastUpdate || new Date(),
     }
 
     return NextResponse.json(metrics)
@@ -41,14 +41,14 @@ export async function GET() {
     
     // Static fallback metrics for MVP (updated July 2025)
     const fallbackMetrics = {
-      totalEthHeld: 1131276.0, // Sum of all 7 companies: 566776 + 360000 + 125000 + 58000 + 12500 + 6200 + 2800
+      totalEthHoldings: 1131276.0, // Sum of all 7 companies: 566776 + 360000 + 125000 + 58000 + 12500 + 6200 + 2800
       totalEthValue: 1131276.0 * 3680.0, // ETH value at current price (~$4.16B)
       totalMarketCap: '5442000000', // Sum of all company market caps
       ethPrice: 3680.0,
-      ethSupplyPercentage: (1131276.0 / 120500000.0) * 100, // ~0.939%
+      ethSupplyPercent: (1131276.0 / 120500000.0) * 100, // ~0.939%
       totalEthSupply: 120500000.0,
-      companyCount: 7,
-      lastUpdated: new Date(),
+      totalCompanies: 7,
+      lastUpdate: new Date(),
     }
     
     return NextResponse.json(fallbackMetrics)

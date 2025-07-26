@@ -12,7 +12,7 @@ export default function Home() {
                 Ethereum Treasury Tracker
               </h1>
               <p className="text-gray-600 mt-1">
-                Track corporate Ethereum holdings and key metrics
+                Track companies whose primary business model is Ethereum Treasury
               </p>
             </div>
             <div className="text-right">
