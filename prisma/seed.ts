@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import { initializeDefaultApiKeys } from '../src/lib/apiKeys'
 
 const prisma = new PrismaClient()
 
@@ -14,6 +15,7 @@ async function main() {
       password: hashedPassword,
     },
   })
+  console.log('✅ Admin user created successfully!')
 
   // Real Ethereum treasury companies data
   const companies = [
@@ -63,7 +65,10 @@ async function main() {
       name: 'Bit Digital, Inc',
       ticker: 'BTBT',
       ethHoldings: 120306.0,
-      ethAddresses: JSON.stringify(['0xu1v2...w3x4']),
+      ethAddresses: JSON.stringify([
+        '0x742d35Cc6634C0532925a3b8D0c4E5E3F8B5C5E5', // Sample address for testing
+        '0x8ba1f109551bD432803012645Hac136c5C1B5B5B'  // Additional address
+      ]),
       marketCap: BigInt(444000000), // ~$444M approx value
       sharesOutstanding: BigInt(85000000),
       ethPerShare: 0.00142,
@@ -77,7 +82,10 @@ async function main() {
       name: 'BTCS Inc.',
       ticker: 'BTCS',
       ethHoldings: 55788.0,
-      ethAddresses: JSON.stringify(['0xy5z6...a7b8']),
+      ethAddresses: JSON.stringify([
+        '0x742d35Cc6634C0532925a3b8D0c4E5E3F8B5C5E5', // Sample address for testing
+        '0x8ba1f109551bD432803012645Hac136c5C1B5B5B'  // Additional address
+      ]),
       marketCap: BigInt(200000000), // ~$200M approx value
       sharesOutstanding: BigInt(28000000),
       ethPerShare: 0.00199,
@@ -109,6 +117,11 @@ async function main() {
     data: companies,
   })
 
+  // Initialize default API key entries
+  console.log('🔑 Initializing API key entries...')
+  await initializeDefaultApiKeys()
+  console.log('✅ API key entries initialized successfully!')
+
   // Calculate and store system metrics
   const totalEth = companies.reduce((sum, company) => sum + company.ethHoldings, 0)
   const ethPrice = 3680.0 // Current ETH price in USD (approximate)
@@ -130,7 +143,10 @@ async function main() {
     },
   })
 
-  console.log('Database seeded successfully!')
+  console.log('🌱 Database seeded successfully!')
+  console.log(`Created ${companies.length} companies`)
+  console.log('System metrics calculated and stored')
+  console.log('Admin user created: username=admin, password=admin123')
 }
 
 main()

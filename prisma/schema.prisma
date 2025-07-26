@@ -12,8 +12,9 @@ datasource db {
 model Company {
   id                  Int      @id @default(autoincrement())
   name                String
-  ticker              String?
+  ticker              String? @unique
   ethHoldings         Float?   @map("eth_holdings")
+  ethAddress          String?  // Ethereum address for live tracking
   ethAddresses        String?  @map("eth_addresses") // JSON string of addresses
   marketCap           BigInt?  @map("market_cap")
   sharesOutstanding   BigInt?  @map("shares_outstanding")
@@ -49,4 +50,16 @@ model Admin {
   password String
   
   @@map("admins")
+}
+
+model ApiKey {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique // e.g., "etherscan", "coingecko", "alpha_vantage"
+  key         String   // encrypted API key
+  description String?  // description of what this key is for
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  
+  @@map("api_keys")
 }
