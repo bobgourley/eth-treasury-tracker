@@ -21,7 +21,9 @@ export default function SimpleAdminLogin() {
       // Set a simple session flag in localStorage for MVP
       localStorage.setItem('adminAuthenticated', 'true')
       localStorage.setItem('adminEmail', process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@ethereumlist.com')
-      router.push('/admin')
+      
+      // Direct redirect to simple admin page
+      window.location.href = '/admin/simple'
     } else {
       setError('Invalid password. Please try again.')
     }
@@ -97,6 +99,12 @@ export default function SimpleAdminLogin() {
                 MVP temporary authentication
                 <br />
                 Password: <code className="bg-gray-100 px-1 rounded">ethereum2024!</code>
+                <br /><br />
+                <strong>Direct Admin Access:</strong>
+                <br />
+                <a href="/admin/simple" className="text-blue-600 hover:text-blue-800 text-xs">
+                  https://www.ethereumlist.com/admin/simple
+                </a>
               </p>
             </div>
           </div>
