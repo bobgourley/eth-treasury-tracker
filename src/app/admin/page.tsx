@@ -1,46 +1,29 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import AdminLogin from '@/components/AdminLogin'
+import { useSession, signOut } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import AdminDashboard from '@/components/AdminDashboard'
 import CompanyManagement from '@/components/CompanyManagement'
 
 export default function AdminPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const { data: session, status } = useSession()
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState<'dashboard' | 'companies'>('dashboard')
 
   useEffect(() => {
-    checkAuthStatus()
-  }, [])
-
-  const checkAuthStatus = async () => {
-    try {
-      const response = await fetch('/api/admin/auth')
-      const result = await response.json()
-      setIsAuthenticated(result.authenticated)
-    } catch (error) {
-      console.error('Auth check failed:', error)
-      setIsAuthenticated(false)
-    } finally {
-      setIsLoading(false)
+    if (status === 'loading') return // Still loading
+    
+    if (status === 'unauthenticated' || !session?.user?.isAdmin) {
+      router.push('/admin/login')
     }
-  }
-
-  const handleLogin = () => {
-    setIsAuthenticated(true)
-  }
+  }, [session, status, router])
 
   const handleLogout = async () => {
-    try {
-      await fetch('/api/admin/auth', { method: 'DELETE' })
-      setIsAuthenticated(false)
-    } catch (error) {
-      console.error('Logout failed:', error)
-    }
+    await signOut({ callbackUrl: '/admin/login' })
   }
 
-  if (isLoading) {
+  if (status === 'loading') {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-lg">Loading...</div>
@@ -48,8 +31,8 @@ export default function AdminPage() {
     )
   }
 
-  if (!isAuthenticated) {
-    return <AdminLogin onLogin={handleLogin} />
+  if (status === 'unauthenticated' || !session?.user?.isAdmin) {
+    return null // Will redirect to login via useEffect
   }
 
   return (

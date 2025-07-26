@@ -1,122 +1,98 @@
-import bcrypt from 'bcryptjs'
-import { prisma } from '@/lib/db'
+import { NextAuthOptions } from "next-auth"
+import GoogleProvider from "next-auth/providers/google"
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import { prisma } from "./db"
 
-/**
- * Hash a password using bcrypt
- */
-export async function hashPassword(password: string): Promise<string> {
-  const saltRounds = 12
-  return bcrypt.hash(password, saltRounds)
-}
+// List of allowed admin email addresses
+const ALLOWED_ADMIN_EMAILS = [
+  process.env.ADMIN_EMAIL, // Your email from environment variable
+].filter(Boolean) as string[]
 
-/**
- * Verify a password against a hash
- */
-export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  return bcrypt.compare(password, hash)
-}
-
-/**
- * Authenticate admin user
- */
-export async function authenticateAdmin(username: string, password: string): Promise<boolean> {
-  try {
-    const admin = await prisma.admin.findUnique({
-      where: { username }
-    })
-
-    if (!admin) {
-      return false
-    }
-
-    return verifyPassword(password, admin.password)
-  } catch (error) {
-    console.error('Authentication error:', error)
-    return false
-  }
-}
-
-/**
- * Create admin user (for initial setup)
- */
-export async function createAdmin(username: string, password: string): Promise<boolean> {
-  try {
-    const existingAdmin = await prisma.admin.findUnique({
-      where: { username }
-    })
-
-    if (existingAdmin) {
-      throw new Error('Admin user already exists')
-    }
-
-    const hashedPassword = await hashPassword(password)
-    
-    await prisma.admin.create({
-      data: {
-        username,
-        password: hashedPassword
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+  ],
+  callbacks: {
+    async signIn({ user, account, profile }) {
+      // Only allow sign-in for allowed admin emails
+      if (!user.email || !ALLOWED_ADMIN_EMAILS.includes(user.email)) {
+        console.log(`🚫 Unauthorized login attempt from: ${user.email}`)
+        return false
       }
-    })
+      
+      console.log(`✅ Authorized admin login: ${user.email}`)
+      return true
+    },
+    async session({ session, user }) {
+      // Add isAdmin flag to session
+      if (session.user?.email && ALLOWED_ADMIN_EMAILS.includes(session.user.email)) {
+        // Update user record to mark as admin
+        await prisma.user.upsert({
+          where: { email: session.user.email },
+          update: { isAdmin: true },
+          create: {
+            email: session.user.email,
+            name: session.user.name,
+            image: session.user.image,
+            isAdmin: true,
+          },
+        })
+        
+        // Add admin flag to session
+        session.user.isAdmin = true
+      }
+      
+      return session
+    },
+  },
+  pages: {
+    signIn: '/admin/login',
+    error: '/admin/login',
+  },
+  session: {
+    strategy: 'database',
+    maxAge: 4 * 60 * 60, // 4 hours
+  },
+}
 
-    return true
+/**
+ * Helper function to check if user is admin
+ */
+export async function isUserAdmin(email: string): Promise<boolean> {
+  if (!email || !ALLOWED_ADMIN_EMAILS.includes(email)) {
+    return false
+  }
+  
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { isAdmin: true },
+    })
+    
+    return user?.isAdmin || false
   } catch (error) {
-    console.error('Failed to create admin:', error)
+    console.error('Error checking admin status:', error)
     return false
   }
 }
 
 /**
- * Simple session token generation (for demo purposes)
- * In production, use proper JWT or session management
+ * Add an email to the allowed admins list (for future use)
  */
-export function generateSessionToken(): string {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36)
-}
-
-/**
- * Simple but robust session storage for development
- * In production, use Redis or database-backed sessions
- */
-const activeSessions = new Set<string>()
-
-export function createSession(token: string): void {
-  activeSessions.add(token)
-  console.log('✅ Session created:', token.substring(0, 8) + '...')
-  
-  // Auto-expire sessions after 4 hours (longer for development)
-  setTimeout(() => {
-    activeSessions.delete(token)
-    console.log('⏰ Session expired:', token.substring(0, 8) + '...')
-  }, 4 * 60 * 60 * 1000)
-}
-
-export function validateSession(token: string): boolean {
-  const isValid = activeSessions.has(token)
-  console.log('🔐 Session validation:', token.substring(0, 8) + '...', isValid ? 'VALID' : 'INVALID')
-  return isValid
-}
-
-export function destroySession(token: string): void {
-  activeSessions.delete(token)
-  console.log('🗑️ Session destroyed:', token.substring(0, 8) + '...')
-}
-
-/**
- * Verify session from request cookies
- */
-export async function verifySession(): Promise<string | null> {
-  try {
-    const { cookies } = await import('next/headers')
-    const cookieStore = await cookies()
-    const sessionToken = cookieStore.get('session-token')?.value
-    
-    if (!sessionToken || !validateSession(sessionToken)) {
-      return null
-    }
-    
-    return sessionToken
-  } catch (error) {
-    console.error('Session verification error:', error)
-    return null
+export function addAllowedAdmin(email: string): void {
+  if (!ALLOWED_ADMIN_EMAILS.includes(email)) {
+    ALLOWED_ADMIN_EMAILS.push(email)
+    console.log(`✅ Added new admin email: ${email}`)
   }
+}
+
+/**
+ * Get list of allowed admin emails (for debugging)
+ */
+export function getAllowedAdmins(): string[] {
+  return [...ALLOWED_ADMIN_EMAILS]
 }

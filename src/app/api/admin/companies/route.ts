@@ -1,26 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { validateSession } from '@/lib/auth'
-import { cookies } from 'next/headers'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
 
 /**
- * Middleware to check admin authentication
+ * Middleware to check admin authentication using NextAuth.js
  */
 async function checkAuth(): Promise<boolean> {
-  const cookieStore = await cookies()
-  const sessionToken = cookieStore.get('admin_session')?.value
-  
-  console.log('🔍 checkAuth - sessionToken:', sessionToken ? 'exists' : 'missing')
-  
-  if (!sessionToken) {
-    console.log('❌ checkAuth - No session token found')
+  try {
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user?.email) {
+      console.log('❌ checkAuth - No session or email found')
+      return false
+    }
+    
+    if (!session.user.isAdmin) {
+      console.log('❌ checkAuth - User is not admin:', session.user.email)
+      return false
+    }
+    
+    console.log('✅ checkAuth - Admin authenticated:', session.user.email)
+    return true
+  } catch (error) {
+    console.error('❌ checkAuth - Error:', error)
     return false
   }
-  
-  const isValid = validateSession(sessionToken)
-  console.log('🔐 checkAuth - validateSession result:', isValid)
-  
-  return isValid
 }
 
 /**
