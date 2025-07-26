@@ -28,20 +28,8 @@ export const authOptions: NextAuthOptions = {
       return true
     },
     async session({ session, user }) {
-      // Add isAdmin flag to session
+      // Add isAdmin flag to session (without database dependency for MVP)
       if (session.user?.email && ALLOWED_ADMIN_EMAILS.includes(session.user.email)) {
-        // Update user record to mark as admin
-        await prisma.user.upsert({
-          where: { email: session.user.email },
-          update: { isAdmin: true },
-          create: {
-            email: session.user.email,
-            name: session.user.name,
-            image: session.user.image,
-            isAdmin: true,
-          },
-        })
-        
         // Add admin flag to session
         session.user.isAdmin = true
       }
