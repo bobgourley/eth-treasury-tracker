@@ -8,7 +8,14 @@ export async function GET() {
       orderBy: { ethHoldings: 'desc' }
     })
 
-    const systemMetrics = await prisma.systemMetrics.findFirst()
+    // Try to get system metrics, but don't fail if table doesn't exist
+    let systemMetrics = null
+    try {
+      systemMetrics = await prisma.systemMetrics.findFirst()
+    } catch (systemMetricsError) {
+      console.log('SystemMetrics table error (non-critical):', systemMetricsError)
+      // Continue without system metrics
+    }
 
     // ENHANCED DEBUGGING to identify company count discrepancy
     console.log(`\n=== METRICS API ENHANCED DEBUG ===`)
@@ -95,4 +102,4 @@ export async function GET() {
     return NextResponse.json(fallbackMetrics)
   }
 }
-// Force redeploy Sun Jul 27 00:10:59 EDT 2025 - Enhanced debugging for company count issue
+// Force redeploy Sun Jul 27 00:16:04 EDT 2025 - Fix systemMetrics table error causing fallback
