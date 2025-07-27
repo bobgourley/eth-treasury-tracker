@@ -11,9 +11,9 @@ interface ExposureData {
   ethHoldings: number
   ethValue: number
   marketCap: string
-  marketCapWeight: number
+  etcdWeight: number
   ethExposureWeight: number
-  ethConcentrationRisk: number
+  ecmcPercentage: number
   diversificationScore: number
 }
 
@@ -33,7 +33,7 @@ export default function MarketCapWeightedExposure() {
   const [data, setData] = useState<ExposureAnalytics | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [sortBy, setSortBy] = useState<'marketWeight' | 'ethWeight' | 'concentration' | 'name'>('marketWeight')
+  const [sortBy, setSortBy] = useState<'etcdWeight' | 'ethWeight' | 'ecmc' | 'name'>('etcdWeight')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
 
   useEffect(() => {
@@ -59,25 +59,25 @@ export default function MarketCapWeightedExposure() {
     let bValue: number | string
 
     switch (sortBy) {
-      case 'marketWeight':
-        aValue = a.marketCapWeight
-        bValue = b.marketCapWeight
+      case 'etcdWeight':
+        aValue = a.etcdWeight
+        bValue = b.etcdWeight
         break
       case 'ethWeight':
         aValue = a.ethExposureWeight
         bValue = b.ethExposureWeight
         break
-      case 'concentration':
-        aValue = a.ethConcentrationRisk
-        bValue = b.ethConcentrationRisk
+      case 'ecmc':
+        aValue = a.ecmcPercentage
+        bValue = b.ecmcPercentage
         break
       case 'name':
         aValue = a.name
         bValue = b.name
         break
       default:
-        aValue = a.marketCapWeight
-        bValue = b.marketCapWeight
+        aValue = a.etcdWeight
+        bValue = b.etcdWeight
     }
 
     if (typeof aValue === 'string' && typeof bValue === 'string') {
@@ -89,7 +89,7 @@ export default function MarketCapWeightedExposure() {
     return sortOrder === 'asc' ? numA - numB : numB - numA
   })
 
-  const handleSort = (column: 'marketWeight' | 'ethWeight' | 'concentration' | 'name') => {
+  const handleSort = (column: 'etcdWeight' | 'ethWeight' | 'ecmc' | 'name') => {
     if (sortBy === column) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
     } else {
@@ -164,38 +164,31 @@ export default function MarketCapWeightedExposure() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Summary Stats */}
         {data && (
-          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg p-6 mb-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <p className="text-2xl lg:text-3xl font-bold">
-                  {formatPercentage(data.averageEthExposure)}
-                </p>
-                <p className="text-purple-100 text-sm">Average ETH Exposure</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl lg:text-3xl font-bold">
-                  {data.concentrationRisk}
-                </p>
-                <p className="text-purple-100 text-sm">Concentration Risk</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl lg:text-3xl font-bold">
-                  {formatPercentage(data.topThreeConcentration)}
-                </p>
-                <p className="text-purple-100 text-sm">Top 3 Concentration</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl lg:text-3xl font-bold">
-                  {data.diversificationIndex.toFixed(1)}
-                </p>
-                <p className="text-purple-100 text-sm">Diversification Index</p>
-              </div>
+          <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-8 rounded-lg mb-8">
+          <h1 className="text-3xl font-bold mb-4">Market Cap Weighted ETH Exposure</h1>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <div className="text-center">
+              <div className="text-2xl font-bold">{formatPercentage(data.averageEthExposure)}</div>
+              <div className="text-sm opacity-90">Average ETH Exposure</div>
             </div>
-            <div className="text-center mt-4 text-sm text-purple-100">
-              Last updated: {new Date(data.lastUpdated).toLocaleString()}
+            <div className="text-center">
+              <div className="text-2xl font-bold">Baselines</div>
+              <div className="text-sm opacity-90">Market Analysis</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">{formatPercentage(data.topThreeConcentration)}</div>
+              <div className="text-sm opacity-90">Median ETCD</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">{data.diversificationIndex.toFixed(1)}/10</div>
+              <div className="text-sm opacity-90">Diversification Index</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">${data.ethPrice.toLocaleString()}</div>
+              <div className="text-sm opacity-90">ETH Price</div>
             </div>
           </div>
-        )}
+        </div>)}
 
         {/* Risk Analysis Cards */}
         {data && (
@@ -274,31 +267,58 @@ export default function MarketCapWeightedExposure() {
               <thead className="bg-gray-50">
                 <tr>
                   <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50"
+                    onClick={() => handleSort('etcdWeight')}
+                  >
+                    <div className="flex items-center space-x-1">
+                      <span>ETCD</span>
+                      {sortBy === 'etcdWeight' && (
+                        <span className="text-blue-500">
+                          {sortOrder === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50"
                     onClick={() => handleSort('name')}
                   >
-                    Company {sortBy === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
+                    <div className="flex items-center space-x-1">
+                      <span>Company</span>
+                      {sortBy === 'name' && (
+                        <span className="text-blue-500">
+                          {sortOrder === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     ETH Holdings
                   </th>
                   <th 
-                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('marketWeight')}
-                  >
-                    Market Weight {sortBy === 'marketWeight' && (sortOrder === 'asc' ? '↑' : '↓')}
-                  </th>
-                  <th 
-                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50"
                     onClick={() => handleSort('ethWeight')}
                   >
-                    ETH Weight {sortBy === 'ethWeight' && (sortOrder === 'asc' ? '↑' : '↓')}
+                    <div className="flex items-center justify-end space-x-1">
+                      <span>ETH Weight</span>
+                      {sortBy === 'ethWeight' && (
+                        <span className="text-blue-500">
+                          {sortOrder === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
                   </th>
                   <th 
-                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('concentration')}
+                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50"
+                    onClick={() => handleSort('ecmc')}
                   >
-                    Concentration Risk {sortBy === 'concentration' && (sortOrder === 'asc' ? '↑' : '↓')}
+                    <div className="flex items-center justify-end space-x-1">
+                      <span>ECMC</span>
+                      {sortBy === 'ecmc' && (
+                        <span className="text-blue-500">
+                          {sortOrder === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Risk Level
@@ -307,9 +327,18 @@ export default function MarketCapWeightedExposure() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {sortedCompanies?.map((company) => {
-                  const riskLevel = getRiskLevel(company.ethConcentrationRisk)
+                  const riskLevel = getRiskLevel(company.ecmcPercentage)
                   return (
                     <tr key={company.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {formatPercentage(company.etcdWeight)}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div>
@@ -326,13 +355,10 @@ export default function MarketCapWeightedExposure() {
                         {formatEth(company.ethHoldings)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
-                        {formatPercentage(company.marketCapWeight)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
                         {formatPercentage(company.ethExposureWeight)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
-                        {formatPercentage(company.ethConcentrationRisk)}
+                        {formatPercentage(company.ecmcPercentage)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${riskLevel.color}`}>
@@ -364,6 +390,39 @@ export default function MarketCapWeightedExposure() {
               
               <h4 className="font-semibold mb-2 mt-3">Diversification Index</h4>
               <p>Measures how evenly distributed ETH holdings are across companies. Higher scores indicate better diversification.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Explanatory Text */}
+        <div className="mt-12 bg-gray-50 rounded-lg p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Understanding the Metrics</h2>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold text-blue-600 mb-3">ECMC - ETH Component of Market Cap</h3>
+              <p className="text-gray-700 leading-relaxed">
+                ECMC measures what percentage of a company's market capitalization is represented by their ETH holdings. 
+                A higher ECMC indicates that ETH holdings make up a larger portion of the company's total value, 
+                showing how much the company's stock price is tied to ETH performance.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold text-purple-600 mb-3">ETCD - ETH Treasury Company Dominance</h3>
+              <p className="text-gray-700 leading-relaxed">
+                ETCD shows each company's relative size within the ETH treasury company ecosystem. 
+                This metric helps identify which companies have the most influence in the space and 
+                how market dominance is distributed among ETH-holding public companies.
+              </p>
+            </div>
+          </div>
+          
+          <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+            <h4 className="font-semibold text-blue-800 mb-2">Baselines</h4>
+            <div className="grid md:grid-cols-2 gap-4 text-sm text-blue-700">
+              <div><strong>Median ECMC:</strong> The middle value of ETH components across all companies</div>
+              <div><strong>Median ETCD:</strong> The middle value of company dominance in the ETH treasury space</div>
             </div>
           </div>
         </div>

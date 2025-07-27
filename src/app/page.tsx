@@ -7,43 +7,16 @@ export default function Home() {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Ethereum Treasury Tracker
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Track companies whose primary business model is Ethereum Treasury
-              </p>
-            </div>
-            <div className="flex items-center space-x-6">
-              {/* Navigation Menu */}
-              <nav className="hidden md:flex space-x-4">
-                <Link 
-                  href="/analytics/premium-discount" 
-                  className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
-                >
-                  Premium/Discount
-                </Link>
-                <span className="text-gray-300">|</span>
-                <Link 
-                  href="/analytics/exposure" 
-                  className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
-                >
-                  ETH Exposure
-                </Link>
-                <span className="text-gray-300">|</span>
-                <span className="text-gray-400 text-sm">Charts & Tools coming soon</span>
-              </nav>
-              
-              {/* Live Data Indicator */}
-              <div className="text-right">
-                <div className="text-sm text-gray-500">Live Data</div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-medium text-gray-700">Updated Daily</span>
-                </div>
-              </div>
+          <div className="flex justify-between items-center">
+            <h1 className="text-4xl font-bold text-gray-900">Ethereum Treasury Companies</h1>
+            <div className="flex items-center space-x-3 text-xs text-gray-500">
+              <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
+                Premium/Discount
+              </Link>
+              <span>•</span>
+              <Link href="/analytics/exposure" className="hover:text-blue-600 transition-colors">
+                ETH Exposure
+              </Link>
             </div>
           </div>
         </div>

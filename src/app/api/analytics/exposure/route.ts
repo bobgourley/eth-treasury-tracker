@@ -29,17 +29,17 @@ export async function GET() {
       const ethValue = ethHoldings * ethPrice
       const marketCap = Number(company.marketCap || 0)
       
-      // Market cap weight (company's share of total market cap)
-      const marketCapWeight = totalMarketCap > 0 ? (marketCap / totalMarketCap) * 100 : 0
+      // ETH Treasury Company Dominance (company's share of total market cap)
+      const etcdWeight = totalMarketCap > 0 ? (marketCap / totalMarketCap) * 100 : 0
       
       // ETH exposure weight (company's share of total ETH holdings)
       const ethExposureWeight = totalEthValue > 0 ? (ethValue / totalEthValue) * 100 : 0
       
-      // ETH concentration risk (ETH value as % of market cap)
-      const ethConcentrationRisk = marketCap > 0 ? (ethValue / marketCap) * 100 : 0
+      // ETH Component of Market Cap (ETH value as % of market cap)
+      const ecmcPercentage = marketCap > 0 ? (ethValue / marketCap) * 100 : 0
       
       // Diversification score (inverse of concentration, normalized to 0-10)
-      const diversificationScore = Math.max(0, 10 - (ethConcentrationRisk / 10))
+      const diversificationScore = Math.max(0, 10 - (ecmcPercentage / 10))
 
       return {
         id: company.id,
@@ -48,16 +48,16 @@ export async function GET() {
         ethHoldings,
         ethValue,
         marketCap: company.marketCap?.toString() || '0',
-        marketCapWeight,
+        etcdWeight,
         ethExposureWeight,
-        ethConcentrationRisk,
+        ecmcPercentage,
         diversificationScore
       }
     })
 
     // Calculate market-wide statistics
     const averageEthExposure = companiesWithExposure.length > 0 
-      ? companiesWithExposure.reduce((sum, company) => sum + company.ethConcentrationRisk, 0) / companiesWithExposure.length
+      ? companiesWithExposure.reduce((sum, company) => sum + company.ecmcPercentage, 0) / companiesWithExposure.length
       : 0
 
     // Top 3 companies concentration (by market cap)
@@ -76,7 +76,7 @@ export async function GET() {
 
     // Diversification index (Herfindahl-Hirschman Index adapted for ETH exposure)
     const hhi = companiesWithExposure.reduce((sum, company) => {
-      const marketShare = company.marketCapWeight / 100
+      const marketShare = company.etcdWeight / 100
       return sum + (marketShare * marketShare)
     }, 0)
     const diversificationIndex = Math.max(0, 10 - (hhi * 10)) // Normalize to 0-10 scale
