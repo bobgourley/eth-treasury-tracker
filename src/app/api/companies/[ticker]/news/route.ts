@@ -58,50 +58,101 @@ export async function GET(
 
     const companyName = companyNames[ticker.toUpperCase()] || ticker.toUpperCase()
     
-    // Search for news articles about the company
-    const searchQuery = `"${companyName}" OR "${ticker.toUpperCase()}" crypto OR ethereum OR bitcoin`
+    // Try multiple search strategies to maximize results
+    let newsData: NewsAPIResponse | null = null
+    let searchAttempts = 0
     
-    const newsResponse = await fetch(
-      `https://newsapi.org/v2/everything?` +
-      `q=${encodeURIComponent(searchQuery)}&` +
-      `sortBy=publishedAt&` +
-      `pageSize=10&` +
-      `language=en&` +
-      `apiKey=${newsApiKey}`,
-      {
-        next: { revalidate: 3600 } // Cache for 1 hour
+    // Strategy 1: Company name + crypto keywords
+    const searchQueries = [
+      `"${companyName}" AND (crypto OR cryptocurrency OR bitcoin OR ethereum)`,
+      `"${ticker.toUpperCase()}" AND (crypto OR cryptocurrency OR bitcoin OR ethereum)`,
+      `"${companyName}" AND (stock OR shares OR trading)`,
+      `"${ticker.toUpperCase()}" AND (stock OR shares OR trading)`,
+      `${companyName.replace(/Inc|Corp|Ltd|plc/gi, '').trim()} crypto`,
+      `${ticker.toUpperCase()} stock`
+    ]
+    
+    for (const searchQuery of searchQueries) {
+      searchAttempts++
+      console.log(`🔍 News search attempt ${searchAttempts}: "${searchQuery}"`)
+    
+      const newsResponse = await fetch(
+        `https://newsapi.org/v2/everything?` +
+        `q=${encodeURIComponent(searchQuery)}&` +
+        `sortBy=publishedAt&` +
+        `pageSize=20&` +
+        `language=en&` +
+        `from=${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}&` + // Last 30 days
+        `apiKey=${newsApiKey}`,
+        {
+          next: { revalidate: 3600 } // Cache for 1 hour
+        }
+      )
+
+      if (!newsResponse.ok) {
+        console.log(`❌ NewsAPI request failed for query: ${searchQuery} (${newsResponse.status})`)
+        continue // Try next search query
       }
-    )
 
-    if (!newsResponse.ok) {
-      throw new Error(`NewsAPI request failed: ${newsResponse.status}`)
+      const currentNewsData: NewsAPIResponse = await newsResponse.json()
+      
+      if (currentNewsData.articles && currentNewsData.articles.length > 0) {
+        console.log(`✅ Found ${currentNewsData.articles.length} articles with query: "${searchQuery}"`)
+        newsData = currentNewsData
+        break // Found articles, stop searching
+      } else {
+        console.log(`📰 No articles found with query: "${searchQuery}"`)
+      }
     }
-
-    const newsData: NewsAPIResponse = await newsResponse.json()
     
-    // Filter articles to ensure they're relevant to the company
+    // If no articles found with any query
+    if (!newsData || !newsData.articles || newsData.articles.length === 0) {
+      console.log(`❌ No news articles found for ${companyName} (${ticker}) after ${searchAttempts} attempts`)
+      return NextResponse.json({
+        ticker: ticker.toUpperCase(),
+        companyName,
+        articles: [],
+        totalResults: 0,
+        searchAttempts,
+        lastUpdate: new Date().toISOString()
+      })
+    }
+    
+    // Filter articles to ensure they're relevant to the company (less strict filtering)
     const relevantArticles = newsData.articles.filter(article => {
       const titleLower = article.title.toLowerCase()
       const descriptionLower = (article.description || '').toLowerCase()
+      const contentLower = (article.content || '').toLowerCase()
       const companyLower = companyName.toLowerCase()
       const tickerLower = ticker.toLowerCase()
+      const companyShort = companyName.replace(/Inc|Corp|Ltd|plc/gi, '').trim().toLowerCase()
       
-      return titleLower.includes(companyLower) || 
-             titleLower.includes(tickerLower) ||
-             descriptionLower.includes(companyLower) ||
-             descriptionLower.includes(tickerLower)
+      // Check if any part of the article mentions the company
+      const searchTerms = [companyLower, tickerLower, companyShort].filter(term => term.length > 2)
+      
+      return searchTerms.some(term => 
+        titleLower.includes(term) || 
+        descriptionLower.includes(term) ||
+        contentLower.includes(term)
+      )
     })
+    
+    // If strict filtering returns no results, use all articles from the search
+    const finalArticles = relevantArticles.length > 0 ? relevantArticles : newsData.articles
+    
+    console.log(`📊 Filtered ${newsData.articles.length} articles down to ${finalArticles.length} relevant articles`)
 
     // Sort by published date (most recent first)
-    relevantArticles.sort((a, b) => 
+    finalArticles.sort((a, b) => 
       new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     )
 
     return NextResponse.json({
       ticker: ticker.toUpperCase(),
       companyName,
-      articles: relevantArticles.slice(0, 5), // Return top 5 most relevant articles
-      totalResults: relevantArticles.length,
+      articles: finalArticles.slice(0, 5), // Return top 5 most relevant articles
+      totalResults: finalArticles.length,
+      searchAttempts,
       lastUpdate: new Date().toISOString()
     })
 
