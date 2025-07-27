@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import SECFilings from '../../../components/SECFilings'
+import CompanyNews from '../../../components/CompanyNews'
 
 interface CompanyProfile {
   id: number
@@ -371,6 +373,17 @@ export default function CompanyProfilePage() {
                 </Link>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* SEC Filings and News Section */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* SEC Filings */}
+            <SECFilings ticker={company.ticker} />
+            
+            {/* Company News */}
+            <CompanyNews ticker={company.ticker} />
           </div>
         </div>
       </main>
