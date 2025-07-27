@@ -33,6 +33,19 @@ export interface SystemMetrics {
   lastStockUpdate?: Date
 }
 
+export interface DailySnapshot {
+  id: number
+  date: Date
+  totalEthHoldings: number
+  totalEthValue: number
+  totalMarketCap: number
+  ethPrice: number
+  totalEthSupply?: number
+  ethSupplyPercent?: number
+  companyCount: number
+  createdAt: Date
+}
+
 export interface CompanyWithMetrics extends Company {
   formattedMarketCap?: string
   formattedEthHoldings?: string

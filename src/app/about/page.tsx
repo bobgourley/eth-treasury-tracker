@@ -21,6 +21,10 @@ export default function AboutPage() {
                 Charts
               </Link>
               <span>•</span>
+              <Link href="/news" className="hover:text-blue-600 transition-colors">
+                News
+              </Link>
+              <span>•</span>
               <Link href="/" className="hover:text-blue-600 transition-colors">
                 Dashboard
               </Link>
@@ -255,6 +259,8 @@ export default function AboutPage() {
             <Link href="/" className="hover:text-blue-600">Dashboard</Link>
             <Link href="/analytics/premium-discount" className="hover:text-blue-600">Analytics</Link>
             <Link href="/analytics/charts" className="hover:text-blue-600">Charts</Link>
+            <Link href="/news" className="hover:text-blue-600">News</Link>
+            <Link href="/sitemap.xml" className="hover:text-blue-600">Sitemap</Link>
           </div>
         </section>
       </main>

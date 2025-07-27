@@ -22,6 +22,10 @@ export default function Home() {
                 Charts
               </Link>
               <span>•</span>
+              <Link href="/news" className="hover:text-blue-600 transition-colors">
+                News
+              </Link>
+              <span>•</span>
               <Link href="/about" className="hover:text-blue-600 transition-colors">
                 About
               </Link>
@@ -42,6 +46,9 @@ export default function Home() {
             <p> 2025 Ethereum Treasury Tracker. Data sourced from public APIs, CoinGecko, EtherScan, Alpha Vantage and company websites.</p>
             <p className="mt-2">
               Built with Next.js, Tailwind CSS, and Prisma.
+            </p>
+            <p className="mt-2">
+              <Link href="/sitemap.xml" className="text-blue-600 hover:text-blue-700">Sitemap</Link>
             </p>
           </div>
         </div>

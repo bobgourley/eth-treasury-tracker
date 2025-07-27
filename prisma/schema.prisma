@@ -49,6 +49,21 @@ model SystemMetrics {
   @@map("system_metrics")
 }
 
+model DailySnapshot {
+  id                 Int      @id @default(autoincrement())
+  date               DateTime @unique @map("snapshot_date") // Date of the snapshot (YYYY-MM-DD)
+  totalEthHoldings   Float    @map("total_eth_holdings")    // Sum of all companies' ETH holdings
+  totalEthValue      Float    @map("total_eth_value")       // Total ETH value in USD
+  totalMarketCap     Float    @map("total_market_cap")      // Sum of all companies' market caps
+  ethPrice           Float    @map("eth_price")             // ETH price at snapshot time
+  totalEthSupply     Float?   @map("total_eth_supply")      // Total ETH supply at snapshot time
+  ethSupplyPercent   Float?   @map("eth_supply_percent")    // % of total ETH supply held
+  companyCount       Int      @map("company_count")         // Number of active companies tracked
+  createdAt          DateTime @default(now()) @map("created_at")
+  
+  @@map("daily_snapshots")
+}
+
 // NextAuth.js required models
 model Account {
   id                String  @id @default(cuid())
