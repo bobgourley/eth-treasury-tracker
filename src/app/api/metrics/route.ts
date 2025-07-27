@@ -100,21 +100,9 @@ export async function GET() {
   } catch (error: unknown) {
     console.error('Database error, using static fallback metrics:', error)
     
-    // Try to get last known ETH price before falling back to hardcoded value
-    let fallbackEthPrice = 3680.0 // Only used if absolutely no database access
-    try {
-      const lastMetrics = await prisma.systemMetrics.findFirst({
-        select: {
-          ethPrice: true
-        }
-      })
-      if (lastMetrics?.ethPrice) {
-        fallbackEthPrice = lastMetrics.ethPrice
-        console.log('Using last known ETH price from database:', fallbackEthPrice)
-      }
-    } catch (dbError) {
-      console.log('Could not access database for last known ETH price, using hardcoded fallback')
-    }
+    // Use hardcoded ETH price for fallback (database is already having issues)
+    const fallbackEthPrice = 3680.0
+    console.log('Using hardcoded ETH price for fallback:', fallbackEthPrice)
     
     // Static fallback metrics for MVP (updated July 27, 2025 - matches current live data)
     const fallbackMetrics = {
