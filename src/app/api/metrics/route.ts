@@ -19,9 +19,9 @@ export async function GET() {
     })
     console.log('========================\n')
 
-    // Ensure we're counting ALL companies, regardless of status
-    const validCompanies = companies.filter(c => c.ticker && c.name)
-    console.log(`Valid companies after filtering: ${validCompanies.length}`)
+    // Use ALL companies - no filtering needed since all have ticker and name
+    const validCompanies = companies
+    console.log(`Valid companies (all companies): ${validCompanies.length}`)
 
     // Calculate totals using ALL companies
     const totalEthHeld = validCompanies.reduce((sum, company) => sum + (company.ethHoldings || 0), 0)
