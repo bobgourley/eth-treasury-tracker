@@ -101,7 +101,7 @@ export default function ChartsPage() {
               <h1 className="text-4xl font-bold text-gray-900">ETH Holdings Charts</h1>
               <div className="flex items-center space-x-3 text-xs text-gray-500">
                 <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
-                  Premium/Discount
+                  ETH Basis
                 </Link>
                 <span>•</span>
                 <Link href="/analytics/exposure" className="hover:text-blue-600 transition-colors">
@@ -205,7 +205,7 @@ export default function ChartsPage() {
             <h1 className="text-4xl font-bold text-gray-900">ETH Holdings Charts</h1>
             <div className="flex items-center space-x-3 text-xs text-gray-500">
               <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
-                Premium/Discount
+                ETH Basis
               </Link>
               <span>•</span>
               <Link href="/analytics/exposure" className="hover:text-blue-600 transition-colors">

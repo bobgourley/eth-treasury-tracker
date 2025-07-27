@@ -144,7 +144,7 @@ export default function MarketCapWeightedExposure() {
             <div>
               <div className="flex items-center space-x-3 text-xs text-gray-500 mb-2">
                 <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
-                  Premium/Discount
+                  ETH Basis
                 </Link>
                 <span>•</span>
                 <Link href="/analytics/exposure" className="hover:text-blue-600 transition-colors">

@@ -9,9 +9,10 @@ export default function EtfsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <h1 className="text-4xl font-bold text-gray-900">Ethereum ETFs</h1>
-            <div className="flex items-center space-x-3 text-xs text-gray-500">
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-3 text-xs text-gray-500">
               <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
-                Premium/Discount
+                ETH Basis
               </Link>
               <span>•</span>
               <Link href="/analytics/exposure" className="hover:text-blue-600 transition-colors">

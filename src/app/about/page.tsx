@@ -10,7 +10,7 @@ export default function AboutPage() {
             <h1 className="text-4xl font-bold text-gray-900">About</h1>
             <div className="flex items-center space-x-3 text-xs text-gray-500">
               <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
-                Premium/Discount
+                ETH Basis
               </Link>
               <span>•</span>
               <Link href="/analytics/exposure" className="hover:text-blue-600 transition-colors">
@@ -167,7 +167,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <h4 className="text-xl font-bold text-gray-900">
-                  <Link href="/analytics/premium-discount" className="hover:text-blue-600">Premium/Discount Analytics</Link>
+                  <Link href="/analytics/premium-discount" className="hover:text-blue-600">ETH Basis Analytics</Link>
                 </h4>
                 <p className="text-gray-600">Identify undervalued and overvalued ETH treasury companies</p>
               </div>

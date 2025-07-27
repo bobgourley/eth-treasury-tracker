@@ -134,7 +134,7 @@ export default function PremiumDiscountAnalytics() {
                 </Link>
                 <span>•</span>
                 <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
-                  Premium/Discount
+                  ETH Basis
                 </Link>
                 <span>•</span>
                 <Link href="/analytics/exposure" className="hover:text-blue-600 transition-colors">
@@ -158,7 +158,7 @@ export default function PremiumDiscountAnalytics() {
                 </Link>
               </div>
               <h1 className="text-3xl font-bold text-gray-900">
-                ETH Treasury Premium/Discount Analysis
+                ETH Treasury Basis Analysis
               </h1>
               <p className="text-gray-600 mt-1">
                 Analyze how companies trade relative to their ETH holdings value
@@ -239,7 +239,7 @@ export default function PremiumDiscountAnalytics() {
                     className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSort('premium')}
                   >
-                    Premium/Discount {sortBy === 'premium' && (sortOrder === 'asc' ? '↑' : '↓')}
+                    ETH Basis {sortBy === 'premium' && (sortOrder === 'asc' ? '↑' : '↓')}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Difference
