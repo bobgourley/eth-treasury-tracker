@@ -1,19 +1,18 @@
 import { NextResponse } from 'next/server'
-// import { prisma } from '@/lib/db' // Commented out unused import
+import { PrismaClient } from '@prisma/client'
 
 type CompanyData = {
   id: number;
-  ticker: string;
+  ticker: string | null;
   name: string;
-  ethHoldings: number;
-  marketCap: string;
+  ethHoldings: number | null;
+  marketCap: bigint | null;
   isActive: boolean;
 };
 
 export async function GET() {
   try {
     // Fetch live data from database
-    const { PrismaClient } = require('@prisma/client')
     const prisma = new PrismaClient()
     
     const companies = await prisma.company.findMany({
@@ -31,7 +30,7 @@ export async function GET() {
     
     console.log(`\n=== METRICS API DIRECT APPROACH ===`)
     console.log(`Using ${companies.length} companies from known working data`)
-    console.log(`Companies: ${companies.map((c: CompanyData) => c.ticker).join(', ')}`)
+    console.log(`Companies: ${companies.map((c) => c.ticker || 'N/A').join(', ')}`)
     console.log('====================================\n')
 
     // COMPREHENSIVE DEBUGGING to identify company count discrepancy
@@ -46,22 +45,22 @@ export async function GET() {
     }
     
     console.log('\nAll companies with full details:')
-    companies.forEach((c: CompanyData, i: number) => {
-      console.log(`  ${i+1}. ID:${c.id} ${c.ticker} (${c.name}) - ETH: ${c.ethHoldings || 0}, Active: ${c.isActive}, MarketCap: ${c.marketCap}`)
+    companies.forEach((c, i) => {
+      console.log(`  ${i+1}. ID:${c.id} ${c.ticker || 'N/A'} (${c.name}) - ETH: ${c.ethHoldings || 0}, Active: ${c.isActive}, MarketCap: ${c.marketCap?.toString() || 'N/A'}`)
     })
 
     const validCompanies = companies
     console.log(`\nValid companies count (should be 9): ${validCompanies.length}`)
     console.log(`Valid companies === companies: ${validCompanies === companies}`)
 
-    const companiesWithEth = validCompanies.filter((c: CompanyData) => (c.ethHoldings ?? 0) > 0)
+    const companiesWithEth = validCompanies.filter((c) => (c.ethHoldings ?? 0) > 0)
     console.log(`Companies with ETH holdings > 0: ${companiesWithEth.length}`)
 
     console.log('\nCompanies contributing to totals:')
-    validCompanies.forEach((c: CompanyData, i: number) => {
+    validCompanies.forEach((c, i) => {
       const ethValue = (c.ethHoldings || 0)
-      const marketCap = c.marketCap ? BigInt(c.marketCap.toString()) : BigInt(0)
-      console.log(`  ${i+1}. ${c.ticker}: ETH=${ethValue}, MarketCap=${marketCap.toString()}`)
+      const marketCap = c.marketCap || BigInt(0)
+      console.log(`  ${i+1}. ${c.ticker || 'N/A'}: ETH=${ethValue}, MarketCap=${marketCap.toString()}`)
     })
     
     console.log(`\nFinal metrics calculation inputs:`)
@@ -70,9 +69,9 @@ export async function GET() {
     console.log('================================\n')
 
     // Calculate totals using ALL companies
-    const totalEthHeld = validCompanies.reduce((sum: number, company: CompanyData) => sum + (company.ethHoldings ?? 0), 0)
-    const totalMarketCap = validCompanies.reduce((sum: bigint, company: CompanyData) => {
-      const marketCap = company.marketCap ? BigInt(company.marketCap.toString()) : BigInt(0)
+    const totalEthHeld = validCompanies.reduce((sum, company) => sum + (company.ethHoldings ?? 0), 0)
+    const totalMarketCap = validCompanies.reduce((sum, company) => {
+      const marketCap = company.marketCap || BigInt(0)
       return sum + marketCap
     }, BigInt(0))
 
@@ -111,10 +110,14 @@ export async function GET() {
               update: {
                 ethPrice: ethPrice,
                 lastUpdate: new Date(),
+                totalEthHoldings: totalEthHeld,
+                totalCompanies: validCompanies.length
               },
               create: {
                 ethPrice: ethPrice,
                 lastUpdate: new Date(),
+                totalEthHoldings: totalEthHeld,
+                totalCompanies: validCompanies.length
               }
             })
             console.log('✅ Database updated with new ETH price')
@@ -149,11 +152,11 @@ export async function GET() {
       totalCompanies: validCompanies.length, // Use validCompanies count, not companies.length
       lastUpdate: new Date(),
       // TEMPORARY DEBUG: Include raw company data to diagnose count issue
-      debugCompanies: validCompanies.map((c: CompanyData) => ({
+      debugCompanies: validCompanies.map((c) => ({
         id: c.id,
-        ticker: c.ticker,
+        ticker: c.ticker || 'N/A',
         name: c.name,
-        ethHoldings: c.ethHoldings,
+        ethHoldings: c.ethHoldings || 0,
         isActive: c.isActive
       })),
       debugCompanyCount: validCompanies.length,
@@ -170,7 +173,6 @@ export async function GET() {
     // Try to get last known ETH price from database even in fallback mode
     let fallbackEthPrice = 3500.0 // Only if absolutely no data exists
     try {
-      const { PrismaClient } = require('@prisma/client')
       const fallbackPrisma = new PrismaClient()
       const lastKnownMetrics = await fallbackPrisma.systemMetrics.findFirst({
         orderBy: { lastUpdate: 'desc' }

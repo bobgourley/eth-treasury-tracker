@@ -43,6 +43,8 @@ export async function POST(request: NextRequest) {
       create: {
         ethPrice: newEthPrice,
         lastUpdate: new Date(),
+        totalEthHoldings: 0, // Will be updated by metrics API
+        totalCompanies: 0, // Will be updated by metrics API
       }
     })
     
