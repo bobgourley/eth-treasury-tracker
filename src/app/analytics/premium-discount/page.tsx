@@ -128,12 +128,16 @@ export default function PremiumDiscountAnalytics() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center space-x-4 mb-2">
-                <Link href="/" className="text-blue-600 hover:text-blue-800">
-                  ← Back to Dashboard
+                <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
+                  Premium/Discount
                 </Link>
-                <span className="text-gray-300">|</span>
-                <Link href="/analytics/exposure" className="text-blue-600 hover:text-blue-800">
-                  ETH Exposure Analysis →
+                <span>•</span>
+                <Link href="/analytics/exposure" className="hover:text-blue-600 transition-colors">
+                  ETH Exposure
+                </Link>
+                <span>•</span>
+                <Link href="/analytics/charts" className="hover:text-blue-600 transition-colors">
+                  Charts
                 </Link>
               </div>
               <h1 className="text-3xl font-bold text-gray-900">

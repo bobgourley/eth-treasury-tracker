@@ -141,13 +141,21 @@ export default function MarketCapWeightedExposure() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center space-x-4 mb-2">
-                <Link href="/analytics/premium-discount" className="text-blue-600 hover:text-blue-800">
-                  ← Premium/Discount Analysis
+              <div className="flex items-center space-x-3 text-xs text-gray-500 mb-2">
+                <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
+                  Premium/Discount
                 </Link>
-                <span className="text-gray-300">|</span>
-                <Link href="/" className="text-blue-600 hover:text-blue-800">
-                  Back to Dashboard
+                <span>•</span>
+                <Link href="/analytics/exposure" className="hover:text-blue-600 transition-colors">
+                  ETH Exposure
+                </Link>
+                <span>•</span>
+                <Link href="/analytics/charts" className="hover:text-blue-600 transition-colors">
+                  Charts
+                </Link>
+                <span>•</span>
+                <Link href="/" className="hover:text-blue-600 transition-colors">
+                  Dashboard
                 </Link>
               </div>
               <h1 className="text-3xl font-bold text-gray-900">

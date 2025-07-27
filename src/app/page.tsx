@@ -17,6 +17,10 @@ export default function Home() {
               <Link href="/analytics/exposure" className="hover:text-blue-600 transition-colors">
                 ETH Exposure
               </Link>
+              <span>•</span>
+              <Link href="/analytics/charts" className="hover:text-blue-600 transition-colors">
+                Charts
+              </Link>
             </div>
           </div>
         </div>
