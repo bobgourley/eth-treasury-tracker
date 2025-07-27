@@ -3,20 +3,29 @@ import { prisma } from '@/lib/db'
 
 export async function GET() {
   try {
+    // Get ALL companies without any filtering
     const companies = await prisma.company.findMany({
       orderBy: { ethHoldings: 'desc' }
     })
 
     const systemMetrics = await prisma.systemMetrics.findFirst()
 
-    // Debug logging to identify company count issue
-    console.log(`Metrics API: Found ${companies.length} companies in database`)
-    console.log('Company tickers:', companies.map(c => c.ticker).join(', '))
-    console.log('Company ETH holdings:', companies.map(c => `${c.ticker}: ${c.ethHoldings}`).join(', '))
+    // Comprehensive logging to debug company count issue
+    console.log(`\n=== METRICS API DEBUG ===`)
+    console.log(`Total companies found: ${companies.length}`)
+    console.log('All companies:')
+    companies.forEach((c, i) => {
+      console.log(`  ${i+1}. ${c.ticker} (${c.name}) - ETH: ${c.ethHoldings}, Active: ${c.isActive}`)
+    })
+    console.log('========================\n')
 
-    // Calculate totals (ensure all companies are included even with NULL values)
-    const totalEthHeld = companies.reduce((sum, company) => sum + (company.ethHoldings || 0), 0)
-    const totalMarketCap = companies.reduce((sum, company) => {
+    // Ensure we're counting ALL companies, regardless of status
+    const validCompanies = companies.filter(c => c.ticker && c.name)
+    console.log(`Valid companies after filtering: ${validCompanies.length}`)
+
+    // Calculate totals using ALL companies
+    const totalEthHeld = validCompanies.reduce((sum, company) => sum + (company.ethHoldings || 0), 0)
+    const totalMarketCap = validCompanies.reduce((sum, company) => {
       const marketCap = company.marketCap ? BigInt(company.marketCap.toString()) : BigInt(0)
       return sum + marketCap
     }, BigInt(0))
@@ -36,7 +45,7 @@ export async function GET() {
       ethPrice,
       ethSupplyPercent: ethSupplyPercentage,
       totalEthSupply,
-      totalCompanies: companies.length,
+      totalCompanies: validCompanies.length, // Use validCompanies count, not companies.length
       lastUpdate: systemMetrics?.lastUpdate || new Date(),
       // ETH price tracking fields (will be enabled after schema migration)
       // ethPriceLastUpdate: systemMetrics?.ethPriceLastUpdate || new Date(),
