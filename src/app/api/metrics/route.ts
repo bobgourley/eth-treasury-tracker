@@ -10,18 +10,30 @@ export async function GET() {
 
     const systemMetrics = await prisma.systemMetrics.findFirst()
 
-    // Comprehensive logging to debug company count issue
-    console.log(`\n=== METRICS API DEBUG ===`)
-    console.log(`Total companies found: ${companies.length}`)
-    console.log('All companies:')
+    // ENHANCED DEBUGGING to identify company count discrepancy
+    console.log(`\n=== METRICS API ENHANCED DEBUG ===`)
+    console.log(`Total companies found from database: ${companies.length}`)
+    console.log('All companies with full details:')
     companies.forEach((c, i) => {
-      console.log(`  ${i+1}. ${c.ticker} (${c.name}) - ETH: ${c.ethHoldings}, Active: ${c.isActive}`)
+      console.log(`  ${i+1}. ID:${c.id} ${c.ticker} (${c.name}) - ETH: ${c.ethHoldings || 0}, Active: ${c.isActive}, MarketCap: ${c.marketCap}`)
     })
-    console.log('========================\n')
-
-    // Use ALL companies - no filtering needed since all have ticker and name
+    
+    // Use ALL companies - no filtering whatsoever
     const validCompanies = companies
-    console.log(`Valid companies (all companies): ${validCompanies.length}`)
+    console.log(`\nValid companies count (should be 9): ${validCompanies.length}`)
+    
+    // Double-check: count companies that contribute to totals
+    const companiesWithEth = validCompanies.filter(c => c.ethHoldings > 0)
+    console.log(`Companies with ETH holdings > 0: ${companiesWithEth.length}`)
+    
+    // Log the actual calculation inputs
+    console.log('Companies contributing to totals:')
+    validCompanies.forEach((c, i) => {
+      const ethValue = (c.ethHoldings || 0)
+      const marketCap = c.marketCap ? BigInt(c.marketCap.toString()) : BigInt(0)
+      console.log(`  ${i+1}. ${c.ticker}: ETH=${ethValue}, MarketCap=${marketCap.toString()}`)
+    })
+    console.log('================================\n')
 
     // Calculate totals using ALL companies
     const totalEthHeld = validCompanies.reduce((sum, company) => sum + (company.ethHoldings || 0), 0)
@@ -83,4 +95,4 @@ export async function GET() {
     return NextResponse.json(fallbackMetrics)
   }
 }
-// Force redeploy Sun Jul 27 00:05:14 EDT 2025
+// Force redeploy Sun Jul 27 00:10:59 EDT 2025 - Enhanced debugging for company count issue
