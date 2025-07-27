@@ -402,16 +402,16 @@ export default function MarketCapWeightedExposure() {
             <div>
               <h3 className="text-lg font-semibold text-blue-600 mb-3">ECMC - ETH Component of Market Cap</h3>
               <p className="text-gray-700 leading-relaxed">
-                ECMC measures what percentage of a company's market capitalization is represented by their ETH holdings. 
-                A higher ECMC indicates that ETH holdings make up a larger portion of the company's total value, 
-                showing how much the company's stock price is tied to ETH performance.
+                ECMC measures what percentage of a company&apos;s market capitalization is represented by their ETH holdings. 
+                A higher ECMC indicates that ETH holdings make up a larger portion of the company&apos;s total value, 
+                showing how much the company&apos;s stock price is tied to ETH performance.
               </p>
             </div>
             
             <div>
               <h3 className="text-lg font-semibold text-purple-600 mb-3">ETCD - ETH Treasury Company Dominance</h3>
               <p className="text-gray-700 leading-relaxed">
-                ETCD shows each company's relative size within the ETH treasury company ecosystem. 
+                ETCD shows each company&apos;s relative size within the ETH treasury company ecosystem. 
                 This metric helps identify which companies have the most influence in the space and 
                 how market dominance is distributed among ETH-holding public companies.
               </p>
