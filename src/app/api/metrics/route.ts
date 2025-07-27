@@ -17,7 +17,13 @@ export async function GET() {
     // Try to get system metrics, but don't fail if table doesn't exist
     let systemMetrics = null
     try {
-      systemMetrics = await prisma.systemMetrics.findFirst()
+      // Only query fields that exist in production database
+      systemMetrics = await prisma.systemMetrics.findFirst({
+        select: {
+          ethPrice: true,
+          lastUpdate: true
+        }
+      })
     } catch (systemMetricsError) {
       console.log('SystemMetrics table error (non-critical):', systemMetricsError)
       // Continue without system metrics
@@ -104,7 +110,11 @@ export async function GET() {
     // Try to get last known ETH price before falling back to hardcoded value
     let fallbackEthPrice = 3680.0 // Only used if absolutely no database access
     try {
-      const lastMetrics = await prisma.systemMetrics.findFirst()
+      const lastMetrics = await prisma.systemMetrics.findFirst({
+        select: {
+          ethPrice: true
+        }
+      })
       if (lastMetrics?.ethPrice) {
         fallbackEthPrice = lastMetrics.ethPrice
         console.log('Using last known ETH price from database:', fallbackEthPrice)
