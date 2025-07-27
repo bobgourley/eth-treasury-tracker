@@ -136,7 +136,38 @@ export async function GET() {
       ethPriceSource = 'database_fallback'
       console.log(`🔄 Using most recent database price: $${ethPrice}`)
     }
-    const totalEthSupply = 120500000.0 // Static value for MVP
+    // Fetch live ETH supply from Etherscan API
+    let totalEthSupply = 120500000.0 // Fallback value
+    let ethSupplySource = 'static_fallback'
+    
+    try {
+      const etherscanApiKey = process.env.ETHERSCAN_API_KEY
+      if (etherscanApiKey) {
+        console.log('📊 Fetching live ETH supply from Etherscan...')
+        const etherscanResponse = await fetch(
+          `https://api.etherscan.io/api?module=stats&action=ethsupply&apikey=${etherscanApiKey}`,
+          { next: { revalidate: 86400 } } // Cache for 24 hours (ETH supply changes slowly)
+        )
+        
+        if (etherscanResponse.ok) {
+          const etherscanData = await etherscanResponse.json()
+          if (etherscanData.status === '1' && etherscanData.result) {
+            // Etherscan returns supply in wei, convert to ETH
+            totalEthSupply = parseFloat(etherscanData.result) / 1e18
+            ethSupplySource = 'etherscan_live'
+            console.log(`✅ Live ETH supply: ${totalEthSupply.toLocaleString()} ETH`)
+          } else {
+            console.warn('⚠️ Etherscan API returned error:', etherscanData.message)
+          }
+        } else {
+          console.warn('⚠️ Etherscan API request failed:', etherscanResponse.status)
+        }
+      } else {
+        console.log('⚠️ No Etherscan API key found, using fallback ETH supply')
+      }
+    } catch (error) {
+      console.error('❌ Error fetching ETH supply from Etherscan:', error)
+    }
 
     // Calculate derived metrics
     const totalEthValue = totalEthHeld * ethPrice
@@ -149,6 +180,7 @@ export async function GET() {
       ethPrice,
       ethSupplyPercent: ethSupplyPercentage,
       totalEthSupply,
+      ethSupplySource,
       totalCompanies: validCompanies.length, // Use validCompanies count, not companies.length
       lastUpdate: new Date(),
       // TEMPORARY DEBUG: Include raw company data to diagnose count issue
@@ -188,14 +220,40 @@ export async function GET() {
       console.log('Cannot access database for ETH price, using emergency fallback:', fallbackEthPrice)
     }
     
+    // Try to get live ETH supply even in fallback mode
+    let fallbackEthSupply = 120500000.0 // Static fallback
+    let fallbackEthSupplySource = 'static_fallback'
+    try {
+      const etherscanApiKey = process.env.ETHERSCAN_API_KEY
+      if (etherscanApiKey) {
+        console.log('📊 Attempting to fetch live ETH supply in fallback mode...')
+        const etherscanResponse = await fetch(
+          `https://api.etherscan.io/api?module=stats&action=ethsupply&apikey=${etherscanApiKey}`,
+          { next: { revalidate: 86400 } } // Cache for 24 hours
+        )
+        
+        if (etherscanResponse.ok) {
+          const etherscanData = await etherscanResponse.json()
+          if (etherscanData.status === '1' && etherscanData.result) {
+            fallbackEthSupply = parseFloat(etherscanData.result) / 1e18
+            fallbackEthSupplySource = 'etherscan_live_fallback'
+            console.log(`✅ Live ETH supply in fallback: ${fallbackEthSupply.toLocaleString()} ETH`)
+          }
+        }
+      }
+    } catch (error) {
+      console.log('Could not fetch live ETH supply in fallback mode, using static value')
+    }
+    
     // Static fallback metrics for MVP (updated July 27, 2025 - matches current live data)
     const fallbackMetrics = {
       totalEthHoldings: 1131276.0, // Current sum from live companies API
       totalEthValue: 1131276.0 * fallbackEthPrice, // ETH value at last known price
       totalMarketCap: '5442000000', // Current sum from live companies API
       ethPrice: fallbackEthPrice,
-      ethSupplyPercent: (1131276.0 / 120500000.0) * 100, // ~0.939%
-      totalEthSupply: 120500000.0,
+      ethSupplyPercent: (1131276.0 / fallbackEthSupply) * 100,
+      totalEthSupply: fallbackEthSupply,
+      ethSupplySource: fallbackEthSupplySource,
       totalCompanies: 9, // Correct count of all 9 companies
       lastUpdate: new Date(),
     }

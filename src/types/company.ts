@@ -27,6 +27,8 @@ export interface SystemMetrics {
   totalEthValue?: number
   totalMarketCap?: number
   ethSupplyPercent?: number
+  totalEthSupply?: number
+  ethSupplySource?: string
   lastUpdate: Date
   lastStockUpdate?: Date
 }
