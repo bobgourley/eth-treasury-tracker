@@ -9,14 +9,17 @@ export async function GET() {
 
     const systemMetrics = await prisma.systemMetrics.findFirst()
 
+    // Debug logging to identify company count issue
+    console.log(`Metrics API: Found ${companies.length} companies in database`)
+    console.log('Company tickers:', companies.map(c => c.ticker).join(', '))
+    console.log('Company ETH holdings:', companies.map(c => `${c.ticker}: ${c.ethHoldings}`).join(', '))
+
     // Calculate totals (ensure all companies are included even with NULL values)
     const totalEthHeld = companies.reduce((sum, company) => sum + (company.ethHoldings || 0), 0)
     const totalMarketCap = companies.reduce((sum, company) => {
       const marketCap = company.marketCap ? BigInt(company.marketCap.toString()) : BigInt(0)
       return sum + marketCap
     }, BigInt(0))
-    
-    console.log(`Metrics API: Found ${companies.length} companies in database`)
 
     // Get ETH price (use last known value from database, only hardcode if no database value exists)
     const ethPrice = systemMetrics?.ethPrice || 3680.0
