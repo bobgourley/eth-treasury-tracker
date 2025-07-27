@@ -116,15 +116,15 @@ export async function GET() {
       console.log('Could not access database for last known ETH price, using hardcoded fallback')
     }
     
-    // Static fallback metrics for MVP (updated July 2025)
+    // Static fallback metrics for MVP (updated July 27, 2025 - matches current live data)
     const fallbackMetrics = {
-      totalEthHoldings: 1130020.0, // Sum of all 9 companies: 566776 + 360807 + 120306 + 55788 + 10170 + 7023 + 5500 + 2550 + 2100
-      totalEthValue: 1130020.0 * fallbackEthPrice, // ETH value at last known price
-      totalMarketCap: '2899000000', // Sum of all 9 company market caps
+      totalEthHoldings: 1131276.0, // Current sum from live companies API
+      totalEthValue: 1131276.0 * fallbackEthPrice, // ETH value at last known price
+      totalMarketCap: '5442000000', // Current sum from live companies API
       ethPrice: fallbackEthPrice,
-      ethSupplyPercent: (1130020.0 / 120500000.0) * 100, // ~0.938%
+      ethSupplyPercent: (1131276.0 / 120500000.0) * 100, // ~0.939%
       totalEthSupply: 120500000.0,
-      totalCompanies: 9,
+      totalCompanies: 9, // Correct count of all 9 companies
       lastUpdate: new Date(),
     }
     

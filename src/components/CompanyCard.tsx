@@ -104,7 +104,7 @@ export default function CompanyCard({ company, rank, ethPrice }: CompanyCardProp
               <div>
                 <p className="text-gray-600">ETH Value</p>
                 <p className="font-semibold text-blue-600">
-                  {company.ethHoldings ? formatNumber(company.ethHoldings * 3680) : 'N/A'}
+                  {company.ethHoldings && ethPrice ? formatNumber(company.ethHoldings * ethPrice) : 'N/A'}
                 </p>
               </div>
               
