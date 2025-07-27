@@ -1,7 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
+
+interface NewsApiArticle {
+  title: string
+  description: string
+  url: string
+  urlToImage: string | null
+  publishedAt: string
+  source: {
+    name: string
+  }
+}
 
 interface NewsArticle {
   title: string
@@ -16,7 +27,7 @@ interface NewsArticle {
   ticker?: string
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const newsApiKey = process.env.NEWS_API_KEY
     
@@ -93,14 +104,14 @@ export async function GET(request: NextRequest) {
             
             // Process and filter articles
             const processedArticles = data.articles
-              .filter((article: any) => 
+              .filter((article: NewsApiArticle) => 
                 article.title && 
                 article.description && 
                 article.url &&
                 article.title !== '[Removed]' &&
                 article.description !== '[Removed]'
               )
-              .map((article: any) => {
+              .map((article: NewsApiArticle) => {
                 // Try to match article to a specific company
                 let matchedCompany = null
                 let matchedTicker = null
