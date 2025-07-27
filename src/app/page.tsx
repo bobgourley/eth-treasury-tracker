@@ -23,10 +23,17 @@ export default function Home() {
                   href="/analytics/premium-discount" 
                   className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
                 >
-                  Premium/Discount Analysis
+                  Premium/Discount
                 </Link>
                 <span className="text-gray-300">|</span>
-                <span className="text-gray-400 text-sm">More analytics coming soon</span>
+                <Link 
+                  href="/analytics/exposure" 
+                  className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                >
+                  ETH Exposure
+                </Link>
+                <span className="text-gray-300">|</span>
+                <span className="text-gray-400 text-sm">Charts & Tools coming soon</span>
               </nav>
               
               {/* Live Data Indicator */}
