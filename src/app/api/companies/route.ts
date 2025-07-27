@@ -149,8 +149,7 @@ export async function GET() {
   try {
     // Try database first
     const companies = await prisma.company.findMany({
-      where: { isActive: true },
-      orderBy: { ethHoldings: 'desc' },
+      orderBy: { ethHoldings: 'desc' }
     })
 
     // Convert BigInt to string for JSON serialization

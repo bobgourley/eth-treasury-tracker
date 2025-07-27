@@ -6,7 +6,6 @@ export async function GET() {
     // Fetch companies and current ETH price
     const [companies, systemMetrics] = await Promise.all([
       prisma.company.findMany({
-        where: { isActive: true },
         orderBy: { ethHoldings: 'desc' }
       }),
       prisma.systemMetrics.findFirst()
