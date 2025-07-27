@@ -353,14 +353,14 @@ export default function MarketCapWeightedExposure() {
           <div className="grid md:grid-cols-2 gap-4 text-sm text-indigo-800">
             <div>
               <h4 className="font-semibold mb-2">Market Weight</h4>
-              <p>Company's market cap as percentage of total market cap across all tracked companies.</p>
+              <p>Company&apos;s market cap as percentage of total market cap across all tracked companies.</p>
               
               <h4 className="font-semibold mb-2 mt-3">ETH Weight</h4>
-              <p>Company's ETH holdings as percentage of total ETH held by all tracked companies.</p>
+              <p>Company&apos;s ETH holdings as percentage of total ETH held by all tracked companies.</p>
             </div>
             <div>
               <h4 className="font-semibold mb-2">Concentration Risk</h4>
-              <p>How much of the company's value comes from ETH holdings. Higher percentages indicate greater exposure to ETH price movements.</p>
+              <p>How much of the company&apos;s value comes from ETH holdings. Higher percentages indicate greater exposure to ETH price movements.</p>
               
               <h4 className="font-semibold mb-2 mt-3">Diversification Index</h4>
               <p>Measures how evenly distributed ETH holdings are across companies. Higher scores indicate better diversification.</p>

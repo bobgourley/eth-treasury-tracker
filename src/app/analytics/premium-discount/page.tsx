@@ -276,11 +276,11 @@ export default function PremiumDiscountAnalytics() {
           <div className="grid md:grid-cols-2 gap-4 text-sm text-blue-800">
             <div>
               <h4 className="font-semibold mb-2">Premium (Green)</h4>
-              <p>Company's market cap is higher than the value of its ETH holdings. Investors are paying extra for the company's business operations, growth potential, or other assets beyond just ETH.</p>
+              <p>Company&apos;s market cap is higher than the value of its ETH holdings. Investors are paying extra for the company&apos;s business operations, growth potential, or other assets beyond just ETH.</p>
             </div>
             <div>
               <h4 className="font-semibold mb-2">Discount (Red)</h4>
-              <p>Company's market cap is lower than the value of its ETH holdings. This could indicate undervaluation, market skepticism, or concerns about the company's ability to realize the full value of its ETH.</p>
+              <p>Company&apos;s market cap is lower than the value of its ETH holdings. This could indicate undervaluation, market skepticism, or concerns about the company&apos;s ability to realize the full value of its ETH.</p>
             </div>
           </div>
         </div>
