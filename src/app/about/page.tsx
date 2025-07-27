@@ -25,6 +25,10 @@ export default function AboutPage() {
                 News
               </Link>
               <span>•</span>
+              <Link href="/etfs" className="hover:text-blue-600 transition-colors">
+                ETFs
+              </Link>
+              <span>•</span>
               <Link href="/" className="hover:text-blue-600 transition-colors">
                 Dashboard
               </Link>

@@ -110,6 +110,10 @@ export default function NewsPage() {
                 Dashboard
               </Link>
               <span>•</span>
+              <Link href="/etfs" className="hover:text-blue-600 transition-colors">
+                ETFs
+              </Link>
+              <span>•</span>
               <Link href="/about" className="hover:text-blue-600 transition-colors">
                 About
               </Link>

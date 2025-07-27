@@ -1,14 +1,14 @@
-import CompanyList from '@/components/CompanyList'
+import EtfList from '@/components/EtfList'
 import Link from 'next/link'
 
-export default function Home() {
+export default function EtfsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
-            <h1 className="text-4xl font-bold text-gray-900">Ethereum Treasury Companies</h1>
+            <h1 className="text-4xl font-bold text-gray-900">Ethereum ETFs</h1>
             <div className="flex items-center space-x-3 text-xs text-gray-500">
               <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
                 Premium/Discount
@@ -26,8 +26,8 @@ export default function Home() {
                 News
               </Link>
               <span>•</span>
-              <Link href="/etfs" className="hover:text-blue-600 transition-colors">
-                ETFs
+              <Link href="/" className="hover:text-blue-600 transition-colors">
+                Dashboard
               </Link>
               <span>•</span>
               <Link href="/about" className="hover:text-blue-600 transition-colors">
@@ -40,14 +40,21 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <CompanyList />
+        {/* Page Description */}
+        <div className="mb-8">
+          <p className="text-gray-600 text-lg">
+            Track Ethereum Exchange-Traded Funds (ETFs) and their ETH holdings, total assets under management, and key metrics.
+          </p>
+        </div>
+
+        <EtfList />
       </main>
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-gray-500 text-sm">
-            <p> 2025 Ethereum Treasury Tracker. Data sourced from public APIs, CoinGecko, EtherScan, Alpha Vantage and company websites.</p>
+            <p>© 2025 Ethereum Treasury Tracker. ETF data sourced from Financial Modeling Prep API.</p>
             <p className="mt-2">
               Built with Next.js, Tailwind CSS, and Prisma.
             </p>

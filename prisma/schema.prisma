@@ -64,6 +64,36 @@ model DailySnapshot {
   @@map("daily_snapshots")
 }
 
+// ETF Models (completely isolated from company logic)
+model Etf {
+  id              Int      @id @default(autoincrement())
+  symbol          String   @unique
+  name            String?
+  ethHoldings     Float?   @map("eth_holdings")     // Number of ETH held by the ETF
+  totalValue      Float?   @map("total_value")      // ETH holdings * ETH price
+  aum             Float?   @map("assets_under_management") // Total AUM from API
+  expenseRatio    Float?   @map("expense_ratio")    // Annual expense ratio
+  nav             Float?   @map("net_asset_value")  // Net Asset Value per share
+  lastUpdated     DateTime @default(now()) @map("last_updated")
+  createdAt       DateTime @default(now()) @map("created_at")
+  isActive        Boolean  @default(true) @map("is_active")
+  
+  @@map("etfs")
+}
+
+model EtfMetrics {
+  id              Int      @id @default(autoincrement())
+  totalEthHeld    Float    @map("total_eth_held")   // Sum of all ETF ETH holdings
+  totalAum        Float    @map("total_aum")        // Sum of all ETF AUM
+  totalValue      Float    @map("total_value")      // Total value of all ETH held
+  etfCount        Int      @map("etf_count")        // Number of active ETFs
+  avgExpenseRatio Float?   @map("avg_expense_ratio") // Average expense ratio
+  ethPrice        Float?   @map("eth_price")        // ETH price used for calculations
+  lastUpdate      DateTime @default(now()) @map("last_update")
+  
+  @@map("etf_metrics")
+}
+
 // NextAuth.js required models
 model Account {
   id                String  @id @default(cuid())

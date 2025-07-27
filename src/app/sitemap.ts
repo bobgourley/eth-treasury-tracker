@@ -55,6 +55,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: 'daily',
         priority: 0.8,
       },
+      {
+        url: `${baseUrl}/etfs`,
+        lastModified: new Date(),
+        changeFrequency: 'daily',
+        priority: 0.8,
+      },
     ]
 
     // Dynamic company pages
@@ -104,6 +110,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
       {
         url: `${baseUrl}/news`,
+        lastModified: new Date(),
+        changeFrequency: 'daily',
+        priority: 0.8,
+      },
+      {
+        url: `${baseUrl}/etfs`,
         lastModified: new Date(),
         changeFrequency: 'daily',
         priority: 0.8,

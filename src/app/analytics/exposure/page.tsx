@@ -155,12 +155,20 @@ export default function MarketCapWeightedExposure() {
                   Charts
                 </Link>
                 <span>•</span>
-                <Link href="/about" className="hover:text-blue-600 transition-colors">
-                  About
+                <Link href="/news" className="hover:text-blue-600 transition-colors">
+                  News
+                </Link>
+                <span>•</span>
+                <Link href="/etfs" className="hover:text-blue-600 transition-colors">
+                  ETFs
                 </Link>
                 <span>•</span>
                 <Link href="/" className="hover:text-blue-600 transition-colors">
                   Dashboard
+                </Link>
+                <span>•</span>
+                <Link href="/about" className="hover:text-blue-600 transition-colors">
+                  About
                 </Link>
               </div>
               <h1 className="text-3xl font-bold text-gray-900">

@@ -145,6 +145,14 @@ export default function PremiumDiscountAnalytics() {
                   Charts
                 </Link>
                 <span>•</span>
+                <Link href="/news" className="hover:text-blue-600 transition-colors">
+                  News
+                </Link>
+                <span>•</span>
+                <Link href="/etfs" className="hover:text-blue-600 transition-colors">
+                  ETFs
+                </Link>
+                <span>•</span>
                 <Link href="/about" className="hover:text-blue-600 transition-colors">
                   About
                 </Link>

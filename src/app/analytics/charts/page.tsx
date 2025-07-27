@@ -212,16 +212,20 @@ export default function ChartsPage() {
                 ETH Exposure
               </Link>
               <span>•</span>
-              <Link href="/analytics/charts" className="hover:text-blue-600 transition-colors">
-                Charts
+              <Link href="/news" className="hover:text-blue-600 transition-colors">
+                News
               </Link>
               <span>•</span>
-              <Link href="/about" className="hover:text-blue-600 transition-colors">
-                About
+              <Link href="/etfs" className="hover:text-blue-600 transition-colors">
+                ETFs
               </Link>
               <span>•</span>
               <Link href="/" className="hover:text-blue-600 transition-colors">
                 Dashboard
+              </Link>
+              <span>•</span>
+              <Link href="/about" className="hover:text-blue-600 transition-colors">
+                About
               </Link>
             </div>
           </div>
