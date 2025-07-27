@@ -49,9 +49,9 @@ export async function POST() {
       console.log('⚠️ ETH price fetch failed, using fallback')
     }
     
-    const updatedEtfs = []
+    const updatedEtfs: any[] = []
     let apiCallsUsed = 0
-    const maxApiCalls = 20 // Conservative limit for 250/day
+    // const maxApiCalls = 20 // Conservative limit for 250/day
     
     for (const symbol of ETF_SYMBOLS) {
       try {
@@ -84,7 +84,7 @@ export async function POST() {
         }
         
         // For now, bypass database and create in-memory record
-        const etf: any = {
+        const etf = {
           id: updatedEtfs.length + 1,
           ...etfData,
           createdAt: new Date()
@@ -93,24 +93,27 @@ export async function POST() {
         updatedEtfs.push(etf)
         console.log(`✅ ${symbol}: ${ethHoldings.toFixed(2)} ETH, $${totalValue.toLocaleString()}`)
         
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`❌ Error updating ${symbol}:`, error)
         
         // Create placeholder record if update fails
-        const fallbackEtf: any = {
-          id: updatedEtfs.length + 1,
-          symbol,
-          name: `${symbol} ETF`,
-          ethHoldings: 0,
-          totalValue: 0,
-          aum: 0,
-          expenseRatio: 0.75,
-          nav: 100,
-          lastUpdated: new Date(),
-          createdAt: new Date(),
-          isActive: true
+        const fallbackInfo = ETF_DATA[symbol as keyof typeof ETF_DATA]
+        if (fallbackInfo) {
+          const etf = {
+            id: updatedEtfs.length + 1,
+            symbol,
+            name: `${symbol} ETF`,
+            ethHoldings: 0,
+            totalValue: 0,
+            aum: 0,
+            expenseRatio: 0.75,
+            nav: 100,
+            lastUpdated: new Date(),
+            createdAt: new Date(),
+            isActive: true
+          }
+          updatedEtfs.push(etf)
         }
-        updatedEtfs.push(fallbackEtf)
       }
     }
     
@@ -124,8 +127,8 @@ export async function POST() {
       etfs: updatedEtfs
     })
     
-  } catch (error) {
-    console.error('❌ Error updating ETF data:', error)
+  } catch (error: unknown) {
+    console.error('❌ ETF update failed:', error)
     return NextResponse.json({
       error: 'Failed to update ETF data',
       details: error instanceof Error ? error.message : 'Unknown error'

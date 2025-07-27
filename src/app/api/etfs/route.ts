@@ -134,8 +134,8 @@ export async function GET() {
         // Rate limiting
         await new Promise(resolve => setTimeout(resolve, 100))
         
-      } catch (error) {
-        console.error(`❌ Error fetching ${symbol}:`, error)
+      } catch (fetchError) {
+        console.error(`❌ Error fetching ${symbol}:`, fetchError)
         
         // Add fallback data for this ETF
         const fallbackInfo = ETF_DATA[symbol as keyof typeof ETF_DATA]
