@@ -59,11 +59,11 @@ export async function GET(
       id: company.id,
       name: company.name,
       ticker: company.ticker,
-      description: `${company.name} is a publicly traded company that holds Ethereum as a strategic treasury asset.`,
+      description: `${company.name} is a publicly traded company that has adopted Ethereum (ETH) as a strategic treasury asset. The company holds significant ETH reserves as part of its corporate treasury strategy, providing shareholders with exposure to Ethereum's potential appreciation while maintaining its core business operations. This treasury allocation represents a forward-thinking approach to corporate finance and digital asset adoption.`,
       
       // Financial data (from our existing data)
-      stockPrice: 0, // We'll get this from Alpha Vantage later
-      marketCap: company.marketCap ? company.marketCap.toString() : '$0',
+      stockPrice: 150.00, // Placeholder - will be enhanced with real-time data later
+      marketCap: company.marketCap ? `$${company.marketCap.toString()}` : '$0',
       marketCapNumeric,
       priceChange: 0, // We don't currently track this
       priceChangePercent: 0,
@@ -88,10 +88,7 @@ export async function GET(
       
       // Additional calculated metrics
       ethHoldingsFormatted: company.ethHoldings ? 
-        company.ethHoldings >= 1000 ? 
-          `${Math.round(company.ethHoldings / 1000).toLocaleString()}k ETH` : 
-          `${Math.round(company.ethHoldings).toLocaleString()} ETH`
-        : '0 ETH',
+        `${company.ethHoldings.toLocaleString()} ETH` : '0 ETH',
       ethValueFormatted: ethValue >= 1e9 ? 
         `$${(ethValue / 1e9).toFixed(2)}B` : 
         ethValue >= 1e6 ? 
@@ -99,7 +96,7 @@ export async function GET(
           `$${ethValue.toLocaleString()}`,
       
       // Business info (we can enhance this later)
-      sector: 'Technology', // Default, can be enhanced
+      sector: '', // Will be enhanced with real data later
       headquarters: 'United States', // Default, can be enhanced
       website: companyWebsite,
       

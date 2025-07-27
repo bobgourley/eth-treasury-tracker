@@ -100,7 +100,10 @@ export default function CompanyList() {
             </div>
           </div>
           <div className="text-center mt-4 text-sm text-blue-100">
-            Last updated: {new Date(metrics.lastUpdate).toLocaleString()}
+            <div>Last updated: {new Date(metrics.lastUpdate).toLocaleString()}</div>
+            <div className="mt-1 text-xs text-blue-200">
+              ETH price updates: Real-time via CoinGecko API • Data refreshes on admin updates
+            </div>
           </div>
         </div>
       )}

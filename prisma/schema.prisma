@@ -43,6 +43,8 @@ model SystemMetrics {
   ethSupplyPercent   Float?   @map("eth_supply_percent")
   lastUpdate         DateTime @default(now()) @map("last_update")
   lastStockUpdate    DateTime? @map("last_stock_update")
+  ethPriceLastUpdate DateTime? @map("eth_price_last_update")
+  ethPriceSource     String?  @map("eth_price_source")
 
   @@map("system_metrics")
 }

@@ -191,7 +191,6 @@ export default function CompanyProfilePage() {
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Market Cap</h3>
             <div className="text-2xl font-bold text-blue-600">{company.marketCap}</div>
-            <div className="text-sm text-gray-500 mt-1">{company.sector}</div>
           </div>
 
           {/* ETH Holdings */}
@@ -229,12 +228,12 @@ export default function CompanyProfilePage() {
                 <p>{company.description}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Sector</h4>
-                    <p className="text-gray-600">{company.sector}</p>
-                  </div>
-                  <div>
                     <h4 className="font-semibold text-gray-900 mb-2">Headquarters</h4>
                     <p className="text-gray-600">{company.headquarters}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-2">Treasury Strategy</h4>
+                    <p className="text-gray-600">Strategic ETH Holdings</p>
                   </div>
                 </div>
               </div>

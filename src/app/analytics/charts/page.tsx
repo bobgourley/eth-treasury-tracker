@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import CompanyLink from '@/components/CompanyLink'
 import {
   Chart as ChartJS,
   ArcElement,
@@ -289,7 +290,12 @@ export default function ChartsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{company.name}</div>
+                          <div className="text-sm font-medium text-gray-900">
+                            <CompanyLink 
+                              ticker={company.ticker} 
+                              name={company.name}
+                            />
+                          </div>
                           <div className="text-sm text-gray-500">{company.ticker}</div>
                         </div>
                       </td>

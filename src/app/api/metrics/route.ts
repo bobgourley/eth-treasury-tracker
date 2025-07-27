@@ -33,6 +33,9 @@ export async function GET() {
       totalEthSupply,
       totalCompanies: companies.length,
       lastUpdate: systemMetrics?.lastUpdate || new Date(),
+      // ETH price tracking fields (will be enabled after schema migration)
+      // ethPriceLastUpdate: systemMetrics?.ethPriceLastUpdate || new Date(),
+      // ethPriceSource: systemMetrics?.ethPriceSource || 'CoinGecko API',
     }
 
     return NextResponse.json(metrics)

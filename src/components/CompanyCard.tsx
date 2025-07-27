@@ -19,10 +19,6 @@ interface CompanyCardProps {
 export default function CompanyCard({ company, rank, ethPrice }: CompanyCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
 
-  const getYahooFinanceUrl = (ticker: string) => {
-    return `https://finance.yahoo.com/quote/${ticker}`
-  }
-
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
       {/* Summary Row - Always Visible */}
@@ -39,14 +35,11 @@ export default function CompanyCard({ company, rank, ethPrice }: CompanyCardProp
                 className="text-lg font-bold text-gray-900"
               />
               {company.ticker && (
-                <a
-                  href={getYahooFinanceUrl(company.ticker)}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <CompanyLink 
+                  ticker={company.ticker} 
+                  name={`(${company.ticker})`}
                   className="text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium"
-                >
-                  ({company.ticker})
-                </a>
+                />
               )}
             </div>
           </div>
