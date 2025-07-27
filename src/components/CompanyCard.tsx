@@ -22,47 +22,48 @@ export default function CompanyCard({ company, rank, ethPrice }: CompanyCardProp
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
       {/* Summary Row - Always Visible */}
-      <div className="p-4 flex items-center justify-between">
-        <div className="flex items-center space-x-3 flex-1">
-          <div className="bg-blue-100 text-blue-800 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
-            {rank}
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center space-x-2">
-              <CompanyLink 
-                ticker={company.ticker || ''} 
-                name={company.name}
-                className="text-lg font-bold text-gray-900"
-              />
-              {company.ticker && (
-                <CompanyLink 
-                  ticker={company.ticker} 
-                  name={`(${company.ticker})`}
-                  className="text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium"
-                />
-              )}
+      <div className="p-4">
+        {/* Mobile Layout */}
+        <div className="flex items-center justify-between sm:hidden">
+          <div className="flex items-center space-x-2 flex-1 min-w-0">
+            <div className="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center font-bold text-xs flex-shrink-0">
+              {rank}
             </div>
-          </div>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <div className="text-right">
-            <p className="text-xl font-bold text-blue-600">
-              {formatEth(company.ethHoldings)}
-            </p>
-            <p className="text-xs text-gray-500">ETH Holdings</p>
-          </div>
-          
-          <div className="text-right">
-            <p className="text-lg font-bold text-green-600">
-              {company.ethHoldings && ethPrice ? formatNumber(company.ethHoldings * ethPrice) : 'N/A'}
-            </p>
-            <p className="text-xs text-gray-500">ETH Value</p>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center space-x-1">
+                <CompanyLink 
+                  ticker={company.ticker || ''} 
+                  name={company.name}
+                  className="text-sm font-bold text-gray-900 truncate"
+                />
+                {company.ticker && (
+                  <CompanyLink 
+                    ticker={company.ticker} 
+                    name={`(${company.ticker})`}
+                    className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-medium flex-shrink-0"
+                  />
+                )}
+              </div>
+              <div className="flex items-center space-x-3 mt-1">
+                <div className="text-left">
+                  <p className="text-sm font-bold text-blue-600">
+                    {formatEth(company.ethHoldings)}
+                  </p>
+                  <p className="text-xs text-gray-500">ETH Holdings</p>
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-bold text-green-600">
+                    {company.ethHoldings && ethPrice ? formatNumber(company.ethHoldings * ethPrice) : 'N/A'}
+                  </p>
+                  <p className="text-xs text-gray-500">ETH Value</p>
+                </div>
+              </div>
+            </div>
           </div>
           
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0 ml-2"
             aria-label={isExpanded ? 'Collapse details' : 'Expand details'}
           >
             {isExpanded ? (
@@ -71,6 +72,59 @@ export default function CompanyCard({ company, rank, ethPrice }: CompanyCardProp
               <ChevronDownIcon className="w-5 h-5" />
             )}
           </button>
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden sm:flex items-center justify-between">
+          <div className="flex items-center space-x-3 flex-1">
+            <div className="bg-blue-100 text-blue-800 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
+              {rank}
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center space-x-2">
+                <CompanyLink 
+                  ticker={company.ticker || ''} 
+                  name={company.name}
+                  className="text-lg font-bold text-gray-900"
+                />
+                {company.ticker && (
+                  <CompanyLink 
+                    ticker={company.ticker} 
+                    name={`(${company.ticker})`}
+                    className="text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            <div className="text-right">
+              <p className="text-xl font-bold text-blue-600">
+                {formatEth(company.ethHoldings)}
+              </p>
+              <p className="text-xs text-gray-500">ETH Holdings</p>
+            </div>
+            
+            <div className="text-right">
+              <p className="text-lg font-bold text-green-600">
+                {company.ethHoldings && ethPrice ? formatNumber(company.ethHoldings * ethPrice) : 'N/A'}
+              </p>
+              <p className="text-xs text-gray-500">ETH Value</p>
+            </div>
+            
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+              aria-label={isExpanded ? 'Collapse details' : 'Expand details'}
+            >
+              {isExpanded ? (
+                <ChevronUpIcon className="w-5 h-5" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 

@@ -33,7 +33,7 @@ export default function NewsPage() {
   const [newsData, setNewsData] = useState<NewsResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [filter, setFilter] = useState<'all' | 'company' | 'general'>('all')
+  const [filter, setFilter] = useState<'all' | 'company' | 'general'>('company')
 
   useEffect(() => {
     fetchNews()
@@ -88,31 +88,39 @@ export default function NewsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-8">
-              <Link href="/" className="text-xl font-bold text-gray-900">
-                Ethereum Treasury Companies
+      {/* Header */}
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex justify-between items-center">
+            <h1 className="text-4xl font-bold text-gray-900">Ethereum Treasury News</h1>
+            <div className="flex items-center space-x-3 text-xs text-gray-500">
+              <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
+                Premium/Discount
               </Link>
-              <div className="hidden md:flex space-x-6 text-sm">
-                <Link href="/" className="text-gray-600 hover:text-gray-900">Dashboard</Link>
-                <Link href="/analytics" className="text-gray-600 hover:text-gray-900">Analytics</Link>
-                <Link href="/about" className="text-gray-600 hover:text-gray-900">About</Link>
-                <Link href="/news" className="text-blue-600 font-medium">News</Link>
-              </div>
+              <span>•</span>
+              <Link href="/analytics/exposure" className="hover:text-blue-600 transition-colors">
+                ETH Exposure
+              </Link>
+              <span>•</span>
+              <Link href="/analytics/charts" className="hover:text-blue-600 transition-colors">
+                Charts
+              </Link>
+              <span>•</span>
+              <Link href="/" className="hover:text-blue-600 transition-colors">
+                Dashboard
+              </Link>
+              <span>•</span>
+              <Link href="/about" className="hover:text-blue-600 transition-colors">
+                About
+              </Link>
             </div>
           </div>
         </div>
-      </nav>
+      </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+        {/* Page Description */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Ethereum Treasury News
-          </h1>
           <p className="text-gray-600 text-lg">
             Latest news and updates about companies holding Ethereum in their treasuries
           </p>
@@ -162,7 +170,7 @@ export default function NewsPage() {
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  Company News
+                  Tracked Companies
                 </button>
                 <button
                   onClick={() => setFilter('general')}
@@ -315,7 +323,9 @@ export default function NewsPage() {
             <p className="text-gray-600 mb-4">
               {filter === 'all' 
                 ? 'No news articles available at the moment.'
-                : `No ${filter} articles found. Try switching to a different filter.`
+                : filter === 'company'
+                ? 'No news found for tracked companies. Try "All News" or "General ETH Treasury" for broader coverage.'
+                : 'No general ETH treasury articles found. Try switching to a different filter.'
               }
             </p>
             <button
