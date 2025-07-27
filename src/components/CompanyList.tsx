@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Company, SystemMetrics } from '@/types/company'
 import CompanyCard from './CompanyCard'
-import { formatEth, formatNumber } from '@/lib/utils'
+import { formatEth, formatEthCompact, formatNumber } from '@/lib/utils'
 
 export default function CompanyList() {
   const [companies, setCompanies] = useState<(Company & { marketCap?: string; sharesOutstanding?: string; stockPrice?: number })[]>([])
@@ -67,7 +67,7 @@ export default function CompanyList() {
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-6">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div className="text-center">
-              <p className="text-2xl lg:text-3xl font-bold">{formatEth(metrics.totalEthHoldings)}</p>
+              <p className="text-2xl lg:text-3xl font-bold">{formatEthCompact(metrics.totalEthHoldings)}</p>
               <p className="text-blue-100 text-sm">Total ETH Holdings</p>
             </div>
             <div className="text-center">

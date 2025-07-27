@@ -25,6 +25,15 @@ export function formatEth(eth: number | undefined): string {
   return `${eth.toLocaleString()} ETH`
 }
 
+export function formatEthCompact(eth: number | undefined): string {
+  if (eth === undefined || eth === null) return 'N/A'
+  
+  if (eth >= 1000) {
+    return `${Math.round(eth / 1000).toLocaleString()}k ETH`
+  }
+  return `${Math.round(eth).toLocaleString()} ETH`
+}
+
 export function formatPercentage(percent: number | undefined): string {
   if (percent === undefined || percent === null) return 'N/A'
   return `${percent.toFixed(2)}%`
