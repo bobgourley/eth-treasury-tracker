@@ -83,3 +83,4 @@ export async function GET() {
     return NextResponse.json(fallbackMetrics)
   }
 }
+// Force redeploy Sun Jul 27 00:05:14 EDT 2025
