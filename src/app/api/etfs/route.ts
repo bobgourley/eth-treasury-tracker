@@ -2,15 +2,15 @@ import { NextResponse } from 'next/server'
 
 // Realistic ETF data estimates
 const ETF_DATA = {
-  'ETHE': { name: 'Grayscale Ethereum Trust', estimatedEthHoldings: 3200000, estimatedAum: 12000000000, expenseRatio: 2.5 },
-  'ETHA': { name: 'iShares Ethereum Trust ETF', estimatedEthHoldings: 350000, estimatedAum: 1300000000, expenseRatio: 0.25 },
-  'FETH': { name: 'Fidelity Ethereum Fund', estimatedEthHoldings: 280000, estimatedAum: 1000000000, expenseRatio: 0.25 },
-  'ETH': { name: 'VanEck Ethereum ETF', estimatedEthHoldings: 180000, estimatedAum: 650000000, expenseRatio: 0.25 },
-  'ETHW': { name: 'Invesco Galaxy Ethereum ETF', estimatedEthHoldings: 150000, estimatedAum: 550000000, expenseRatio: 0.25 },
-  'ETHV': { name: 'Valkyrie Ethereum Strategy ETF', estimatedEthHoldings: 120000, estimatedAum: 450000000, expenseRatio: 0.75 },
-  'EZET': { name: 'Xtrackers MSCI World UCITS ETF', estimatedEthHoldings: 100000, estimatedAum: 380000000, expenseRatio: 0.30 },
-  'CETH': { name: 'Bitwise Ethereum ETF', estimatedEthHoldings: 90000, estimatedAum: 340000000, expenseRatio: 0.20 },
-  'QETH': { name: 'Defiance Quantum ETF', estimatedEthHoldings: 75000, estimatedAum: 280000000, expenseRatio: 0.40 }
+  'ETHA': { name: 'iShares Ethereum Trust ETF', estimatedEthHoldings: 2730000, estimatedAum: 10490000000, expenseRatio: 0.25 }, // $10.49B AUM
+  'ETHE': { name: 'Grayscale Ethereum Trust', estimatedEthHoldings: 1108000, estimatedAum: 4260000000, expenseRatio: 2.5 }, // $4.26B AUM
+  'ETH': { name: 'Grayscale Ethereum Mini Trust', estimatedEthHoldings: 642000, estimatedAum: 2470000000, expenseRatio: 0.25 }, // $2.47B AUM
+  'FETH': { name: 'Fidelity Ethereum Fund', estimatedEthHoldings: 598000, estimatedAum: 2300000000, expenseRatio: 0.25 }, // $2.30B AUM
+  'ETHW': { name: 'Bitwise Ethereum ETF', estimatedEthHoldings: 132000, estimatedAum: 507130000, expenseRatio: 0.25 }, // $507.13M AUM
+  'ETHV': { name: 'VanEck Ethereum ETF', estimatedEthHoldings: 55200, estimatedAum: 212340000, expenseRatio: 0.75 }, // $212.34M AUM
+  'EZET': { name: 'Franklin Ethereum ETF', estimatedEthHoldings: 19600, estimatedAum: 75290000, expenseRatio: 0.30 }, // $75.29M AUM
+  'CETH': { name: '21Shares Core Ethereum ETF', estimatedEthHoldings: 11500, estimatedAum: 44290000, expenseRatio: 0.20 }, // $44.29M AUM
+  'QETH': { name: 'Invesco Galaxy Ethereum ETF', estimatedEthHoldings: 9900, estimatedAum: 38150000, expenseRatio: 0.40 } // $38.15M AUM
 }
 
 const ETF_SYMBOLS = Object.keys(ETF_DATA)
@@ -106,28 +106,30 @@ export async function GET() {
           const profile = Array.isArray(profileData) ? profileData[0] : profileData
           
           if (profile && profile.symbol) {
-            // Calculate ETH holdings based on market cap and ETH price
-            // This is an approximation since ETFs don't directly report ETH holdings
-            const marketCap = profile.mktCap || 0
-            const estimatedEthHoldings = marketCap > 0 ? (marketCap * 0.95) / ethPrice : 0 // Assume 95% ETH exposure
-            const totalValue = estimatedEthHoldings * ethPrice
-            
-            const etf = {
-              id: i + 1,
-              symbol: profile.symbol,
-              name: profile.companyName || `${symbol} ETF`,
-              ethHoldings: estimatedEthHoldings,
-              totalValue,
-              aum: marketCap,
-              expenseRatio: getEstimatedExpenseRatio(symbol),
-              nav: profile.price || 0,
-              lastUpdated: new Date(),
-              createdAt: new Date(),
-              isActive: profile.isActivelyTrading || true
+            // Use correct AUM data from our source, supplement with FMP NAV price
+            const etfInfo = ETF_DATA[symbol as keyof typeof ETF_DATA]
+            if (etfInfo) {
+              const correctAum = etfInfo.estimatedAum
+              const correctEthHoldings = etfInfo.estimatedEthHoldings
+              const totalValue = correctEthHoldings * ethPrice
+              
+              const etf = {
+                id: i + 1,
+                symbol: profile.symbol,
+                name: etfInfo.name,
+                ethHoldings: correctEthHoldings,
+                totalValue,
+                aum: correctAum, // Use correct AUM from our data source
+                expenseRatio: etfInfo.expenseRatio,
+                nav: profile.price || 0, // Use live NAV from FMP
+                lastUpdated: new Date(),
+                createdAt: new Date(),
+                isActive: profile.isActivelyTrading || true
+              }
+              
+              etfs.push(etf)
+              console.log(`✅ ${symbol}: $${profile.price} NAV, $${(correctAum/1e6).toFixed(0)}M AUM (corrected), ${(correctEthHoldings/1000).toFixed(0)}K ETH`)
             }
-            
-            etfs.push(etf)
-            console.log(`✅ ${symbol}: $${profile.price}, $${(marketCap/1e6).toFixed(0)}M market cap`)
           }
         }
         
