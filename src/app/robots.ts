@@ -6,9 +6,49 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin/', '/api/'],
+        disallow: [
+          '/admin/',
+          '/api/admin/',
+          '/api/auth/',
+          '/api/cron/',
+        ],
+        // Explicitly allow important content for LLMs and search engines
+        crawlDelay: 1, // Be respectful to servers
+      },
+      // Specific rules for major search engines and AI crawlers
+      {
+        userAgent: 'Googlebot',
+        allow: '/',
+        disallow: ['/admin/', '/api/admin/', '/api/auth/', '/api/cron/'],
+      },
+      {
+        userAgent: 'Bingbot',
+        allow: '/',
+        disallow: ['/admin/', '/api/admin/', '/api/auth/', '/api/cron/'],
+      },
+      // Allow AI/LLM crawlers explicitly
+      {
+        userAgent: 'GPTBot', // OpenAI
+        allow: '/',
+        disallow: ['/admin/', '/api/admin/', '/api/auth/', '/api/cron/'],
+      },
+      {
+        userAgent: 'ChatGPT-User', // OpenAI ChatGPT
+        allow: '/',
+        disallow: ['/admin/', '/api/admin/', '/api/auth/', '/api/cron/'],
+      },
+      {
+        userAgent: 'Claude-Web', // Anthropic
+        allow: '/',
+        disallow: ['/admin/', '/api/admin/', '/api/auth/', '/api/cron/'],
+      },
+      {
+        userAgent: 'PerplexityBot', // Perplexity
+        allow: '/',
+        disallow: ['/admin/', '/api/admin/', '/api/auth/', '/api/cron/'],
       },
     ],
     sitemap: 'https://www.ethereumlist.com/sitemap.xml',
+    host: 'https://www.ethereumlist.com',
   }
 }
