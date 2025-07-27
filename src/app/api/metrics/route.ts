@@ -76,6 +76,16 @@ export async function GET() {
       totalEthSupply,
       totalCompanies: validCompanies.length, // Use validCompanies count, not companies.length
       lastUpdate: systemMetrics?.lastUpdate || new Date(),
+      // TEMPORARY DEBUG: Include raw company data to diagnose count issue
+      debugCompanies: validCompanies.map(c => ({
+        id: c.id,
+        ticker: c.ticker,
+        name: c.name,
+        ethHoldings: c.ethHoldings,
+        isActive: c.isActive
+      })),
+      debugCompanyCount: validCompanies.length,
+      debugRawCount: companies.length,
       // ETH price tracking fields (will be enabled after schema migration)
       // ethPriceLastUpdate: systemMetrics?.ethPriceLastUpdate || new Date(),
       // ethPriceSource: systemMetrics?.ethPriceSource || 'CoinGecko API',
