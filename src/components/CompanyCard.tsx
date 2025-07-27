@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Company } from '@/types/company'
 import { formatNumber, formatEth, formatPercentage, formatShares } from '@/lib/utils'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
+import CompanyLink from './CompanyLink'
 
 interface CompanyCardProps {
   company: Company & {
@@ -32,7 +33,11 @@ export default function CompanyCard({ company, rank, ethPrice }: CompanyCardProp
           </div>
           <div className="flex-1">
             <div className="flex items-center space-x-2">
-              <h3 className="text-lg font-bold text-gray-900">{company.name}</h3>
+              <CompanyLink 
+                ticker={company.ticker || ''} 
+                name={company.name}
+                className="text-lg font-bold text-gray-900"
+              />
               {company.ticker && (
                 <a
                   href={getYahooFinanceUrl(company.ticker)}

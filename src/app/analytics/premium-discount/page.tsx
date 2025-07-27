@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import CompanyLink from '@/components/CompanyLink'
 import { formatNumber, formatEth, formatPercentage } from '@/lib/utils'
 
 interface PremiumDiscountData {
@@ -240,7 +241,10 @@ export default function PremiumDiscountAnalytics() {
                       <div className="flex items-center">
                         <div>
                           <div className="text-sm font-medium text-gray-900">
-                            {company.name}
+                            <CompanyLink 
+                              ticker={company.ticker} 
+                              name={company.name}
+                            />
                           </div>
                           <div className="text-sm text-gray-500">
                             {company.ticker}
