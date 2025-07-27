@@ -8,26 +8,14 @@ export async function GET() {
       orderBy: { ethHoldings: 'desc' }
     })
 
-    // Ensure we have the expected number of companies
+    // TEMPORARY: Return basic info to verify database connection works
     if (companies.length !== 9) {
       console.error(`CRITICAL: Expected 9 companies, got ${companies.length}`);
       console.error('Companies found:', companies.map(c => `${c.ticker} (${c.name})`));
     }
 
-    // Try to get system metrics, but don't fail if table doesn't exist
-    let systemMetrics = null
-    try {
-      // Only query fields that exist in production database
-      systemMetrics = await prisma.systemMetrics.findFirst({
-        select: {
-          ethPrice: true,
-          lastUpdate: true
-        }
-      })
-    } catch (systemMetricsError) {
-      console.log('SystemMetrics table error (non-critical):', systemMetricsError)
-      // Continue without system metrics
-    }
+    // Skip systemMetrics query entirely to isolate the issue
+    const systemMetrics = null
 
     // COMPREHENSIVE DEBUGGING to identify company count discrepancy
     console.log(`\n=== METRICS API COMPREHENSIVE DEBUG ===`)
@@ -71,8 +59,8 @@ export async function GET() {
       return sum + marketCap
     }, BigInt(0))
 
-    // Get ETH price (use last known value from database, only hardcode if no database value exists)
-    const ethPrice = systemMetrics?.ethPrice || 3680.0
+    // Get ETH price (use hardcoded value for now to isolate issue)
+    const ethPrice = 3680.0
     const totalEthSupply = 120500000.0 // Static value for MVP
 
     // Calculate derived metrics
@@ -87,7 +75,7 @@ export async function GET() {
       ethSupplyPercent: ethSupplyPercentage,
       totalEthSupply,
       totalCompanies: validCompanies.length, // Use validCompanies count, not companies.length
-      lastUpdate: systemMetrics?.lastUpdate || new Date(),
+      lastUpdate: new Date(),
       // TEMPORARY DEBUG: Include raw company data to diagnose count issue
       debugCompanies: validCompanies.map(c => ({
         id: c.id,
