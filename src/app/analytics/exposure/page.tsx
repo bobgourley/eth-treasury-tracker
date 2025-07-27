@@ -190,7 +190,7 @@ export default function MarketCapWeightedExposure() {
           </div>
         </div>)}
 
-        {/* Risk Analysis Cards */}
+        {/* Market Analysis Cards */}
         {data && (
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white rounded-lg shadow p-6">
@@ -198,11 +198,11 @@ export default function MarketCapWeightedExposure() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Total Market Cap:</span>
-                  <span className="text-sm font-medium">${formatNumber(data.totalMarketCap)}</span>
+                  <span className="text-sm font-medium">{formatNumber(data.totalMarketCap)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Total ETH Value:</span>
-                  <span className="text-sm font-medium">${formatNumber(data.totalEthValue)}</span>
+                  <span className="text-sm font-medium">{formatNumber(data.totalEthValue)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">ETH/Market Ratio:</span>
@@ -214,21 +214,15 @@ export default function MarketCapWeightedExposure() {
             </div>
 
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Risk Assessment</h3>
-              <div className="space-y-3">
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm text-gray-600">Overall Risk:</span>
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${getRiskLevel(data.topThreeConcentration).color}`}>
-                      {getRiskLevel(data.topThreeConcentration).level}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-gradient-to-r from-green-400 to-red-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${Math.min(data.topThreeConcentration, 100)}%` }}
-                    ></div>
-                  </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Baselines</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Median ECMC:</span>
+                  <span className="text-sm font-medium">{formatPercentage(data.averageEthExposure)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Median ETCD:</span>
+                  <span className="text-sm font-medium">{formatPercentage(data.topThreeConcentration)}</span>
                 </div>
               </div>
             </div>
@@ -320,14 +314,10 @@ export default function MarketCapWeightedExposure() {
                       )}
                     </div>
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Risk Level
-                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {sortedCompanies?.map((company) => {
-                  const riskLevel = getRiskLevel(company.ecmcPercentage)
                   return (
                     <tr key={company.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -360,11 +350,6 @@ export default function MarketCapWeightedExposure() {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
                         {formatPercentage(company.ecmcPercentage)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${riskLevel.color}`}>
-                          {riskLevel.level}
-                        </span>
-                      </td>
                     </tr>
                   )
                 })}
@@ -373,26 +358,7 @@ export default function MarketCapWeightedExposure() {
           </div>
         </div>
 
-        {/* Explanation */}
-        <div className="mt-8 bg-indigo-50 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-indigo-900 mb-3">Understanding Exposure Analysis</h3>
-          <div className="grid md:grid-cols-2 gap-4 text-sm text-indigo-800">
-            <div>
-              <h4 className="font-semibold mb-2">Market Weight</h4>
-              <p>Company&apos;s market cap as percentage of total market cap across all tracked companies.</p>
-              
-              <h4 className="font-semibold mb-2 mt-3">ETH Weight</h4>
-              <p>Company&apos;s ETH holdings as percentage of total ETH held by all tracked companies.</p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-2">Concentration Risk</h4>
-              <p>How much of the company&apos;s value comes from ETH holdings. Higher percentages indicate greater exposure to ETH price movements.</p>
-              
-              <h4 className="font-semibold mb-2 mt-3">Diversification Index</h4>
-              <p>Measures how evenly distributed ETH holdings are across companies. Higher scores indicate better diversification.</p>
-            </div>
-          </div>
-        </div>
+
 
         {/* Explanatory Text */}
         <div className="mt-12 bg-gray-50 rounded-lg p-8">
