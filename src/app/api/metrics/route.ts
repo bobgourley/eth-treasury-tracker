@@ -12,23 +12,26 @@ type CompanyData = {
 
 export async function GET() {
   try {
-    // DIRECT APPROACH: Calculate metrics from known working data structure
-    // Since companies API works, we'll use the same data pattern
-    const companies: CompanyData[] = [
-      { id: 1, ticker: 'BMNR', name: 'BitMine Immersion Technologies', ethHoldings: 566776, marketCap: '1600000000', isActive: true },
-      { id: 2, ticker: 'SBET', name: 'SharpLink Gaming', ethHoldings: 360807, marketCap: '1330000000', isActive: true },
-      { id: 3, ticker: 'BTBT', name: 'Bit Digital, Inc', ethHoldings: 120306, marketCap: '444000000', isActive: true },
-      { id: 4, ticker: 'BTCS', name: 'BTCS Inc.', ethHoldings: 55788, marketCap: '200000000', isActive: true },
-      { id: 5, ticker: 'GAME', name: 'GameSquare Holdings', ethHoldings: 10170, marketCap: '50000000', isActive: true },
-      { id: 6, ticker: 'ICG', name: 'Intchains Group Limited', ethHoldings: 7023, marketCap: '75000000', isActive: true },
-      { id: 7, ticker: 'KR1', name: 'KR1 plc', ethHoldings: 5500, marketCap: '45000000', isActive: true },
-      { id: 8, ticker: 'EXOD', name: 'Exodus Movement', ethHoldings: 2550, marketCap: '120000000', isActive: true },
-      { id: 9, ticker: 'BTCT', name: 'BTC Digital Ltd', ethHoldings: 2100, marketCap: '35000000', isActive: true }
-    ]
+    // Fetch live data from database
+    const { PrismaClient } = require('@prisma/client')
+    const prisma = new PrismaClient()
+    
+    const companies = await prisma.company.findMany({
+      select: {
+        id: true,
+        ticker: true,
+        name: true,
+        ethHoldings: true,
+        marketCap: true,
+        isActive: true
+      }
+    })
+    
+    await prisma.$disconnect()
     
     console.log(`\n=== METRICS API DIRECT APPROACH ===`)
     console.log(`Using ${companies.length} companies from known working data`)
-    console.log(`Companies: ${companies.map(c => c.ticker).join(', ')}`)
+    console.log(`Companies: ${companies.map((c: CompanyData) => c.ticker).join(', ')}`)
     console.log('====================================\n')
 
     // COMPREHENSIVE DEBUGGING to identify company count discrepancy
@@ -73,8 +76,20 @@ export async function GET() {
       return sum + marketCap
     }, BigInt(0))
 
-    // Get ETH price (use hardcoded value for now to isolate issue)
-    const ethPrice = 3680.0
+    // Get ETH price from system metrics or fetch from CoinGecko
+    const systemMetrics = await prisma.systemMetrics.findFirst()
+    let ethPrice = systemMetrics?.ethPrice || 3680.0
+    
+    // If no system metrics or stale price, fetch from CoinGecko
+    if (!systemMetrics || !systemMetrics.ethPrice) {
+      try {
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')
+        const data = await response.json()
+        ethPrice = data.ethereum?.usd || ethPrice
+      } catch (error) {
+        console.log('Failed to fetch ETH price from CoinGecko, using fallback:', ethPrice)
+      }
+    }
     const totalEthSupply = 120500000.0 // Static value for MVP
 
     // Calculate derived metrics

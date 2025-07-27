@@ -37,9 +37,10 @@ export async function GET(
     const marketCapNumeric = company.marketCap ? parseFloat(company.marketCap.toString()) : 0
     const ecmcPercentage = marketCapNumeric > 0 ? (ethValue / marketCapNumeric) * 100 : 0
     
-    // Calculate premium/discount (simplified since we don't have real-time stock price)
+    // Calculate premium/discount: (Market Cap - ETH Value) / ETH Value * 100
     const fairValue = ethValue
-    const premiumDiscount = 0 // Will be calculated when we have real-time stock data
+    const premiumDiscount = marketCapNumeric > 0 && ethValue > 0 ? 
+      ((marketCapNumeric - ethValue) / ethValue) * 100 : 0
 
     // Generate external links
     const yahooFinanceUrl = `https://finance.yahoo.com/quote/${ticker.toUpperCase()}`
