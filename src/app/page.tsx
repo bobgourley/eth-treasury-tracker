@@ -21,6 +21,10 @@ export default function Home() {
               <Link href="/analytics/charts" className="hover:text-blue-600 transition-colors">
                 Charts
               </Link>
+              <span>•</span>
+              <Link href="/about" className="hover:text-blue-600 transition-colors">
+                About
+              </Link>
             </div>
           </div>
         </div>

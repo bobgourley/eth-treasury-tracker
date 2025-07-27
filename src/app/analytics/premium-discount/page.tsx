@@ -139,6 +139,10 @@ export default function PremiumDiscountAnalytics() {
                 <Link href="/analytics/charts" className="hover:text-blue-600 transition-colors">
                   Charts
                 </Link>
+                <span>•</span>
+                <Link href="/about" className="hover:text-blue-600 transition-colors">
+                  About
+                </Link>
               </div>
               <h1 className="text-3xl font-bold text-gray-900">
                 ETH Treasury Premium/Discount Analysis
