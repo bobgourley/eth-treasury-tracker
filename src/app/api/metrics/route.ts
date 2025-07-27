@@ -3,19 +3,24 @@ import { prisma } from '@/lib/db'
 
 export async function GET() {
   try {
-    // Use EXACT same query pattern as companies API to ensure consistency
-    const companies = await prisma.company.findMany({
-      orderBy: { ethHoldings: 'desc' }
-    })
-
-    // TEMPORARY: Return basic info to verify database connection works
-    if (companies.length !== 9) {
-      console.error(`CRITICAL: Expected 9 companies, got ${companies.length}`);
-      console.error('Companies found:', companies.map(c => `${c.ticker} (${c.name})`));
+    // WORKAROUND: Call companies API internally to bypass database issue
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : process.env.NODE_ENV === 'production' 
+        ? 'https://www.ethereumlist.com'
+        : 'http://localhost:3000'
+    
+    const companiesResponse = await fetch(`${baseUrl}/api/companies`)
+    if (!companiesResponse.ok) {
+      throw new Error(`Companies API failed: ${companiesResponse.status}`)
     }
-
-    // Skip systemMetrics query entirely to isolate the issue
-    const systemMetrics = null
+    
+    const companies: any[] = await companiesResponse.json()
+    
+    console.log(`\n=== METRICS API WORKAROUND ===`)
+    console.log(`Fetched ${companies.length} companies from companies API`)
+    console.log(`Companies: ${companies.map(c => c.ticker).join(', ')}`)
+    console.log('===============================\n')
 
     // COMPREHENSIVE DEBUGGING to identify company count discrepancy
     console.log(`\n=== METRICS API COMPREHENSIVE DEBUG ===`)
@@ -29,7 +34,7 @@ export async function GET() {
     }
     
     console.log('\nAll companies with full details:')
-    companies.forEach((c, i) => {
+    companies.forEach((c: any, i: number) => {
       console.log(`  ${i+1}. ID:${c.id} ${c.ticker} (${c.name}) - ETH: ${c.ethHoldings || 0}, Active: ${c.isActive}, MarketCap: ${c.marketCap}`)
     })
 
@@ -37,11 +42,11 @@ export async function GET() {
     console.log(`\nValid companies count (should be 9): ${validCompanies.length}`)
     console.log(`Valid companies === companies: ${validCompanies === companies}`)
 
-    const companiesWithEth = validCompanies.filter(c => (c.ethHoldings ?? 0) > 0)
+    const companiesWithEth = validCompanies.filter((c: any) => (c.ethHoldings ?? 0) > 0)
     console.log(`Companies with ETH holdings > 0: ${companiesWithEth.length}`)
 
     console.log('\nCompanies contributing to totals:')
-    validCompanies.forEach((c, i) => {
+    validCompanies.forEach((c: any, i: number) => {
       const ethValue = (c.ethHoldings || 0)
       const marketCap = c.marketCap ? BigInt(c.marketCap.toString()) : BigInt(0)
       console.log(`  ${i+1}. ${c.ticker}: ETH=${ethValue}, MarketCap=${marketCap.toString()}`)
@@ -53,8 +58,8 @@ export async function GET() {
     console.log('================================\n')
 
     // Calculate totals using ALL companies
-    const totalEthHeld = validCompanies.reduce((sum, company) => sum + (company.ethHoldings ?? 0), 0)
-    const totalMarketCap = validCompanies.reduce((sum, company) => {
+    const totalEthHeld = validCompanies.reduce((sum: number, company: any) => sum + (company.ethHoldings ?? 0), 0)
+    const totalMarketCap = validCompanies.reduce((sum: bigint, company: any) => {
       const marketCap = company.marketCap ? BigInt(company.marketCap.toString()) : BigInt(0)
       return sum + marketCap
     }, BigInt(0))
@@ -77,7 +82,7 @@ export async function GET() {
       totalCompanies: validCompanies.length, // Use validCompanies count, not companies.length
       lastUpdate: new Date(),
       // TEMPORARY DEBUG: Include raw company data to diagnose count issue
-      debugCompanies: validCompanies.map(c => ({
+      debugCompanies: validCompanies.map((c: any) => ({
         id: c.id,
         ticker: c.ticker,
         name: c.name,
