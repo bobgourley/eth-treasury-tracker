@@ -63,8 +63,8 @@ export async function POST() {
           
           successCount++
           
-          // Add delay between API calls to respect rate limits (Alpha Vantage free tier: 5 calls/min)
-          await new Promise(resolve => setTimeout(resolve, 12000)) // 12 second delay = 5 calls/min
+          // Add small delay between API calls to be respectful (Alpha Vantage free tier: 25 calls/day)
+          await new Promise(resolve => setTimeout(resolve, 1000)) // 1 second delay between calls
           
         } else {
           // API call failed or rate limited - use last known database value

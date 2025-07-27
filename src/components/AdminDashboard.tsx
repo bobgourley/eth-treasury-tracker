@@ -201,7 +201,9 @@ export default function AdminDashboard() {
         <div className="bg-gray-50 rounded-lg p-6 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Market Cap Management</h3>
           <p className="text-sm text-gray-600 mb-4">
-            Update market cap data from Alpha Vantage API. Rate limited to 5 calls/minute on free tier.
+            Update market cap data from Alpha Vantage API. Uses 18 of 25 daily requests (2 per company: stock price + market cap).
+            <br />
+            <span className="text-xs text-gray-500">Recommended: Update once per day to stay within rate limits and ensure fresh data.</span>
           </p>
           
           <div className="flex flex-wrap gap-4 mb-4">
