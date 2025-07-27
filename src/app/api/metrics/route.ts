@@ -17,29 +17,39 @@ export async function GET() {
       // Continue without system metrics
     }
 
-    // ENHANCED DEBUGGING to identify company count discrepancy
-    console.log(`\n=== METRICS API ENHANCED DEBUG ===`)
-    console.log(`Total companies found from database: ${companies.length}`)
-    console.log('All companies with full details:')
+    // COMPREHENSIVE DEBUGGING to identify company count discrepancy
+    console.log(`\n=== METRICS API COMPREHENSIVE DEBUG ===`)
+    console.log(`Raw companies array length: ${companies.length}`)
+    console.log(`Raw companies array type: ${typeof companies}`)
+    console.log(`Raw companies array is array: ${Array.isArray(companies)}`)
+    
+    if (companies.length === 0) {
+      console.log('ERROR: No companies returned from database query!')
+      console.log('This suggests a database connection or query issue')
+    }
+    
+    console.log('\nAll companies with full details:')
     companies.forEach((c, i) => {
       console.log(`  ${i+1}. ID:${c.id} ${c.ticker} (${c.name}) - ETH: ${c.ethHoldings || 0}, Active: ${c.isActive}, MarketCap: ${c.marketCap}`)
     })
-    
-    // Use ALL companies - no filtering whatsoever
+
     const validCompanies = companies
     console.log(`\nValid companies count (should be 9): ${validCompanies.length}`)
-    
-    // Double-check: count companies that contribute to totals
+    console.log(`Valid companies === companies: ${validCompanies === companies}`)
+
     const companiesWithEth = validCompanies.filter(c => c.ethHoldings > 0)
     console.log(`Companies with ETH holdings > 0: ${companiesWithEth.length}`)
-    
-    // Log the actual calculation inputs
-    console.log('Companies contributing to totals:')
+
+    console.log('\nCompanies contributing to totals:')
     validCompanies.forEach((c, i) => {
       const ethValue = (c.ethHoldings || 0)
       const marketCap = c.marketCap ? BigInt(c.marketCap.toString()) : BigInt(0)
       console.log(`  ${i+1}. ${c.ticker}: ETH=${ethValue}, MarketCap=${marketCap.toString()}`)
     })
+    
+    console.log(`\nFinal metrics calculation inputs:`)
+    console.log(`- validCompanies.length: ${validCompanies.length}`)
+    console.log(`- This will be returned as totalCompanies: ${validCompanies.length}`)
     console.log('================================\n')
 
     // Calculate totals using ALL companies
@@ -102,4 +112,4 @@ export async function GET() {
     return NextResponse.json(fallbackMetrics)
   }
 }
-// Force redeploy Sun Jul 27 00:16:04 EDT 2025 - Fix systemMetrics table error causing fallback
+// Force redeploy Sun Jul 27 00:27:33 EDT 2025 - Comprehensive debugging for company count issue
