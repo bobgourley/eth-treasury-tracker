@@ -97,8 +97,7 @@ export async function GET(
       website: companyWebsite,
       
       // Risk and exposure metrics
-      riskLevel: ecmcPercentage > 50 ? 'High' : ecmcPercentage > 20 ? 'Medium' : 'Low',
-      exposureCategory: ecmcPercentage > 30 ? 'ETH-Focused' : ecmcPercentage > 10 ? 'ETH-Exposed' : 'ETH-Light'
+      riskLevel: ecmcPercentage > 50 ? 'High' : ecmcPercentage > 20 ? 'Medium' : 'Low'
     }
 
     return NextResponse.json(companyProfile)

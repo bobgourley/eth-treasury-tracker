@@ -29,7 +29,6 @@ interface CompanyProfile {
   headquarters: string
   website: string
   riskLevel: string
-  exposureCategory: string
 }
 
 export default function CompanyProfilePage() {
