@@ -34,6 +34,27 @@ interface UpdateStatus {
 export default function AdminDashboard() {
   const [isUpdating, setIsUpdating] = useState(false)
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus | null>(null)
+  const [isUpdatingMarketCaps, setIsUpdatingMarketCaps] = useState(false)
+  const [marketCapStatus, setMarketCapStatus] = useState<{
+    success: boolean
+    summary?: {
+      totalCompanies: number
+      companiesWithData: number
+      companiesNeedingUpdate: number
+      totalMarketCap: number
+    }
+    companies?: Array<{
+      name: string
+      ticker: string
+      marketCapFormatted: string
+      stockPrice: number
+      lastUpdated: string
+      dataAge: number
+      needsUpdate: boolean
+    }>
+    message?: string
+    error?: string
+  } | null>(null)
 
   const triggerDataUpdate = async () => {
     setIsUpdating(true)
@@ -85,7 +106,60 @@ export default function AdminDashboard() {
     }
   }
 
+  const updateMarketCaps = async () => {
+    setIsUpdatingMarketCaps(true)
+    setMarketCapStatus(null)
 
+    try {
+      const response = await fetch('/api/admin/update-market-caps', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        setMarketCapStatus(result)
+        // Also refresh the status to show updated data
+        setTimeout(() => checkMarketCapStatus(), 1000)
+      } else {
+        setMarketCapStatus({
+          success: false,
+          message: result.message || 'Failed to update market caps',
+          error: result.error
+        })
+      }
+    } catch (error) {
+      console.error('Market cap update failed:', error)
+      setMarketCapStatus({
+        success: false,
+        message: 'Failed to update market caps',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      })
+    } finally {
+      setIsUpdatingMarketCaps(false)
+    }
+  }
+
+  const checkMarketCapStatus = async () => {
+    try {
+      const response = await fetch('/api/admin/update-market-caps', {
+        method: 'GET'
+      })
+
+      const result = await response.json()
+      setMarketCapStatus(result)
+    } catch (error) {
+      console.error('Failed to check market cap status:', error)
+      setMarketCapStatus({
+        success: false,
+        message: 'Failed to check market cap status',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      })
+    }
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
@@ -121,6 +195,106 @@ export default function AdminDashboard() {
           </button>
 
 
+        </div>
+
+        {/* Market Cap Management */}
+        <div className="bg-gray-50 rounded-lg p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Market Cap Management</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Update market cap data from Alpha Vantage API. Rate limited to 5 calls/minute on free tier.
+          </p>
+          
+          <div className="flex flex-wrap gap-4 mb-4">
+            <button
+              onClick={updateMarketCaps}
+              disabled={isUpdatingMarketCaps}
+              className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+                isUpdatingMarketCaps
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-green-600 hover:bg-green-700 text-white'
+              }`}
+            >
+              {isUpdatingMarketCaps ? 'Updating Market Caps...' : 'Update Market Caps'}
+            </button>
+            
+            <button
+              onClick={checkMarketCapStatus}
+              disabled={isUpdatingMarketCaps}
+              className="px-6 py-3 rounded-lg font-semibold bg-gray-600 hover:bg-gray-700 text-white transition-colors"
+            >
+              Check Status
+            </button>
+          </div>
+          
+          {marketCapStatus && (
+            <div className="mt-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+                <div className="bg-white p-3 rounded border">
+                  <p className="font-medium text-gray-600">Total Companies</p>
+                  <p className="text-xl font-bold text-blue-600">{marketCapStatus.summary?.totalCompanies || 0}</p>
+                </div>
+                <div className="bg-white p-3 rounded border">
+                  <p className="font-medium text-gray-600">With Market Cap</p>
+                  <p className="text-xl font-bold text-green-600">{marketCapStatus.summary?.companiesWithData || 0}</p>
+                </div>
+                <div className="bg-white p-3 rounded border">
+                  <p className="font-medium text-gray-600">Need Update</p>
+                  <p className="text-xl font-bold text-orange-600">{marketCapStatus.summary?.companiesNeedingUpdate || 0}</p>
+                </div>
+                <div className="bg-white p-3 rounded border">
+                  <p className="font-medium text-gray-600">Total Market Cap</p>
+                  <p className="text-xl font-bold text-purple-600">
+                    ${marketCapStatus.summary?.totalMarketCap ? (marketCapStatus.summary.totalMarketCap / 1000000000).toFixed(2) + 'B' : '0'}
+                  </p>
+                </div>
+              </div>
+              
+              {marketCapStatus.companies && (
+                <div className="bg-white rounded border max-h-64 overflow-y-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50 sticky top-0">
+                      <tr>
+                        <th className="text-left p-2 font-medium text-gray-600">Company</th>
+                        <th className="text-left p-2 font-medium text-gray-600">Market Cap</th>
+                        <th className="text-left p-2 font-medium text-gray-600">Stock Price</th>
+                        <th className="text-left p-2 font-medium text-gray-600">Last Updated</th>
+                        <th className="text-left p-2 font-medium text-gray-600">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {marketCapStatus.companies.map((company, index: number) => (
+                        <tr key={index} className="border-t">
+                          <td className="p-2">
+                            <div>
+                              <div className="font-medium">{company.name}</div>
+                              <div className="text-gray-500 text-xs">{company.ticker}</div>
+                            </div>
+                          </td>
+                          <td className="p-2 font-mono">{company.marketCapFormatted}</td>
+                          <td className="p-2 font-mono">${company.stockPrice?.toFixed(2) || '0.00'}</td>
+                          <td className="p-2 text-xs">
+                            {company.lastUpdated ? new Date(company.lastUpdated).toLocaleDateString() : 'Never'}
+                            {company.dataAge && (
+                              <div className="text-gray-500">({company.dataAge}h ago)</div>
+                            )}
+                          </td>
+                          <td className="p-2">
+                            <span className={`px-2 py-1 rounded text-xs ${
+                              company.needsUpdate 
+                                ? 'bg-orange-100 text-orange-800' 
+                                : 'bg-green-100 text-green-800'
+                            }`}>
+                              {company.needsUpdate ? 'Needs Update' : 'Current'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* API Health Status - Temporarily disabled for MVP deployment */}

@@ -120,14 +120,96 @@ export async function getEthPrice(): Promise<number> {
 }
 
 /**
- * Get market data for a stock symbol from a financial API
- * Note: This would typically use Alpha Vantage or similar service
+ * Get market data for a stock symbol from Alpha Vantage API
+ * Returns stock price and market cap, with proper error handling for rate limits
  */
 export async function getStockPrice(symbol: string): Promise<{ price: number; marketCap: number } | null> {
-  // Placeholder for stock API integration
-  // In production, this would connect to Alpha Vantage, Yahoo Finance API, etc.
-  console.warn(`Stock price API not implemented for ${symbol}`)
-  return null
+  const ALPHA_VANTAGE_API_KEY = process.env.ALPHA_VANTAGE_API_KEY
+  
+  if (!ALPHA_VANTAGE_API_KEY) {
+    console.warn('Alpha Vantage API key not configured')
+    return null
+  }
+
+  try {
+    // First, get the stock quote for current price
+    const quoteUrl = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`
+    
+    console.log(`Fetching stock data for ${symbol} from Alpha Vantage...`)
+    
+    const quoteResponse = await fetch(quoteUrl, {
+      headers: {
+        'Accept': 'application/json',
+      },
+      // Add timeout to prevent hanging
+      signal: AbortSignal.timeout(10000)
+    })
+
+    if (!quoteResponse.ok) {
+      throw new Error(`Alpha Vantage API returned ${quoteResponse.status}`)
+    }
+
+    const quoteData = await quoteResponse.json()
+    
+    // Check for API rate limit or error
+    if (quoteData['Error Message']) {
+      throw new Error(`Alpha Vantage Error: ${quoteData['Error Message']}`)
+    }
+    
+    if (quoteData['Note']) {
+      // Rate limit hit
+      console.warn(`Alpha Vantage rate limit for ${symbol}: ${quoteData['Note']}`)
+      return null
+    }
+
+    const globalQuote = quoteData['Global Quote']
+    if (!globalQuote) {
+      throw new Error('Invalid response format from Alpha Vantage Global Quote')
+    }
+
+    const price = parseFloat(globalQuote['05. price'] || '0')
+    
+    // Get company overview for market cap
+    const overviewUrl = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`
+    
+    const overviewResponse = await fetch(overviewUrl, {
+      headers: {
+        'Accept': 'application/json',
+      },
+      signal: AbortSignal.timeout(10000)
+    })
+
+    if (!overviewResponse.ok) {
+      throw new Error(`Alpha Vantage Overview API returned ${overviewResponse.status}`)
+    }
+
+    const overviewData = await overviewResponse.json()
+    
+    // Check for API rate limit or error
+    if (overviewData['Error Message']) {
+      throw new Error(`Alpha Vantage Overview Error: ${overviewData['Error Message']}`)
+    }
+    
+    if (overviewData['Note']) {
+      // Rate limit hit
+      console.warn(`Alpha Vantage overview rate limit for ${symbol}: ${overviewData['Note']}`)
+      // Return price data even if we can't get market cap
+      return { price, marketCap: 0 }
+    }
+
+    const marketCap = parseFloat(overviewData['MarketCapitalization'] || '0')
+    
+    if (price > 0) {
+      console.log(`✅ Alpha Vantage data for ${symbol}: Price=$${price}, MarketCap=$${marketCap.toLocaleString()}`)
+      return { price, marketCap }
+    } else {
+      throw new Error('Invalid price data received')
+    }
+    
+  } catch (error) {
+    console.error(`❌ Failed to fetch stock data for ${symbol}:`, error)
+    return null
+  }
 }
 
 /**
