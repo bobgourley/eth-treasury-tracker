@@ -59,15 +59,6 @@ export default function CompanyProfilePage() {
     }
   }, [ticker])
 
-  const formatNumber = (num: number) => {
-    if (num >= 1e9) {
-      return `$${(num / 1e9).toFixed(2)}B`
-    } else if (num >= 1e6) {
-      return `$${(num / 1e6).toFixed(2)}M`
-    }
-    return `$${num.toLocaleString()}`
-  }
-
   const formatPercentage = (num: number) => {
     return `${num.toFixed(2)}%`
   }
@@ -327,23 +318,23 @@ export default function CompanyProfilePage() {
               <div className="space-y-4">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Ticker Symbol</span>
-                  <span className="font-semibold">{company.ticker}</span>
+                  <span className="font-semibold text-gray-900">{company.ticker}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Current ETH Price</span>
-                  <span className="font-semibold">${company.ethPrice.toLocaleString()}</span>
+                  <span className="font-semibold text-gray-900">${company.ethPrice.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">ETH Holdings</span>
-                  <span className="font-semibold">{company.ethHoldingsFormatted}</span>
+                  <span className="font-semibold text-gray-900">{company.ethHoldingsFormatted}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Holdings Value</span>
-                  <span className="font-semibold">{company.ethValueFormatted}</span>
+                  <span className="font-semibold text-gray-900">{company.ethValueFormatted}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Last Updated</span>
-                  <span className="font-semibold text-sm">
+                  <span className="font-semibold text-gray-900 text-sm">
                     {new Date(company.lastUpdated).toLocaleDateString()}
                   </span>
                 </div>

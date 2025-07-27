@@ -59,7 +59,7 @@ export async function GET(
       
       // Financial data (from our existing data)
       stockPrice: company.stockPrice || 0,
-      marketCap: company.marketCap ? `$${company.marketCap.toString()}` : '$0',
+      marketCap: company.marketCap ? `$${Number(company.marketCap).toLocaleString()}` : '$0',
       marketCapNumeric,
       priceChange: 0, // We don't currently track this
       priceChangePercent: 0,
@@ -86,11 +86,7 @@ export async function GET(
       ethHoldingsFormatted: company.ethHoldings ? 
         `${company.ethHoldings.toLocaleString()} ETH` : '0 ETH',
       ethWeight: totalEthHoldings > 0 ? ((company.ethHoldings || 0) / totalEthHoldings) * 100 : 0,
-      ethValueFormatted: ethValue >= 1e9 ? 
-        `$${(ethValue / 1e9).toFixed(2)}B` : 
-        ethValue >= 1e6 ? 
-          `$${(ethValue / 1e6).toFixed(2)}M` : 
-          `$${ethValue.toLocaleString()}`,
+      ethValueFormatted: `$${ethValue.toLocaleString()}`,
       
       // Business info (we can enhance this later)
       sector: 'Technology', // Default sector for crypto/blockchain companies

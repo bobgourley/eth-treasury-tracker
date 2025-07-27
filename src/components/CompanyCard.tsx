@@ -89,14 +89,14 @@ export default function CompanyCard({ company, rank, ethPrice }: CompanyCardProp
               
               <div>
                 <p className="text-gray-600">Shares Outstanding</p>
-                <p className="font-semibold">
+                <p className="font-semibold text-gray-900">
                   {company.sharesOutstanding ? formatShares(BigInt(company.sharesOutstanding)) : 'N/A'}
                 </p>
               </div>
               
               <div>
                 <p className="text-gray-600">Market Cap</p>
-                <p className="font-semibold">
+                <p className="font-semibold text-gray-900">
                   {company.marketCap ? formatNumber(BigInt(company.marketCap)) : 'N/A'}
                 </p>
               </div>
@@ -110,14 +110,14 @@ export default function CompanyCard({ company, rank, ethPrice }: CompanyCardProp
               
               <div>
                 <p className="text-gray-600">ETH per Share</p>
-                <p className="font-semibold">
+                <p className="font-semibold text-gray-900">
                   {company.ethPerShare ? company.ethPerShare.toFixed(6) : 'N/A'}
                 </p>
               </div>
               
               <div>
                 <p className="text-gray-600">Staking Yield</p>
-                <p className="font-semibold">
+                <p className="font-semibold text-gray-900">
                   {formatPercentage(company.stakingYield)}
                 </p>
               </div>

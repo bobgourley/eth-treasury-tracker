@@ -128,7 +128,11 @@ export default function PremiumDiscountAnalytics() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center space-x-4 mb-2">
+              <div className="flex items-center space-x-3 text-xs text-gray-500 mb-2">
+                <Link href="/" className="hover:text-blue-600 transition-colors">
+                  Dashboard
+                </Link>
+                <span>•</span>
                 <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
                   Premium/Discount
                 </Link>
@@ -256,10 +260,10 @@ export default function PremiumDiscountAnalytics() {
                       {formatEth(company.ethHoldings)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
-                      ${formatNumber(company.ethValue)}
+                      {formatNumber(company.ethValue)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
-                      ${formatNumber(BigInt(company.marketCap))}
+                      {formatNumber(BigInt(company.marketCap))}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -272,7 +276,7 @@ export default function PremiumDiscountAnalytics() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
                       <span className={company.premiumDiscount >= 0 ? 'text-green-600' : 'text-red-600'}>
-                        {company.premiumDiscount >= 0 ? '+' : ''}${formatNumber(Math.abs(company.premiumDiscount))}
+                        {company.premiumDiscount >= 0 ? '+' : ''}{formatNumber(Math.abs(company.premiumDiscount))}
                       </span>
                     </td>
                   </tr>
