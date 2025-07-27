@@ -1,4 +1,5 @@
 import CompanyList from '@/components/CompanyList'
+import Link from 'next/link'
 
 export default function Home() {
   return (
@@ -15,11 +16,26 @@ export default function Home() {
                 Track companies whose primary business model is Ethereum Treasury
               </p>
             </div>
-            <div className="text-right">
-              <div className="text-sm text-gray-500">Live Data</div>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium text-gray-700">Updated Daily</span>
+            <div className="flex items-center space-x-6">
+              {/* Navigation Menu */}
+              <nav className="hidden md:flex space-x-4">
+                <Link 
+                  href="/analytics/premium-discount" 
+                  className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                >
+                  Premium/Discount Analysis
+                </Link>
+                <span className="text-gray-300">|</span>
+                <span className="text-gray-400 text-sm">More analytics coming soon</span>
+              </nav>
+              
+              {/* Live Data Indicator */}
+              <div className="text-right">
+                <div className="text-sm text-gray-500">Live Data</div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-medium text-gray-700">Updated Daily</span>
+                </div>
               </div>
             </div>
           </div>
