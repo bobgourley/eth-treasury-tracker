@@ -14,6 +14,11 @@ export async function GET(
       return NextResponse.json({ error: 'Ticker parameter is required' }, { status: 400 })
     }
 
+    // Get current ETH price and total ETH holdings for weight calculation
+    const systemMetrics = await prisma.systemMetrics.findFirst()
+    const ethPrice = systemMetrics?.ethPrice || 3680.0
+    const totalEthHoldings = systemMetrics?.totalEthHoldings || 1130020.0
+
     // Get company data from database
     const company = await prisma.company.findFirst({
       where: {
@@ -25,17 +30,7 @@ export async function GET(
       return NextResponse.json({ error: 'Company not found' }, { status: 404 })
     }
 
-    // Get current ETH price from CoinGecko
-    let ethPrice = 3500 // fallback price
-    try {
-      const ethResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')
-      if (ethResponse.ok) {
-        const ethData = await ethResponse.json()
-        ethPrice = ethData.ethereum?.usd || 3500
-      }
-    } catch (error) {
-      console.error('Error fetching ETH price:', error)
-    }
+    // ETH price already fetched from systemMetrics above
 
     // Calculate derived metrics
     const ethValue = (company.ethHoldings || 0) * ethPrice
@@ -62,7 +57,7 @@ export async function GET(
       description: `${company.name} is a publicly traded company that has adopted Ethereum (ETH) as a strategic treasury asset. The company holds significant ETH reserves as part of its corporate treasury strategy, providing shareholders with exposure to Ethereum's potential appreciation while maintaining its core business operations. This treasury allocation represents a forward-thinking approach to corporate finance and digital asset adoption.`,
       
       // Financial data (from our existing data)
-      stockPrice: 150.00, // Placeholder - will be enhanced with real-time data later
+      stockPrice: 0, // Temporarily disabled until schema migration - company.stockPrice || 0
       marketCap: company.marketCap ? `$${company.marketCap.toString()}` : '$0',
       marketCapNumeric,
       priceChange: 0, // We don't currently track this
@@ -89,6 +84,7 @@ export async function GET(
       // Additional calculated metrics
       ethHoldingsFormatted: company.ethHoldings ? 
         `${company.ethHoldings.toLocaleString()} ETH` : '0 ETH',
+      ethWeight: totalEthHoldings > 0 ? ((company.ethHoldings || 0) / totalEthHoldings) * 100 : 0,
       ethValueFormatted: ethValue >= 1e9 ? 
         `$${(ethValue / 1e9).toFixed(2)}B` : 
         ethValue >= 1e6 ? 

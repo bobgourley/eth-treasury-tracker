@@ -73,7 +73,7 @@ export async function POST(request: Request) {
               await prisma.company.update({
                 where: { id: company.id },
                 data: { 
-                  // stockPrice, // Temporarily commented out for build compatibility
+                  // stockPrice, // Temporarily disabled until schema migration
                   lastUpdated: new Date()
                 }
               })

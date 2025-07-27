@@ -24,6 +24,7 @@ interface CompanyProfile {
   lastUpdated: string
   ethHoldingsFormatted: string
   ethValueFormatted: string
+  ethWeight?: number
   sector: string
   headquarters: string
   website: string
@@ -254,13 +255,13 @@ export default function CompanyProfilePage() {
                 </div>
                 
                 <div className="bg-purple-50 p-6 rounded-lg">
-                  <h4 className="font-bold text-purple-900 mb-3">Exposure Category</h4>
+                  <h4 className="font-bold text-purple-900 mb-3">ETH Weight</h4>
                   <div className="text-2xl font-bold text-purple-600 mb-2">
-                    {company.exposureCategory}
+                    {formatPercentage(company.ethWeight || 0)}
                   </div>
-                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getRiskLevelColor(company.riskLevel)}`}>
-                    {company.riskLevel} Risk
-                  </span>
+                  <p className="text-purple-800 text-sm">
+                    Share of total ETH holdings across all tracked companies
+                  </p>
                 </div>
               </div>
 
