@@ -49,8 +49,20 @@ export async function POST() {
       console.log('⚠️ ETH price fetch failed, using fallback')
     }
     
-    const updatedEtfs: any[] = []
-    let apiCallsUsed = 0
+    const updatedEtfs: Array<{
+      id: number;
+      symbol: string;
+      name: string;
+      ethHoldings: number;
+      totalValue: number;
+      aum: number;
+      expenseRatio: number;
+      nav: number;
+      lastUpdated: Date;
+      createdAt: Date;
+      isActive: boolean;
+    }> = []
+    const apiCallsUsed = 0
     // const maxApiCalls = 20 // Conservative limit for 250/day
     
     for (const symbol of ETF_SYMBOLS) {

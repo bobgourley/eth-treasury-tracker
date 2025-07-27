@@ -19,7 +19,7 @@ export async function GET() {
     let totalAum = 0
     let activeEtfs = 0
     
-    etfs.forEach((etf: any) => {
+    etfs.forEach((etf: { isActive?: boolean; ethHoldings?: number; totalValue?: number; aum?: number }) => {
       if (etf.isActive) {
         totalEthHeld += etf.ethHoldings || 0
         totalValue += etf.totalValue || 0
@@ -50,7 +50,7 @@ export async function GET() {
           ethPrice = coinGeckoData.ethereum.usd
         }
       }
-    } catch (fetchError) {
+    } catch {
       console.log('⚠️ ETF metrics fetch failed, using fallback')
     }
     
