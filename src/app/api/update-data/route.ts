@@ -11,26 +11,31 @@ export async function POST(request: Request) {
   try {
     console.log('🚀 Starting data update...')
     
-    // Get live ETH price from CoinGecko API
-    let ethPrice = 3680.0 // fallback
-    let ethPriceSource = 'Fallback'
+    // Get last known ETH price from database as fallback
+    const lastSystemMetrics = await prisma.systemMetrics.findFirst()
+    let ethPrice = lastSystemMetrics?.ethPrice || 3680.0 // Only use hardcoded if no database value exists
+    let ethPriceSource = 'Last known value (database)'
     let ethPriceLastUpdate = new Date()
     
+    // Try to get live ETH price from CoinGecko API
     try {
       const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')
       if (response.ok) {
         const data = await response.json()
-        ethPrice = data.ethereum?.usd || ethPrice
-        ethPriceSource = 'CoinGecko API'
-        ethPriceLastUpdate = new Date()
-        console.log('✅ Live ETH price fetched from CoinGecko:', ethPrice)
+        const newEthPrice = data.ethereum?.usd
+        if (newEthPrice && newEthPrice > 0) {
+          ethPrice = newEthPrice
+          ethPriceSource = 'CoinGecko API'
+          ethPriceLastUpdate = new Date()
+          console.log('✅ Live ETH price fetched from CoinGecko:', ethPrice)
+        } else {
+          console.log('⚠️ CoinGecko returned invalid price, using last known value:', ethPrice)
+        }
       } else {
-        console.log('⚠️ CoinGecko API failed, using fallback price')
-        ethPriceSource = 'Fallback (CoinGecko API failed)'
+        console.log('⚠️ CoinGecko API failed, using last known value:', ethPrice)
       }
     } catch (error) {
-      console.log('⚠️ ETH price fetch error, using fallback:', error)
-      ethPriceSource = 'Fallback (API error)'
+      console.log('⚠️ ETH price fetch error, using last known value:', ethPrice, error)
     }
     
     // Stock price updates re-enabled with Alpha Vantage API

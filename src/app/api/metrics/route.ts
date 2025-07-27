@@ -16,7 +16,7 @@ export async function GET() {
       return sum + marketCap
     }, BigInt(0))
 
-    // Get ETH price (fallback to reasonable default if not available)
+    // Get ETH price (use last known value from database, only hardcode if no database value exists)
     const ethPrice = systemMetrics?.ethPrice || 3680.0
     const totalEthSupply = 120500000.0 // Static value for MVP
 
@@ -42,15 +42,27 @@ export async function GET() {
   } catch (error: unknown) {
     console.error('Database error, using static fallback metrics:', error)
     
+    // Try to get last known ETH price before falling back to hardcoded value
+    let fallbackEthPrice = 3680.0 // Only used if absolutely no database access
+    try {
+      const lastMetrics = await prisma.systemMetrics.findFirst()
+      if (lastMetrics?.ethPrice) {
+        fallbackEthPrice = lastMetrics.ethPrice
+        console.log('Using last known ETH price from database:', fallbackEthPrice)
+      }
+    } catch (dbError) {
+      console.log('Could not access database for last known ETH price, using hardcoded fallback')
+    }
+    
     // Static fallback metrics for MVP (updated July 2025)
     const fallbackMetrics = {
-      totalEthHoldings: 1131276.0, // Sum of all 7 companies: 566776 + 360000 + 125000 + 58000 + 12500 + 6200 + 2800
-      totalEthValue: 1131276.0 * 3680.0, // ETH value at current price (~$4.16B)
-      totalMarketCap: '5442000000', // Sum of all company market caps
-      ethPrice: 3680.0,
-      ethSupplyPercent: (1131276.0 / 120500000.0) * 100, // ~0.939%
+      totalEthHoldings: 1130020.0, // Sum of all 9 companies: 566776 + 360807 + 120306 + 55788 + 10170 + 7023 + 5500 + 2550 + 2100
+      totalEthValue: 1130020.0 * fallbackEthPrice, // ETH value at last known price
+      totalMarketCap: '2899000000', // Sum of all 9 company market caps
+      ethPrice: fallbackEthPrice,
+      ethSupplyPercent: (1130020.0 / 120500000.0) * 100, // ~0.938%
       totalEthSupply: 120500000.0,
-      totalCompanies: 7,
+      totalCompanies: 9,
       lastUpdate: new Date(),
     }
     
