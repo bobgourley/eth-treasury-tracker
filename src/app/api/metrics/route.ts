@@ -3,10 +3,16 @@ import { prisma } from '@/lib/db'
 
 export async function GET() {
   try {
-    // Get ALL companies without any filtering
+    // Use EXACT same query pattern as companies API to ensure consistency
     const companies = await prisma.company.findMany({
       orderBy: { ethHoldings: 'desc' }
     })
+
+    // Ensure we have the expected number of companies
+    if (companies.length !== 9) {
+      console.error(`CRITICAL: Expected 9 companies, got ${companies.length}`);
+      console.error('Companies found:', companies.map(c => `${c.ticker} (${c.name})`));
+    }
 
     // Try to get system metrics, but don't fail if table doesn't exist
     let systemMetrics = null
@@ -37,7 +43,7 @@ export async function GET() {
     console.log(`\nValid companies count (should be 9): ${validCompanies.length}`)
     console.log(`Valid companies === companies: ${validCompanies === companies}`)
 
-    const companiesWithEth = validCompanies.filter(c => c.ethHoldings > 0)
+    const companiesWithEth = validCompanies.filter(c => (c.ethHoldings ?? 0) > 0)
     console.log(`Companies with ETH holdings > 0: ${companiesWithEth.length}`)
 
     console.log('\nCompanies contributing to totals:')
@@ -53,7 +59,7 @@ export async function GET() {
     console.log('================================\n')
 
     // Calculate totals using ALL companies
-    const totalEthHeld = validCompanies.reduce((sum, company) => sum + (company.ethHoldings || 0), 0)
+    const totalEthHeld = validCompanies.reduce((sum, company) => sum + (company.ethHoldings ?? 0), 0)
     const totalMarketCap = validCompanies.reduce((sum, company) => {
       const marketCap = company.marketCap ? BigInt(company.marketCap.toString()) : BigInt(0)
       return sum + marketCap
