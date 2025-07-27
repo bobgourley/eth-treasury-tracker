@@ -57,7 +57,7 @@ export async function GET(
       description: `${company.name} is a publicly traded company that has adopted Ethereum (ETH) as a strategic treasury asset. The company holds significant ETH reserves as part of its corporate treasury strategy, providing shareholders with exposure to Ethereum's potential appreciation while maintaining its core business operations. This treasury allocation represents a forward-thinking approach to corporate finance and digital asset adoption.`,
       
       // Financial data (from our existing data)
-      stockPrice: 0, // Temporarily disabled until schema migration - company.stockPrice || 0
+      stockPrice: company.stockPrice || 0,
       marketCap: company.marketCap ? `$${company.marketCap.toString()}` : '$0',
       marketCapNumeric,
       priceChange: 0, // We don't currently track this
@@ -92,7 +92,7 @@ export async function GET(
           `$${ethValue.toLocaleString()}`,
       
       // Business info (we can enhance this later)
-      sector: '', // Will be enhanced with real data later
+      sector: 'Technology', // Default sector for crypto/blockchain companies
       headquarters: 'United States', // Default, can be enhanced
       website: companyWebsite,
       
