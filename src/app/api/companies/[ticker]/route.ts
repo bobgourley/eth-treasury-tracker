@@ -14,12 +14,17 @@ export async function GET(
       return NextResponse.json({ error: 'Ticker parameter is required' }, { status: 400 })
     }
 
+    // Force fresh database connection to ensure latest data
+    await prisma.$connect()
+
     // Get current ETH price and total ETH holdings for weight calculation
-    const systemMetrics = await prisma.systemMetrics.findFirst()
+    const systemMetrics = await prisma.systemMetrics.findFirst({
+      orderBy: { lastUpdate: 'desc' }
+    })
     const ethPrice = systemMetrics?.ethPrice || 3680.0
     const totalEthHoldings = systemMetrics?.totalEthHoldings || 1130020.0
 
-    // Get company data from database
+    // Get company data from database with fresh read
     const company = await prisma.company.findFirst({
       where: {
         ticker: ticker.toUpperCase()

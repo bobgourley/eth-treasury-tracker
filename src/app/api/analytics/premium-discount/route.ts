@@ -5,12 +5,17 @@ export async function GET() {
   try {
     console.log('Premium/Discount API: Starting data fetch...')
     
-    // Fetch companies and current ETH price
+    // Force fresh database connection and bypass any potential caching
+    await prisma.$connect()
+    
+    // Fetch companies and current ETH price with explicit fresh reads
     const [companies, systemMetrics] = await Promise.all([
       prisma.company.findMany({
         orderBy: { ethHoldings: 'desc' }
       }),
-      prisma.systemMetrics.findFirst()
+      prisma.systemMetrics.findFirst({
+        orderBy: { lastUpdate: 'desc' }
+      })
     ])
     
     console.log(`Premium/Discount API: Found ${companies.length} companies`)
@@ -170,5 +175,8 @@ export async function GET() {
       totalEthValue,
       lastUpdated: new Date()
     })
+  } finally {
+    // Ensure database connection is properly closed
+    await prisma.$disconnect()
   }
 }
