@@ -152,6 +152,103 @@ Currently tracking 9 major Ethereum treasury companies:
 
 **Total Tracked**: 864,771 ETH (~$3.18B at current ETH prices)
 
+## 🌐 External APIs Used
+
+This project integrates with several external APIs to provide real-time data and comprehensive financial information:
+
+### 🔗 **Etherscan API** (Ethereum Foundation)
+**Company**: Etherscan  
+**Website**: [etherscan.io](https://etherscan.io/)  
+**Purpose**: Ethereum blockchain data and analytics  
+**Usage in Project**:
+- **ETH Balance Tracking**: Monitor Ethereum wallet balances for companies
+- **Total ETH Supply**: Get current total Ethereum supply for percentage calculations
+- **Blockchain Analytics**: Access to Ethereum network statistics
+- **Rate Limits**: 5 calls/second, 100,000 calls/day (free tier)
+- **API Key Required**: Yes (`ETHERSCAN_API_KEY`)
+
+### 💰 **CoinGecko API** (CoinGecko Pte Ltd)
+**Company**: CoinGecko  
+**Website**: [coingecko.com](https://www.coingecko.com/)  
+**Purpose**: Cryptocurrency market data and pricing  
+**Usage in Project**:
+- **Real-time ETH Price**: Current Ethereum price in USD
+- **Market Data**: Cryptocurrency market statistics
+- **Price History**: Historical price data for calculations
+- **Rate Limits**: 50 calls/minute (free tier), 500 calls/minute (paid)
+- **API Key Required**: Optional (`COINGECKO_API_KEY` - improves rate limits)
+
+### 📈 **Alpha Vantage API** (Alpha Vantage Inc.)
+**Company**: Alpha Vantage  
+**Website**: [alphavantage.co](https://www.alphavantage.co/)  
+**Purpose**: Stock market data and financial information  
+**Usage in Project**:
+- **Live Stock Prices**: Real-time stock price data for all tracked companies
+- **Market Capitalization**: Current market cap calculations
+- **Shares Outstanding**: Company share count data
+- **Company Overview**: Basic company financial information
+- **Rate Limits**: 25 requests per day (free tier), 75 requests per minute (paid)
+- **API Key Required**: Yes (`ALPHA_VANTAGE_API_KEY`)
+
+### 🏛️ **SEC EDGAR API** (U.S. Securities and Exchange Commission)
+**Company**: U.S. Securities and Exchange Commission  
+**Website**: [sec.gov](https://www.sec.gov/)  
+**Purpose**: Public company filings and regulatory documents  
+**Usage in Project**:
+- **Company Filings**: Latest 10-K, 10-Q, 8-K, and other SEC filings
+- **CIK Lookup**: Central Index Key mapping for company identification
+- **Filing Documents**: Direct links to official SEC documents
+- **Company Information**: Official company names and identifiers
+- **Rate Limits**: 10 requests per second (no API key required)
+- **API Key Required**: No (public government API)
+
+### 📰 **NewsAPI** (NewsAPI.org)
+**Company**: NewsAPI.org  
+**Website**: [newsapi.org](https://newsapi.org/)  
+**Purpose**: News articles and media content  
+**Usage in Project**:
+- **Company News**: Latest news articles for tracked companies
+- **Ethereum News**: General Ethereum and cryptocurrency news
+- **Market Analysis**: Financial news and market insights
+- **Content Filtering**: Relevant news filtering by company and keywords
+- **Rate Limits**: 1,000 requests per day (free tier), 50,000+ (paid)
+- **API Key Required**: Yes (`NEWS_API_KEY`)
+
+### 💼 **Financial Modeling Prep API** (Financial Modeling Prep)
+**Company**: Financial Modeling Prep  
+**Website**: [financialmodelingprep.com](https://financialmodelingprep.com/)  
+**Purpose**: ETF and financial market data  
+**Usage in Project**:
+- **ETF Data**: Ethereum ETF information and metrics
+- **ETF Holdings**: Assets under management (AUM) for Ethereum ETFs
+- **ETF Pricing**: Net Asset Value (NAV) and market prices
+- **ETF Analytics**: Expense ratios and performance metrics
+- **Rate Limits**: 250 requests per day (free tier), 10,000+ (paid)
+- **API Key Required**: Yes (`FMP_API_KEY`)
+
+### 🔐 **API Key Management**
+
+All API keys are securely managed through environment variables:
+
+```bash
+# Required for core functionality
+ETHERSCAN_API_KEY="your-etherscan-api-key"     # Ethereum blockchain data
+COINGECKO_API_KEY="your-coingecko-api-key"     # ETH price data (optional)
+ALPHA_VANTAGE_API_KEY="your-alpha-vantage-key" # Stock market data
+
+# Optional for enhanced features
+NEWS_API_KEY="your-newsapi-key"                # Company news
+FMP_API_KEY="your-fmp-api-key"                 # ETF data
+```
+
+### 📊 **API Usage Strategy**
+
+- **Rate Limit Compliance**: Smart caching and request throttling
+- **Fallback Systems**: Static data fallbacks when APIs are unavailable
+- **Daily Limits**: Optimized for free tier usage with manual override options
+- **Error Handling**: Comprehensive error handling and retry logic
+- **Caching**: 1-24 hour caching depending on data type and API limits
+
 ## 🔧 API Endpoints
 
 ### GET `/api/companies`

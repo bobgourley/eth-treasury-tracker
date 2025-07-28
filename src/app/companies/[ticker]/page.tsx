@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import Navigation from '../../../components/Navigation'
 import SECFilings from '../../../components/SECFilings'
 import CompanyNews from '../../../components/CompanyNews'
 

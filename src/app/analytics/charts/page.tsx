@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import CompanyLink from '@/components/CompanyLink'
+import Navigation from '@/components/Navigation'
 import {
   Chart as ChartJS,
   ArcElement,
@@ -102,22 +103,7 @@ export default function ChartsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="flex justify-between items-center">
-              <h1 className="text-4xl font-bold text-gray-900">ETH Holdings Charts</h1>
-              <div className="flex items-center space-x-3 text-xs text-gray-500">
-                <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
-                  ETH Basis
-                </Link>
-                <span>•</span>
-                <Link href="/analytics/exposure" className="hover:text-blue-600 transition-colors">
-                  ETH Exposure
-                </Link>
-              </div>
-            </div>
-          </div>
-        </header>
+        <Navigation title="ETH Holdings Charts" />
         
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex justify-center items-center min-h-64">
@@ -131,6 +117,7 @@ export default function ChartsPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50">
+        <Navigation title="ETH Holdings Charts" />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="text-red-600 text-lg font-semibold">Error: {error}</div>
@@ -205,39 +192,7 @@ export default function ChartsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-4xl font-bold text-gray-900">ETH Holdings Charts</h1>
-            <div className="flex items-center space-x-3 text-xs text-gray-500">
-              <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
-                ETH Basis
-              </Link>
-              <span>•</span>
-              <Link href="/analytics/exposure" className="hover:text-blue-600 transition-colors">
-                ETH Exposure
-              </Link>
-              <span>•</span>
-              <Link href="/news" className="hover:text-blue-600 transition-colors">
-                News
-              </Link>
-              <span>•</span>
-              <Link href="/etfs" className="hover:text-blue-600 transition-colors">
-                ETFs
-              </Link>
-              <span>•</span>
-              <Link href="/" className="hover:text-blue-600 transition-colors">
-                Dashboard
-              </Link>
-              <span>•</span>
-              <Link href="/about" className="hover:text-blue-600 transition-colors">
-                About
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navigation title="ETH Holdings Charts" />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Summary Stats */}

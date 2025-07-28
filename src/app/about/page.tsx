@@ -1,41 +1,10 @@
 import Link from 'next/link'
+import Navigation from '@/components/Navigation'
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-4xl font-bold text-gray-900">About</h1>
-            <div className="flex items-center space-x-3 text-xs text-gray-500">
-              <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
-                ETH Basis
-              </Link>
-              <span>•</span>
-              <Link href="/analytics/exposure" className="hover:text-blue-600 transition-colors">
-                ETH Exposure
-              </Link>
-              <span>•</span>
-              <Link href="/analytics/charts" className="hover:text-blue-600 transition-colors">
-                Charts
-              </Link>
-              <span>•</span>
-              <Link href="/news" className="hover:text-blue-600 transition-colors">
-                News
-              </Link>
-              <span>•</span>
-              <Link href="/etfs" className="hover:text-blue-600 transition-colors">
-                ETFs
-              </Link>
-              <span>•</span>
-              <Link href="/" className="hover:text-blue-600 transition-colors">
-                Dashboard
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navigation title="About" />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Hero Section */}

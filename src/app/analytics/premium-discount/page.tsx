@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import CompanyLink from '@/components/CompanyLink'
+import Navigation from '@/components/Navigation'
 import { formatNumber, formatEth, formatPercentage } from '@/lib/utils'
 
 interface PremiumDiscountData {
@@ -123,50 +124,7 @@ export default function PremiumDiscountAnalytics() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center space-x-3 text-xs text-gray-500 mb-2">
-                <Link href="/" className="hover:text-blue-600 transition-colors">
-                  Dashboard
-                </Link>
-                <span>•</span>
-                <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
-                  ETH Basis
-                </Link>
-                <span>•</span>
-                <Link href="/analytics/exposure" className="hover:text-blue-600 transition-colors">
-                  ETH Exposure
-                </Link>
-                <span>•</span>
-                <Link href="/analytics/charts" className="hover:text-blue-600 transition-colors">
-                  Charts
-                </Link>
-                <span>•</span>
-                <Link href="/news" className="hover:text-blue-600 transition-colors">
-                  News
-                </Link>
-                <span>•</span>
-                <Link href="/etfs" className="hover:text-blue-600 transition-colors">
-                  ETFs
-                </Link>
-                <span>•</span>
-                <Link href="/about" className="hover:text-blue-600 transition-colors">
-                  About
-                </Link>
-              </div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                ETH Treasury Basis Analysis
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Analyze how companies trade relative to their ETH holdings value
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navigation title="ETH Treasury Basis Analysis" />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Summary Stats */}
