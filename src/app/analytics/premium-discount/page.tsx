@@ -187,13 +187,13 @@ export default function PremiumDiscountAnalytics() {
               </div>
               <div className="text-center">
                 <p className="text-2xl lg:text-3xl font-bold">
-                  ${formatNumber(data.totalMarketCap)}
+                  {formatNumber(data.totalMarketCap)}
                 </p>
                 <p className="text-blue-100 text-sm">Total Market Cap</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl lg:text-3xl font-bold">
-                  ${formatNumber(data.totalEthValue)}
+                  {formatNumber(data.totalEthValue)}
                 </p>
                 <p className="text-blue-100 text-sm">Total ETH Value</p>
               </div>

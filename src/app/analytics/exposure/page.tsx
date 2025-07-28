@@ -219,15 +219,15 @@ export default function MarketCapWeightedExposure() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Total Market Cap:</span>
-                  <span className="text-sm font-medium">{formatNumber(data.totalMarketCap)}</span>
+                  <span className="text-sm font-medium text-gray-900">{formatNumber(data.totalMarketCap)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Total ETH Value:</span>
-                  <span className="text-sm font-medium">{formatNumber(data.totalEthValue)}</span>
+                  <span className="text-sm font-medium text-gray-900">{formatNumber(data.totalEthValue)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">ETH/Market Ratio:</span>
-                  <span className="text-sm font-medium">
+                  <span className="text-sm font-medium text-gray-900">
                     {formatPercentage((data.totalEthValue / data.totalMarketCap) * 100)}
                   </span>
                 </div>
@@ -239,11 +239,11 @@ export default function MarketCapWeightedExposure() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Median ECMC:</span>
-                  <span className="text-sm font-medium">{formatPercentage(data.averageEthExposure)}</span>
+                  <span className="text-sm font-medium text-gray-900">{formatPercentage(data.averageEthExposure)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Median ETCD:</span>
-                  <span className="text-sm font-medium">{formatPercentage(data.topThreeConcentration)}</span>
+                  <span className="text-sm font-medium text-gray-900">{formatPercentage(data.topThreeConcentration)}</span>
                 </div>
               </div>
             </div>
@@ -253,15 +253,15 @@ export default function MarketCapWeightedExposure() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Companies Tracked:</span>
-                  <span className="text-sm font-medium">{data.companies.length}</span>
+                  <span className="text-sm font-medium text-gray-900">{data.companies.length}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Diversification Score:</span>
-                  <span className="text-sm font-medium">{data.diversificationIndex.toFixed(1)}/10</span>
+                  <span className="text-sm font-medium text-gray-900">{data.diversificationIndex.toFixed(1)}/10</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Current ETH Price:</span>
-                  <span className="text-sm font-medium">${data.ethPrice.toLocaleString()}</span>
+                  <span className="text-sm font-medium text-gray-900">${data.ethPrice.toLocaleString()}</span>
                 </div>
               </div>
             </div>

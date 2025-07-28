@@ -36,8 +36,10 @@ export async function GET() {
       }).format(value)
     }
     
-    // Get current ETH price
+    // Get current ETH price and supply
     let ethPrice = 3825.95 // Fallback
+    let ethSupply = 120500000 // Fallback ETH supply
+    
     try {
       const coinGeckoResponse = await fetch(
         'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd',
@@ -51,8 +53,27 @@ export async function GET() {
         }
       }
     } catch {
-      console.log('⚠️ ETF metrics fetch failed, using fallback')
+      console.log('⚠️ ETH price fetch failed, using fallback')
     }
+    
+    // Get live ETH supply from Etherscan
+    try {
+      const etherscanResponse = await fetch(
+        `https://api.etherscan.io/api?module=stats&action=ethsupply&apikey=${process.env.ETHERSCAN_API_KEY}`,
+        { next: { revalidate: 86400 } } // Cache for 24 hours
+      )
+      
+      if (etherscanResponse.ok) {
+        const etherscanData = await etherscanResponse.json()
+        if (etherscanData.status === '1' && etherscanData.result) {
+          ethSupply = parseFloat(etherscanData.result) / 1e18 // Convert from wei to ETH
+        }
+      }
+    } catch {
+      console.log('⚠️ ETH supply fetch failed, using fallback')
+    }
+    
+    const ethSupplyPercentage = (totalEthHeld / ethSupply) * 100
     
     return NextResponse.json({
       totalEthHeld,
@@ -60,6 +81,8 @@ export async function GET() {
       totalAum,
       activeEtfs,
       ethPrice,
+      ethSupply,
+      ethSupplyPercentage,
       lastUpdated: new Date(),
       formattedTotalValue: new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -73,7 +96,8 @@ export async function GET() {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
       }).format(totalAum),
-      formattedTotalEthHeld: formatEth(totalEthHeld)
+      formattedTotalEthHeld: formatEth(totalEthHeld),
+      formattedEthSupplyPercentage: `${ethSupplyPercentage.toFixed(3)}%`
     })
     
   } catch (metricsError) {

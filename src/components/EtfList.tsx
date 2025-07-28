@@ -81,20 +81,13 @@ export default function EtfList() {
       {/* Summary Stats */}
       {metrics && (
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 rounded-lg shadow-lg">
-          <div className="flex justify-between items-center mb-4">
+          <div className="mb-4">
             <h2 className="text-2xl font-bold">Ethereum ETF Overview</h2>
-            <button
-              onClick={updateEtfData}
-              disabled={updating}
-              className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
-            >
-              {updating ? 'Updating...' : 'Update Data'}
-            </button>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="text-center">
-              <div className="text-3xl font-bold">{metrics.etfCount || etfs.length}</div>
+              <div className="text-3xl font-bold">{(metrics as any).activeEtfs || etfs.length}</div>
               <div className="text-sm opacity-90">Total ETFs</div>
             </div>
             
@@ -133,18 +126,33 @@ export default function EtfList() {
               </div>
               <div className="text-sm opacity-90">Total ETH Value</div>
             </div>
+            
+            <div className="text-center">
+              <div className="text-3xl font-bold">
+                {(metrics as any).formattedEthSupplyPercentage || `${((metrics.totalEthHeld / 120500000) * 100).toFixed(3)}%`}
+              </div>
+              <div className="text-sm opacity-90">% of ETH Supply</div>
+            </div>
           </div>
           
           <div className="mt-4 pt-4 border-t border-white border-opacity-20">
             <div className="flex justify-between items-center text-sm opacity-90">
               <span>
-                Average Expense Ratio: {metrics.avgExpenseRatio ? `${metrics.avgExpenseRatio.toFixed(2)}%` : 'N/A'}
+                Average Expense Ratio: {etfs.length > 0 ? `${(etfs.reduce((sum, etf) => sum + (etf.expenseRatio || 0), 0) / etfs.length).toFixed(2)}%` : 'N/A'}
               </span>
               <span>
                 ETH Price: ${metrics.ethPrice?.toFixed(2) || 'N/A'}
               </span>
               <span>
-                Last Updated: {new Date(metrics.lastUpdate).toLocaleString()}
+                Last Updated: {(metrics as any).lastUpdated ? new Date((metrics as any).lastUpdated).toLocaleDateString('en-US', { 
+                  month: 'numeric', 
+                  day: 'numeric', 
+                  year: 'numeric'
+                }) + ' ' + new Date((metrics as any).lastUpdated).toLocaleTimeString('en-US', {
+                  hour: 'numeric', 
+                  minute: '2-digit',
+                  hour12: true 
+                }) : 'N/A'}
               </span>
             </div>
           </div>
