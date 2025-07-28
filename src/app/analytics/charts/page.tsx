@@ -38,16 +38,23 @@ export default function ChartsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/companies')
-        if (!response.ok) {
+        // Fetch both companies and metrics data to get live ETH price
+        const [companiesResponse, metricsResponse] = await Promise.all([
+          fetch('/api/companies'),
+          fetch('/api/metrics')
+        ])
+        
+        if (!companiesResponse.ok || !metricsResponse.ok) {
           throw new Error('Failed to fetch data')
         }
-        const companiesData = await response.json()
         
-        // Calculate totals
+        const companiesData = await companiesResponse.json()
+        const metricsData = await metricsResponse.json()
+        
+        // Calculate totals using live ETH price
         const totalEthHoldings = companiesData.reduce((sum: number, company: CompanyData) => 
           sum + (company.ethHoldings || 0), 0)
-        const ethPrice = 3500 // We'll get this from CoinGecko API later
+        const ethPrice = metricsData.ethPrice || 3500 // Fallback to 3500 if API fails
         const totalEthValue = totalEthHoldings * ethPrice
 
         setData({
