@@ -87,7 +87,7 @@ export default function EtfList() {
           
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="text-center">
-              <div className="text-3xl font-bold">{(metrics as any).activeEtfs || etfs.length}</div>
+              <div className="text-3xl font-bold">{etfs.length}</div>
               <div className="text-sm opacity-90">Total ETFs</div>
             </div>
             
@@ -129,7 +129,7 @@ export default function EtfList() {
             
             <div className="text-center">
               <div className="text-3xl font-bold">
-                {(metrics as any).formattedEthSupplyPercentage || `${((metrics.totalEthHeld / 120500000) * 100).toFixed(3)}%`}
+                {`${((metrics.totalEthHeld / 120500000) * 100).toFixed(3)}%`}
               </div>
               <div className="text-sm opacity-90">% of ETH Supply</div>
             </div>
@@ -144,15 +144,15 @@ export default function EtfList() {
                 ETH Price: ${metrics.ethPrice?.toFixed(2) || 'N/A'}
               </span>
               <span>
-                Last Updated: {(metrics as any).lastUpdated ? new Date((metrics as any).lastUpdated).toLocaleDateString('en-US', { 
+                Last Updated: {new Date().toLocaleDateString('en-US', { 
                   month: 'numeric', 
                   day: 'numeric', 
                   year: 'numeric'
-                }) + ' ' + new Date((metrics as any).lastUpdated).toLocaleTimeString('en-US', {
+                }) + ' ' + new Date().toLocaleTimeString('en-US', {
                   hour: 'numeric', 
                   minute: '2-digit',
                   hour12: true 
-                }) : 'N/A'}
+                })}
               </span>
             </div>
           </div>
