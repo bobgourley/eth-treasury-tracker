@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Ethereum Treasury Companies - Corporate ETH Holdings",
     description: "Track publicly traded companies holding Ethereum in their corporate treasuries with real-time data and financial analysis.",
-    url: "https://www.ethereumlist.com",
+    url: "https://ethereumlist.com",
     siteName: "Ethereum Treasury Companies",
     type: "website",
     locale: "en_US"

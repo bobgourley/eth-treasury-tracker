@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://www.ethereumlist.com'
+  const baseUrl = 'https://ethereumlist.com'
   
   try {
     // Fetch all companies for dynamic routes

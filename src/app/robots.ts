@@ -48,7 +48,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin/', '/api/admin/', '/api/auth/', '/api/cron/'],
       },
     ],
-    sitemap: 'https://www.ethereumlist.com/sitemap.xml',
-    host: 'https://www.ethereumlist.com',
+    sitemap: 'https://ethereumlist.com/sitemap.xml',
+    host: 'https://ethereumlist.com',
   }
 }

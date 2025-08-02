@@ -58,6 +58,9 @@ This guide will help you set up Google OAuth authentication for secure admin acc
 7. Click "Create"
 8. **Copy the Client ID and Client Secret** - you'll need these!
 
+119603907835-l2qri2fib8m3vli1dokl7g40bb49pjom.apps.googleusercontent.com
+
+
 ### Step 5: Configure Environment Variables
 
 1. Copy `env.example` to `.env`:
