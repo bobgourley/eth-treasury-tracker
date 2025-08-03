@@ -22,8 +22,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       {
         url: baseUrl,
         lastModified: new Date(),
-        changeFrequency: 'daily',
+        changeFrequency: 'daily', // Main page updates daily with new ETH prices, holdings, news
         priority: 1.0,
+      },
+      {
+        url: `${baseUrl}/treasury-companies`,
+        lastModified: new Date(),
+        changeFrequency: 'daily', // ETH Treasury page updates daily with new holdings data
+        priority: 0.9,
+      },
+      {
+        url: `${baseUrl}/etfs`,
+        lastModified: new Date(),
+        changeFrequency: 'daily', // ETF data updates daily
+        priority: 0.9,
+      },
+      {
+        url: `${baseUrl}/news`,
+        lastModified: new Date(),
+        changeFrequency: 'daily', // News updates daily
+        priority: 0.8,
       },
       {
         url: `${baseUrl}/about`,
@@ -32,34 +50,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.8,
       },
       {
+        url: `${baseUrl}/analytics/charts`,
+        lastModified: new Date(),
+        changeFrequency: 'daily', // Charts update with new data daily
+        priority: 0.7,
+      },
+      {
         url: `${baseUrl}/analytics/premium-discount`,
         lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.7,
+        changeFrequency: 'daily', // Premium/discount analysis updates daily
+        priority: 0.6,
       },
       {
         url: `${baseUrl}/analytics/exposure`,
         lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.7,
+        changeFrequency: 'daily', // Exposure analysis updates daily
+        priority: 0.6,
       },
       {
-        url: `${baseUrl}/analytics/charts`,
+        url: `${baseUrl}/sitemap-html`,
         lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.7,
-      },
-      {
-        url: `${baseUrl}/news`,
-        lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.8,
-      },
-      {
-        url: `${baseUrl}/etfs`,
-        lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.8,
+        changeFrequency: 'weekly',
+        priority: 0.3,
       },
     ]
 
@@ -81,8 +93,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       {
         url: baseUrl,
         lastModified: new Date(),
-        changeFrequency: 'daily',
+        changeFrequency: 'daily', // Main page updates daily with new ETH prices, holdings, news
         priority: 1.0,
+      },
+      {
+        url: `${baseUrl}/treasury-companies`,
+        lastModified: new Date(),
+        changeFrequency: 'daily', // ETH Treasury page updates daily with new holdings data
+        priority: 0.9,
+      },
+      {
+        url: `${baseUrl}/etfs`,
+        lastModified: new Date(),
+        changeFrequency: 'daily', // ETF data updates daily
+        priority: 0.9,
+      },
+      {
+        url: `${baseUrl}/news`,
+        lastModified: new Date(),
+        changeFrequency: 'daily', // News updates daily
+        priority: 0.8,
       },
       {
         url: `${baseUrl}/about`,
@@ -91,34 +121,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.8,
       },
       {
+        url: `${baseUrl}/analytics/charts`,
+        lastModified: new Date(),
+        changeFrequency: 'daily', // Charts update with new data daily
+        priority: 0.7,
+      },
+      {
         url: `${baseUrl}/analytics/premium-discount`,
         lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.7,
+        changeFrequency: 'daily', // Premium/discount analysis updates daily
+        priority: 0.6,
       },
       {
         url: `${baseUrl}/analytics/exposure`,
         lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.7,
+        changeFrequency: 'daily', // Exposure analysis updates daily
+        priority: 0.6,
       },
       {
-        url: `${baseUrl}/analytics/charts`,
+        url: `${baseUrl}/sitemap-html`,
         lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.7,
-      },
-      {
-        url: `${baseUrl}/news`,
-        lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.8,
-      },
-      {
-        url: `${baseUrl}/etfs`,
-        lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.8,
+        changeFrequency: 'weekly',
+        priority: 0.3,
       },
       // Static fallback company pages
       {

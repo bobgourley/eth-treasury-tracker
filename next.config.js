@@ -44,7 +44,7 @@ const nextConfig = {
   
   // Experimental features for performance
   experimental: {
-    optimizeCss: true,
+    // optimizeCss: true, // Disabled due to critters module error in deployment
     optimizePackageImports: ['lucide-react'],
   },
 }
