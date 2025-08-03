@@ -120,31 +120,31 @@ export async function GET() {
     return NextResponse.json({
       ethPrice: 3484.13,
       ethSupply: 120500000,
-      totalTrackedEth: 5000000,
-      totalTrackedPercentage: 4.15,
+      totalTrackedEth: 6440276,
+      totalTrackedPercentage: 5.345,
       companies: {
         count: 9,
-        totalEth: 1800000,
-        totalValue: 6885000000,
-        percentage: 1.496
+        totalEth: 1134076,
+        totalValue: 3952000000,
+        percentage: 0.941
       },
       etfs: {
         count: 9,
-        totalEth: 3200000,
-        totalValue: 12240000000,
-        percentage: 2.654
+        totalEth: 5306200,
+        totalValue: 18490000000,
+        percentage: 4.403
       },
       formatted: {
         ethPrice: '$3,484.13',
         ethSupply: '120,500,000',
-        totalTrackedEth: '5,000,000',
-        totalTrackedPercentage: '4.150%',
-        companyEth: '1,800,000',
-        companyValue: '$6,885,000,000',
-        companyPercentage: '1.496%',
-        etfEth: '3,200,000',
-        etfValue: '$12,240,000,000',
-        etfPercentage: '2.654%'
+        totalTrackedEth: '6,440,276',
+        totalTrackedPercentage: '5.345%',
+        companyEth: '1,134,076',
+        companyValue: '$3,952,000,000',
+        companyPercentage: '0.941%',
+        etfEth: '5,306,200',
+        etfValue: '$18,490,000,000',
+        etfPercentage: '4.403%'
       },
       lastUpdated: new Date(),
       message: 'Database error - using fallback data with different company/ETF values'
