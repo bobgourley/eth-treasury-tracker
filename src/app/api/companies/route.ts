@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { getLatestEthPrice } from '@/lib/dataFetcher'
 
 // Static fallback data for MVP (updated with current holdings as of July 2025)
 const fallbackCompanies = [
@@ -161,23 +162,13 @@ export async function GET() {
       return NextResponse.json({
         companies: fallbackCompanies,
         count: fallbackCompanies.length,
-        ethPrice: 3825.95,
+        ethPrice: 3484.13,
         message: 'Using static fallback company data - database empty'
       })
     }
 
-    // Get ETH price from ecosystem summary
-    let ethPrice = 3825.95
-    try {
-      const ecosystemSummary = await prisma.ecosystemSummary.findFirst({
-        orderBy: { lastUpdated: 'desc' }
-      })
-      if (ecosystemSummary) {
-        ethPrice = ecosystemSummary.ethPrice
-      }
-    } catch (error) {
-      console.log('⚠️ Could not fetch ETH price from ecosystem summary, using fallback')
-    }
+    // Get ETH price from live API with database backup
+    const ethPrice = await getLatestEthPrice()
 
     // Convert BigInt to string for JSON serialization and add calculated values
     const serializedCompanies = companies.map((company) => ({

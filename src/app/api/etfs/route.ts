@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { getLatestEthPrice } from '@/lib/dataFetcher'
 
 // Realistic ETF data estimates
 const ETF_DATA = {
@@ -29,7 +30,7 @@ function getFallbackEtfData() {
     const variation = 0.95 + (Math.random() * 0.1) // 95% to 105%
     const ethHoldings = etfInfo.estimatedEthHoldings * variation
     const aum = etfInfo.estimatedAum * variation
-    const ethPrice = 3825.95
+    const ethPrice = 3484.13
     const totalValue = ethHoldings * ethPrice
     
     return {
@@ -52,7 +53,7 @@ function getFallbackEtfData() {
   return NextResponse.json({
     etfs: fallbackEtfs,
     count: fallbackEtfs.length,
-    ethPrice: 3825.95,
+    ethPrice: 3484.13,
     message: 'Using fallback ETF data - FMP API key not available'
   })
 }
@@ -73,18 +74,8 @@ export async function GET() {
       return getFallbackEtfData()
     }
 
-    // Get ETH price from ecosystem summary
-    let ethPrice = 3825.95
-    try {
-      const ecosystemSummary = await prisma.ecosystemSummary.findFirst({
-        orderBy: { lastUpdated: 'desc' }
-      })
-      if (ecosystemSummary) {
-        ethPrice = ecosystemSummary.ethPrice
-      }
-    } catch (error) {
-      console.log('⚠️ Could not fetch ETH price from ecosystem summary, using fallback')
-    }
+    // Get ETH price from live API with database backup
+    const ethPrice = await getLatestEthPrice()
 
     // Convert BigInt to string for JSON serialization and add calculated values
     const serializedEtfs = etfs.map((etf) => ({

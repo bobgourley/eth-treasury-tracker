@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { getLatestEthPrice } from '@/lib/dataFetcher'
 
 export async function GET() {
   try {
@@ -25,19 +26,8 @@ export async function GET() {
       })
     ])
     
-    // Get ETH price (fallback if no ecosystem summary)
-    let ethPrice = 3825.95
-    try {
-      const latestPrice = await prisma.systemMetrics.findFirst({
-        orderBy: { lastUpdate: 'desc' },
-        select: { ethPrice: true }
-      })
-      if (latestPrice?.ethPrice) {
-        ethPrice = latestPrice.ethPrice
-      }
-    } catch (error) {
-      console.log('⚠️ Could not fetch ETH price from system metrics, using fallback')
-    }
+    // Get ETH price from live API with database backup
+    const ethPrice = await getLatestEthPrice()
     
     // Calculate company totals
     const companyTotalEth = companies.reduce((sum, company) => sum + (company.ethHoldings || 0), 0)
@@ -128,7 +118,7 @@ export async function GET() {
     // Fallback to realistic different values for companies vs ETFs
     console.log('⚠️ Using fallback ecosystem data due to database error')
     return NextResponse.json({
-      ethPrice: 3825.95,
+      ethPrice: 3484.13,
       ethSupply: 120500000,
       totalTrackedEth: 5000000,
       totalTrackedPercentage: 4.15,
@@ -145,7 +135,7 @@ export async function GET() {
         percentage: 2.654
       },
       formatted: {
-        ethPrice: '$3,825.95',
+        ethPrice: '$3,484.13',
         ethSupply: '120,500,000',
         totalTrackedEth: '5,000,000',
         totalTrackedPercentage: '4.150%',
