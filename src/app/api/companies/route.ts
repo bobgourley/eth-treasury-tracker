@@ -147,23 +147,63 @@ const fallbackCompanies = [
 
 export async function GET() {
   try {
-    // Try database first
+    console.log('📊 Fetching companies from database...')
+    
+    // Fetch companies from database
     const companies = await prisma.company.findMany({
+      where: { isActive: true },
       orderBy: { ethHoldings: 'desc' }
     })
 
-    // Convert BigInt to string for JSON serialization
+    // If database is empty, use fallback
+    if (!companies || companies.length === 0) {
+      console.log('⚠️ No companies in database, using static fallback data')
+      return NextResponse.json({
+        companies: fallbackCompanies,
+        count: fallbackCompanies.length,
+        ethPrice: 3825.95,
+        message: 'Using static fallback company data - database empty'
+      })
+    }
+
+    // Get ETH price from ecosystem summary
+    let ethPrice = 3825.95
+    try {
+      const ecosystemSummary = await prisma.ecosystemSummary.findFirst({
+        orderBy: { lastUpdated: 'desc' }
+      })
+      if (ecosystemSummary) {
+        ethPrice = ecosystemSummary.ethPrice
+      }
+    } catch (error) {
+      console.log('⚠️ Could not fetch ETH price from ecosystem summary, using fallback')
+    }
+
+    // Convert BigInt to string for JSON serialization and add calculated values
     const serializedCompanies = companies.map((company) => ({
       ...company,
       marketCap: company.marketCap?.toString(),
       sharesOutstanding: company.sharesOutstanding?.toString(),
+      ethValue: (company.ethHoldings || 0) * ethPrice, // Add calculated ETH value
     }))
 
-    return NextResponse.json(serializedCompanies)
+    console.log(`✅ Fetched ${serializedCompanies.length} companies from database`)
+
+    return NextResponse.json({
+      companies: serializedCompanies,
+      count: serializedCompanies.length,
+      ethPrice,
+      message: 'Companies data from database'
+    })
   } catch (error: unknown) {
-    console.error('Database error, using static fallback:', error)
+    console.error('❌ Database error, using static fallback:', error)
     
-    // Return static data as fallback for MVP
-    return NextResponse.json(fallbackCompanies)
+    // Return static data as fallback
+    return NextResponse.json({
+      companies: fallbackCompanies,
+      count: fallbackCompanies.length,
+      ethPrice: 3825.95,
+      message: 'Database error - using static fallback company data'
+    })
   }
 }

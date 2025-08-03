@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ethereum Treasury Companies - Corporate ETH Holdings Tracker",
-  description: "Comprehensive tracking of publicly traded companies holding Ethereum (ETH) in their corporate treasuries. Real-time data on ETH holdings, market caps, premiums/discounts, and financial metrics for institutional crypto investments.",
+  title: "EthereumList.com",
+  description: "Comprehensive tracking of Ethereum ecosystem: ETFs, treasury companies, and market data",
   keywords: [
     "ethereum treasury",
     "corporate ETH holdings",

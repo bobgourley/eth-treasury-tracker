@@ -2,6 +2,13 @@ import EtfList from '@/components/EtfList'
 import Navigation from '@/components/Navigation'
 import Link from 'next/link'
 
+export async function generateMetadata() {
+  return {
+    title: 'Ethereum ETFs - EthereumList.com',
+    description: 'Track Ethereum Exchange-Traded Funds (ETFs) and their ETH holdings, total assets under management, and key metrics.',
+  }
+}
+
 export default function EtfsPage() {
   return (
     <div className="min-h-screen bg-gray-50">

@@ -30,6 +30,13 @@ interface NewsResponse {
   lastUpdated: string
 }
 
+export async function generateMetadata() {
+  return {
+    title: 'Ethereum Treasury News - EthereumList.com',
+    description: 'Latest news and updates about companies holding Ethereum in their treasuries. Track institutional crypto adoption and corporate ETH holdings.',
+  }
+}
+
 export default function NewsPage() {
   const [newsData, setNewsData] = useState<NewsResponse | null>(null)
   const [loading, setLoading] = useState(true)

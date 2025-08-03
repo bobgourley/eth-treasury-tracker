@@ -5,7 +5,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -30,6 +30,9 @@ model Company {
   createdAt           DateTime @default(now()) @map("created_at")
   isActive            Boolean  @default(true) @map("is_active")
 
+  @@index([isActive])
+  @@index([ethHoldings])
+  @@index([isActive, ethHoldings])
   @@map("companies")
 }
 
@@ -77,7 +80,10 @@ model Etf {
   lastUpdated     DateTime @default(now()) @map("last_updated")
   createdAt       DateTime @default(now()) @map("created_at")
   isActive        Boolean  @default(true) @map("is_active")
-  
+
+  @@index([isActive])
+  @@index([aum])
+  @@index([isActive, aum])
   @@map("etfs")
 }
 
@@ -92,6 +98,46 @@ model EtfMetrics {
   lastUpdate      DateTime @default(now()) @map("last_update")
   
   @@map("etf_metrics")
+}
+
+// News Articles (cached from NewsAPI)
+model NewsArticle {
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String?
+  url           String   @unique
+  urlToImage    String?  @map("url_to_image")
+  publishedAt   DateTime @map("published_at")
+  sourceName    String   @map("source_name")
+  company       String?  // Associated company name if any
+  ticker        String?  // Associated ticker if any
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  lastUpdated   DateTime @default(now()) @map("last_updated")
+
+  @@index([publishedAt])
+  @@index([company])
+  @@map("news_articles")
+}
+
+// Ecosystem Summary (cached calculations)
+model EcosystemSummary {
+  id                    Int      @id @default(autoincrement())
+  ethPrice              Float    @map("eth_price")
+  ethSupply             Float    @map("eth_supply")
+  totalTrackedEth       Float    @map("total_tracked_eth")
+  totalTrackedPercentage Float   @map("total_tracked_percentage")
+  companyCount          Int      @map("company_count")
+  companyTotalEth       Float    @map("company_total_eth")
+  companyTotalValue     Float    @map("company_total_value")
+  companyPercentage     Float    @map("company_percentage")
+  etfCount              Int      @map("etf_count")
+  etfTotalEth           Float    @map("etf_total_eth")
+  etfTotalValue         Float    @map("etf_total_value")
+  etfPercentage         Float    @map("etf_percentage")
+  lastUpdated           DateTime @default(now()) @map("last_updated")
+  
+  @@map("ecosystem_summaries")
 }
 
 // NextAuth.js required models
