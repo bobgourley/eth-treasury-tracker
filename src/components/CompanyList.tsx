@@ -26,7 +26,8 @@ export default function CompanyList() {
         const companiesData = await companiesRes.json()
         const metricsData = await metricsRes.json()
 
-        setCompanies(companiesData)
+        // Handle API response format - companies are in companiesData.companies
+        setCompanies(companiesData.companies || [])
         setMetrics(metricsData)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred')
