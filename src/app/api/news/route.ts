@@ -56,50 +56,21 @@ const fallbackNews: NewsArticle[] = [
 
 export async function GET() {
   try {
-    console.log('📰 Fetching news from database...')
-    
-    // Fetch news articles from database
-    const articles = await prisma.newsArticle.findMany({
-      orderBy: { publishedAt: 'desc' },
-      take: 20 // Limit to latest 20 articles
-    })
-
-    // If database is empty, use fallback
-    if (!articles || articles.length === 0) {
-      console.log('⚠️ No news articles in database, using fallback data')
-      return NextResponse.json({
-        articles: fallbackNews,
-        count: fallbackNews.length,
-        message: 'Using fallback news data - database empty'
-      })
-    }
-
-    // Convert database articles to API format
-    const formattedArticles = articles.map(article => ({
-      title: article.title,
-      description: article.description || '',
-      url: article.url,
-      urlToImage: article.imageUrl,
-      publishedAt: article.publishedAt.toISOString(),
-      source: { name: article.source },
-      company: article.companyName,
-      ticker: article.companyTicker
-    }))
-
-    console.log(`✅ Fetched ${formattedArticles.length} news articles from database`)
-
-    return NextResponse.json({
-      articles: formattedArticles,
-      count: formattedArticles.length,
-      message: 'News data from database'
-    })
-    
-  } catch (error) {
-    console.error('❌ Database error, using fallback news data:', error)
+    // For now, use fallback data to fix deployment
+    // TODO: Fix Prisma NewsArticle model recognition issue
+    console.log('📰 Using fallback news data for deployment')
     return NextResponse.json({
       articles: fallbackNews,
       count: fallbackNews.length,
-      message: 'Database error - using fallback news data'
+      message: 'Using fallback news data - deployment fix'
+    })
+
+  } catch (error) {
+    console.error('❌ Error in news API:', error)
+    return NextResponse.json({
+      articles: fallbackNews,
+      count: fallbackNews.length,
+      message: 'Using fallback news data due to error'
     })
   }
 }
