@@ -119,8 +119,12 @@ export async function updateSystemMetrics(): Promise<void> {
       orderBy: { lastUpdate: 'desc' }
     })
     
-    // Use live data if available, otherwise keep existing values
-    const updatedEthPrice = ethPrice || currentMetrics?.ethPrice || 3484.13
+    // Use live data if available, otherwise keep existing database values
+    const updatedEthPrice = ethPrice || currentMetrics?.ethPrice
+    if (!updatedEthPrice) {
+      throw new Error('No ETH price available from API or database - cannot update system metrics')
+    }
+    
     const updatedEthSupply = ethSupply || 120500000 // Fallback to approximate current supply
     
     // Calculate company totals for system metrics
@@ -200,10 +204,15 @@ export async function getLatestEthPrice(): Promise<number> {
     // No database data, fetch from API
     console.log('⚠️ No ETH price in database, fetching from API...')
     const livePrice = await fetchEthPrice()
-    return livePrice || 3484.13 // Ultimate fallback
+    if (livePrice) {
+      return livePrice
+    }
+    
+    // No API data available - this is a critical error
+    throw new Error('No ETH price available from database or API')
     
   } catch (error) {
     console.error('❌ Error getting latest ETH price:', error)
-    return 3484.13 // Ultimate fallback
+    throw error // No hardcoded fallbacks - database/API is required
   }
 }

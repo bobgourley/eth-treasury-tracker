@@ -68,10 +68,14 @@ export async function GET() {
       orderBy: { aum: 'desc' }
     })
 
-    // If database is empty, use fallback
+    // If database is empty, return error - database is the single source of truth
     if (!etfs || etfs.length === 0) {
-      console.log('⚠️ No ETFs in database, using fallback data')
-      return getFallbackEtfData()
+      console.log('❌ No ETFs in database - database is required data source')
+      return NextResponse.json({
+        error: 'No ETF data available',
+        message: 'Database contains no ETF records',
+        timestamp: new Date().toISOString()
+      }, { status: 404 })
     }
 
     // Get ETH price from live API with database backup

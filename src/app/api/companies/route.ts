@@ -156,15 +156,14 @@ export async function GET() {
       orderBy: { ethHoldings: 'desc' }
     })
 
-    // If database is empty, use fallback
+    // If database is empty, return error - database is the single source of truth
     if (!companies || companies.length === 0) {
-      console.log('⚠️ No companies in database, using static fallback data')
+      console.log('❌ No companies in database - database is required data source')
       return NextResponse.json({
-        companies: fallbackCompanies,
-        count: fallbackCompanies.length,
-        ethPrice: 3484.13,
-        message: 'Using static fallback company data - database empty'
-      })
+        error: 'No company data available',
+        message: 'Database contains no company records',
+        timestamp: new Date().toISOString()
+      }, { status: 404 })
     }
 
     // Get ETH price from live API with database backup
