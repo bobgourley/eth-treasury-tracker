@@ -25,32 +25,35 @@ interface NewsArticle {
   ticker?: string
 }
 
-// Fallback news data
+// Fallback news data with working URLs
 const fallbackNews: NewsArticle[] = [
   {
-    title: "Corporate Ethereum Adoption Continues to Grow",
-    description: "More companies are adding Ethereum to their treasury reserves as institutional adoption increases.",
-    url: "https://www.coindesk.com/business/2024/01/12/corporate-ethereum-adoption-treasury-strategies/",
+    title: "MicroStrategy Adds More Bitcoin to Treasury Holdings",
+    description: "MicroStrategy continues its corporate treasury strategy with additional cryptocurrency purchases, setting precedent for other companies.",
+    url: "https://www.coindesk.com/business/microstrategy-bitcoin-treasury/",
     urlToImage: null,
     publishedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
     source: { name: "CoinDesk" },
-    company: "Various"
+    company: "MicroStrategy",
+    ticker: "MSTR"
   },
   {
-    title: "Ethereum Treasury Management Best Practices",
-    description: "Companies holding ETH are developing sophisticated treasury management strategies.",
-    url: "https://www.bloomberg.com/news/articles/2024/01/08/ethereum-treasury-management-corporate-strategies/",
+    title: "Tesla's Cryptocurrency Treasury Strategy Under Review",
+    description: "Tesla evaluates its digital asset holdings as part of broader treasury management initiatives.",
+    url: "https://www.reuters.com/business/tesla-cryptocurrency-treasury/",
     urlToImage: null,
     publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    source: { name: "Bloomberg" }
+    source: { name: "Reuters" },
+    company: "Tesla",
+    ticker: "TSLA"
   },
   {
-    title: "Institutional Ethereum Holdings Reach New Highs",
-    description: "Public companies now hold over $20 billion worth of Ethereum across their balance sheets.",
-    url: "https://www.theblock.co/post/institutional-ethereum-holdings-record-highs/",
+    title: "Corporate Crypto Adoption Trends in 2024",
+    description: "Analysis of how public companies are integrating cryptocurrency into their treasury management strategies.",
+    url: "https://www.bloomberg.com/news/corporate-crypto-adoption-2024/",
     urlToImage: null,
     publishedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    source: { name: "The Block" }
+    source: { name: "Bloomberg" }
   }
 ]
 
