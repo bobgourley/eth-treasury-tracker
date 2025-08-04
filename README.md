@@ -308,11 +308,22 @@ node scripts/update-live-data.js
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Set up environment variables
-4. Deploy automatically on push
+### GitHub → Vercel (Automatic)
+**This project uses automatic deployment via GitHub integration with Vercel.**
+
+**Deployment Process:**
+1. Make changes to code locally
+2. Commit changes: `git add -A && git commit -m "your message"`
+3. Push to GitHub: `git push origin main`
+4. Vercel automatically detects changes and deploys
+5. Live site updates at https://ethereumlist.com
+
+**⚠️ Important:** Do NOT use Netlify or other deployment tools. This project is configured for GitHub → Vercel automatic deployment only.
+
+### Initial Setup (One-time)
+1. Repository is connected to Vercel
+2. Environment variables are configured in Vercel dashboard
+3. Automatic deployments are enabled for main branch
 
 ### Environment Variables
 ```bash

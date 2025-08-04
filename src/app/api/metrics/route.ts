@@ -59,7 +59,7 @@ export async function GET() {
     console.log('\nCompanies contributing to totals:')
     validCompanies.forEach((c, i) => {
       const ethValue = (c.ethHoldings || 0)
-      const marketCap = c.marketCap || BigInt(0)
+      const marketCap = c.marketCap ? BigInt(c.marketCap) : BigInt(0)
       console.log(`  ${i+1}. ${c.ticker || 'N/A'}: ETH=${ethValue}, MarketCap=${marketCap.toString()}`)
     })
     
@@ -71,7 +71,7 @@ export async function GET() {
     // Calculate totals using ALL companies
     const totalEthHeld = validCompanies.reduce((sum, company) => sum + (company.ethHoldings ?? 0), 0)
     const totalMarketCap = validCompanies.reduce((sum, company) => {
-      const marketCap = company.marketCap || BigInt(0)
+      const marketCap = company.marketCap ? BigInt(company.marketCap) : BigInt(0)
       return sum + marketCap
     }, BigInt(0))
 

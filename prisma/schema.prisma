@@ -5,7 +5,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -17,8 +17,8 @@ model Company {
   ethHoldings         Float?   @map("eth_holdings")
   ethAddress          String?  // Ethereum address for live tracking
   ethAddresses        String?  @map("eth_addresses") // JSON string of addresses
-  marketCap           BigInt?  @map("market_cap")
-  sharesOutstanding   BigInt?  @map("shares_outstanding")
+  marketCap           String?  @map("market_cap")
+  sharesOutstanding   String?  @map("shares_outstanding")
   stockPrice          Float?   @map("stock_price")
   ethPerShare         Float?   @map("eth_per_share")
   mnavRatio           Float?   @map("mnav_ratio")
