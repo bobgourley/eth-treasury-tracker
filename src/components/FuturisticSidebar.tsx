@@ -13,29 +13,34 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
+    href: '/',
+    label: 'Home',
+    icon: <span>🏠</span>
+  },
+  {
     href: '/overview',
     label: 'Dashboard',
     icon: <span>📊</span>
   },
   {
-    href: '/analytics',
-    label: 'Analytics', 
-    icon: <span>📈</span>
-  },
-  {
-    href: '/treasury',
-    label: 'Treasury',
+    href: '/treasury-companies',
+    label: 'Companies',
     icon: <span>🏢</span>
   },
   {
     href: '/etfs',
     label: 'ETFs',
-    icon: <span>📊</span>
+    icon: <span>📈</span>
   },
   {
     href: '/news',
     label: 'News',
     icon: <span>📰</span>
+  },
+  {
+    href: '/analytics/charts',
+    label: 'Analytics',
+    icon: <span>📊</span>
   }
 ]
 
