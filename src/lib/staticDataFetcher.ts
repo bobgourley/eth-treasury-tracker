@@ -113,6 +113,7 @@ export async function fetchStaticEcosystemData(): Promise<StaticEcosystemData> {
     // Try to fetch ETFs data (optional table - may not exist in production yet)
     let etfs: Array<{ ethHoldings: number | null; totalValue: number | null }> = []
     try {
+      console.log('🔍 Fetching ETF data for ecosystem summary...')
       etfs = await prisma.etf.findMany({
         where: { isActive: true },
         select: {
@@ -120,6 +121,7 @@ export async function fetchStaticEcosystemData(): Promise<StaticEcosystemData> {
           totalValue: true
         }
       })
+      console.log(`✅ Found ${etfs.length} ETFs in database for ecosystem data`)
     } catch (error: unknown) {
       console.log('⚠️ ETFs table not found in database, using empty array:', error instanceof Error ? error.message : 'Unknown error')
       etfs = []
@@ -232,10 +234,12 @@ export async function fetchStaticETFsData() {
     // Try to fetch ETFs data (table may not exist in production yet)
     let etfs: Array<{ id: number; symbol: string; name: string | null; ethHoldings: number | null; aum: number | null; totalValue: number | null; expenseRatio: number | null; nav: number | null; isActive: boolean; lastUpdated: Date; createdAt: Date }> = []
     try {
+      console.log('🔍 Fetching ETF data for static ETF page...')
       etfs = await prisma.etf.findMany({
         where: { isActive: true },
         orderBy: { aum: 'desc' }
       })
+      console.log(`✅ Found ${etfs.length} ETFs in database for static ETF data`)
     } catch (error: unknown) {
       console.log('⚠️ ETFs table not found in database, returning empty result:', error instanceof Error ? error.message : 'Unknown error')
       return {
