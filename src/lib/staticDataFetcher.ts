@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { fetchEthSupply } from './dataFetcher'
 
 // Server-side data fetching for static generation
 // These functions are used during build time and ISR regeneration
@@ -118,14 +119,17 @@ export async function fetchStaticEcosystemData(): Promise<StaticEcosystemData> {
       })
     ])
 
-    // Get ETH price from system metrics, use hardcoded ETH supply
-    const systemMetrics = await prisma.systemMetrics.findFirst({
-      orderBy: { lastUpdate: 'desc' },
-      select: { ethPrice: true }
-    })
+    // Get ETH price from system metrics and live ETH supply from Etherscan
+    const [systemMetrics, liveEthSupply] = await Promise.all([
+      prisma.systemMetrics.findFirst({
+        orderBy: { lastUpdate: 'desc' },
+        select: { ethPrice: true }
+      }),
+      fetchEthSupply()
+    ])
 
     const ethPrice = systemMetrics?.ethPrice || 3500
-    const ethSupply = 120500000 // Hardcoded ETH supply as it's not stored in SystemMetrics
+    const ethSupply = liveEthSupply || 120709652 // Live ETH supply from Etherscan, fallback to current estimate
 
     // Calculate totals
     const companyTotalEth = companies.reduce((sum, company) => sum + Number(company.ethHoldings || 0), 0)
