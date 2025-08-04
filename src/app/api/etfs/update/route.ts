@@ -22,6 +22,10 @@ export async function POST() {
   try {
     console.log('🔄 Starting ETF data update...')
     
+    // Explicit database connection
+    await prisma.$connect()
+    console.log('✅ Database connected successfully')
+    
     const fmpApiKey = process.env.FMP_API_KEY
     if (!fmpApiKey) {
       return NextResponse.json({
@@ -83,6 +87,7 @@ export async function POST() {
         const nav = aum > 0 ? (aum / 1000000) : 100 // Rough NAV calculation
         
         // Update or create ETF record in database
+        console.log(`💾 Storing ${symbol} in database...`)
         const etf = await prisma.etf.upsert({
           where: { symbol },
           update: {
@@ -114,6 +119,8 @@ export async function POST() {
         
       } catch (error: unknown) {
         console.error(`❌ Error updating ${symbol}:`, error)
+        console.error('Error details:', error instanceof Error ? error.message : 'Unknown error')
+        console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace')
         
         // Create placeholder record in database if update fails
         const fallbackInfo = ETF_DATA[symbol as keyof typeof ETF_DATA]
