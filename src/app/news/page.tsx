@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import FuturisticLayout from '@/components/FuturisticLayout'
-import FuturisticCard, { MetricDisplay } from '@/components/FuturisticCard'
+import FuturisticCard from '@/components/FuturisticCard'
 import { FuturisticButton, FuturisticBadge, LoadingSpinner } from '@/components/FuturisticUI'
 import { ExternalLink, Building2, Clock, RefreshCw, Globe, Calendar, TrendingUp } from 'lucide-react'
 import styles from '@/styles/futuristic.module.css'
@@ -115,35 +115,39 @@ export default function NewsPage() {
         <div className={styles.cardGrid}>
           {/* Stats Cards */}
           <FuturisticCard title="Total Articles" icon="📊">
-            <MetricDisplay
-              value={newsData.stats.total}
-              label="Articles Tracked"
-              color="cyan"
-            />
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'var(--accent-cyan)', marginBottom: '0.5rem' }}>
+                {newsData.stats.total}
+              </div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Articles Tracked</div>
+            </div>
           </FuturisticCard>
 
           <FuturisticCard title="Company News" icon="🏢">
-            <MetricDisplay
-              value={newsData.stats.companySpecific}
-              label="Company Specific"
-              color="green"
-            />
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'var(--accent-green)', marginBottom: '0.5rem' }}>
+                {newsData.stats.companySpecific}
+              </div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Company Specific</div>
+            </div>
           </FuturisticCard>
 
           <FuturisticCard title="General News" icon="🌐">
-            <MetricDisplay
-              value={newsData.stats.general}
-              label="ETH Treasury News"
-              color="blue"
-            />
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'var(--accent-blue)', marginBottom: '0.5rem' }}>
+                {newsData.stats.general}
+              </div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>ETH Treasury News</div>
+            </div>
           </FuturisticCard>
 
           <FuturisticCard title="Companies" icon="📈">
-            <MetricDisplay
-              value={newsData.stats.companiesTracked}
-              label="Companies Tracked"
-              color="orange"
-            />
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'var(--accent-orange)', marginBottom: '0.5rem' }}>
+                {newsData.stats.companiesTracked}
+              </div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Companies Tracked</div>
+            </div>
           </FuturisticCard>
         </div>
       )}
