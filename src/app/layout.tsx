@@ -4,6 +4,7 @@ import Script from "next/script";
 import { Providers } from "@/components/Providers";
 import { StructuredData } from "@/components/StructuredData";
 import "./globals.css";
+import "../styles/futuristic-globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

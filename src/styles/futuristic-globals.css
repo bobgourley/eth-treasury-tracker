@@ -1,0 +1,20 @@
+/* Futuristic Dashboard Global Variables */
+
+:root {
+  --neon-cyan: #00FFFF;
+  --neon-blue: #0099FF;
+  --neon-green: #00FF88;
+  --neon-orange: #FF8800;
+  --neon-red: #FF0044;
+  --dark-bg: #0A0F1C;
+  --card-bg: #1A1F2E;
+  --border-color: #2A3441;
+  --text-primary: #FFFFFF;
+  --text-secondary: #8892B0;
+  --text-muted: #64748B;
+}
+
+/* Global news link hover effect */
+.news-link:hover {
+  color: var(--neon-cyan) !important;
+}
