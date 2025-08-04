@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/db'
+import { PrismaClient } from '@prisma/client'
 
 interface CoinGeckoResponse {
   ethereum: {
@@ -103,10 +103,9 @@ export async function fetchEthSupply(): Promise<number | null> {
  * Updates system metrics in database with latest data from APIs
  */
 export async function updateSystemMetrics(): Promise<void> {
+  const prisma = new PrismaClient()
   try {
     console.log('🔄 Updating system metrics from live APIs...')
-    
-    await prisma.$connect()
     
     // Fetch live data
     const [ethPrice, ethSupply] = await Promise.all([
@@ -133,8 +132,8 @@ export async function updateSystemMetrics(): Promise<void> {
       select: { ethHoldings: true, marketCap: true }
     })
     
-    const totalEthHoldings = companies.reduce((sum, company) => sum + Number(company.ethHoldings || 0), 0)
-    const totalMarketCap = companies.reduce((sum, company) => sum + Number(company.marketCap || 0), 0)
+    const totalEthHoldings = companies.reduce((sum: number, company: any) => sum + Number(company.ethHoldings || 0), 0)
+    const totalMarketCap = companies.reduce((sum: number, company: any) => sum + Number(company.marketCap || 0), 0)
     const totalEthValue = totalEthHoldings * updatedEthPrice
     const ethSupplyPercent = (totalEthHoldings / updatedEthSupply) * 100
     
@@ -180,6 +179,7 @@ export async function updateSystemMetrics(): Promise<void> {
  * Gets the latest ETH price from database (with live API as backup)
  */
 export async function getLatestEthPrice(): Promise<number> {
+  const prisma = new PrismaClient()
   try {
     const systemMetrics = await prisma.systemMetrics.findFirst({
       orderBy: { lastUpdate: 'desc' },
@@ -214,5 +214,7 @@ export async function getLatestEthPrice(): Promise<number> {
   } catch (error) {
     console.error('❌ Error getting latest ETH price:', error)
     throw error // No hardcoded fallbacks - database/API is required
+  } finally {
+    await prisma.$disconnect()
   }
 }

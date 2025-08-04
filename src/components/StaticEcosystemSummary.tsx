@@ -1,137 +1,11 @@
-'use client'
+import { memo } from 'react'
+import { StaticEcosystemData } from '@/lib/staticDataFetcher'
 
-import { useState, useEffect, memo } from 'react'
-
-interface EcosystemData {
-  ethPrice: number
-  ethSupply: number
-  totalTrackedEth: number
-  totalTrackedPercentage: number
-  companies: {
-    count: number
-    totalEth: number
-    totalValue: number
-    percentage: number
-  }
-  etfs: {
-    count: number
-    totalEth: number
-    totalValue: number
-    percentage: number
-  }
-  formatted: {
-    ethPrice: string
-    ethSupply: string
-    totalTrackedEth: string
-    totalTrackedPercentage: string
-    companyEth: string
-    companyValue: string
-    companyPercentage: string
-    etfEth: string
-    etfValue: string
-    etfPercentage: string
-  }
-  lastUpdated: string
+interface StaticEcosystemSummaryProps {
+  data: StaticEcosystemData
 }
 
-function EcosystemSummary() {
-  const [data, setData] = useState<EcosystemData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [retryCount, setRetryCount] = useState(0)
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        console.log(`🔄 Fetching ecosystem summary... (attempt ${retryCount + 1})`)
-        const response = await fetch('/api/ecosystem/summary', {
-          cache: 'no-cache', // Force fresh request
-          headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
-          }
-        })
-        console.log('📡 Response status:', response.status, response.statusText)
-        
-        if (!response.ok) {
-          const errorText = await response.text()
-          console.error('❌ API Error:', response.status, errorText)
-          
-          // Retry on 500 errors (server issues) but not on 4xx errors (client issues)
-          if (response.status >= 500 && retryCount < 3) {
-            console.log(`🔄 Retrying in 2 seconds... (attempt ${retryCount + 1}/3)`)
-            setTimeout(() => {
-              setRetryCount(prev => prev + 1)
-              setLoading(true)
-            }, 2000)
-            return
-          }
-          
-          throw new Error(`Failed to fetch ecosystem data: ${response.status} ${response.statusText}`)
-        }
-        
-        const result = await response.json()
-        console.log('✅ Ecosystem data loaded:', result)
-        setData(result)
-        setError(null) // Clear any previous errors
-        setRetryCount(0) // Reset retry count on success
-      } catch (err) {
-        console.error('❌ Fetch error:', err)
-        setError(err instanceof Error ? err.message : 'Unknown error')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchData()
-  }, [retryCount])
-
-  if (loading) {
-    return (
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-        <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-                <div className="h-8 bg-gray-200 rounded w-full"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (error || !data) {
-    return (
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-        <div className="text-center text-red-600">
-          <p>Failed to load ecosystem summary</p>
-          {error && <p className="text-sm text-gray-500 mt-1">{error}</p>}
-          {retryCount > 0 && (
-            <p className="text-xs text-blue-500 mt-2">
-              Retrying... (attempt {retryCount + 1}/3)
-            </p>
-          )}
-          {retryCount === 0 && (
-            <button 
-              onClick={() => {
-                setRetryCount(1)
-                setLoading(true)
-                setError(null)
-              }}
-              className="mt-3 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
-            >
-              Retry
-            </button>
-          )}
-        </div>
-      </div>
-    )
-  }
-
+function StaticEcosystemSummary({ data }: StaticEcosystemSummaryProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
       <h2 className="text-xl font-semibold text-gray-900 mb-6">Ethereum Ecosystem Overview</h2>
@@ -227,10 +101,11 @@ function EcosystemSummary() {
           second: '2-digit',
           hour12: false
         })} UTC
+        <span className="ml-2 text-green-500">• Static</span>
       </div>
     </div>
   )
 }
 
 // Memoize component for performance
-export default memo(EcosystemSummary)
+export default memo(StaticEcosystemSummary)

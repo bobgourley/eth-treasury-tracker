@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { PrismaClient } from '@prisma/client'
 import { getLatestEthPrice } from '@/lib/dataFetcher'
 
 // Static fallback data for MVP (updated with current holdings as of July 2025)
@@ -150,7 +150,10 @@ export async function GET() {
   try {
     console.log('📊 Fetching companies from database...')
     
-    // Fetch companies from database
+    // Create fresh database connection (same pattern as working metrics API)
+    const prisma = new PrismaClient()
+    
+    // Fetch companies from database with explicit ordering
     const companies = await prisma.company.findMany({
       where: { isActive: true },
       orderBy: { ethHoldings: 'desc' }
@@ -178,6 +181,9 @@ export async function GET() {
     }))
 
     console.log(`✅ Fetched ${serializedCompanies.length} companies from database`)
+
+    // Clean up database connection
+    await prisma.$disconnect()
 
     return NextResponse.json({
       companies: serializedCompanies,

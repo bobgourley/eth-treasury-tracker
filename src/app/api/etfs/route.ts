@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { PrismaClient } from '@prisma/client'
 import { getLatestEthPrice } from '@/lib/dataFetcher'
 
 // Realistic ETF data estimates
@@ -59,8 +59,12 @@ function getFallbackEtfData() {
 }
 
 export async function GET() {
+  const prisma = new PrismaClient()
   try {
     console.log('📈 Fetching ETF data from database...')
+    
+    // Ensure database connection is established
+    await prisma.$connect()
     
     // Fetch ETFs from database
     const etfs = await prisma.etf.findMany({
@@ -102,5 +106,8 @@ export async function GET() {
   } catch (error) {
     console.error('❌ Database error, using fallback ETF data:', error)
     return getFallbackEtfData()
+  } finally {
+    // Always clean up database connection
+    await prisma.$disconnect()
   }
 }

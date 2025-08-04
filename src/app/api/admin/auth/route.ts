@@ -1,38 +1,29 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
+import { cookies } from 'next/headers'
 
 /**
  * GET /api/admin/auth
- * Check NextAuth.js session for admin authentication
+ * Check simple cookie-based admin authentication
  */
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
+    const cookieStore = await cookies()
+    const adminSession = cookieStore.get('admin-session')
     
-    if (!session?.user?.email) {
+    if (!adminSession || adminSession.value !== 'authenticated') {
       return NextResponse.json({
         success: false,
         authenticated: false,
-        message: 'No session found'
+        message: 'No valid admin session found'
       }, { status: 401 })
-    }
-    
-    if (!session.user.isAdmin) {
-      return NextResponse.json({
-        success: false,
-        authenticated: false,
-        message: 'User is not admin'
-      }, { status: 403 })
     }
     
     return NextResponse.json({
       success: true,
       authenticated: true,
       user: {
-        email: session.user.email,
-        name: session.user.name,
-        isAdmin: session.user.isAdmin
+        role: 'admin',
+        isAdmin: true
       },
       message: 'Admin authenticated'
     })

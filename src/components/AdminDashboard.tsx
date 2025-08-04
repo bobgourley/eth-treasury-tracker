@@ -61,7 +61,7 @@ export default function AdminDashboard() {
     setUpdateStatus(null)
 
     try {
-      const response = await fetch('/api/update-data', {
+      const response = await fetch('/api/admin/update-metrics', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -69,7 +69,11 @@ export default function AdminDashboard() {
       })
 
       const result = await response.json()
-      setUpdateStatus(result)
+      setUpdateStatus({
+        success: result.success,
+        message: result.message,
+        timestamp: result.timestamp || new Date().toISOString()
+      })
     } catch (error) {
       setUpdateStatus({
         success: false,
@@ -82,28 +86,8 @@ export default function AdminDashboard() {
   }
 
   const triggerStockUpdate = async () => {
-    setIsUpdating(true)
-    setUpdateStatus(null)
-
-    try {
-      const response = await fetch('/api/update-data?forceStockUpdate=true', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-
-      const result = await response.json()
-      setUpdateStatus(result)
-    } catch (error) {
-      setUpdateStatus({
-        success: false,
-        message: 'Failed to trigger stock data update',
-        timestamp: new Date().toISOString()
-      })
-    } finally {
-      setIsUpdating(false)
-    }
+    // Stock updates are now handled by the main update-metrics endpoint
+    await triggerDataUpdate()
   }
 
   const updateMarketCaps = async () => {

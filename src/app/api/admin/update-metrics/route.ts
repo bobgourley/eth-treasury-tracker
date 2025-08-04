@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { updateSystemMetrics } from '@/lib/dataFetcher'
+import { prisma } from '@/lib/db'
+import { formatNumber, formatEth } from '@/lib/utils'
 
 export async function POST() {
   try {
@@ -7,10 +9,51 @@ export async function POST() {
     
     await updateSystemMetrics()
     
+    // Fetch updated data to return detailed stats
+    const [companies, systemMetrics] = await Promise.all([
+      prisma.company.findMany({
+        where: { isActive: true },
+        orderBy: { ethHoldings: 'desc' }
+      }),
+      prisma.systemMetrics.findFirst({
+        orderBy: { lastUpdate: 'desc' }
+      })
+    ])
+    
+    if (!systemMetrics || !systemMetrics.ethPrice) {
+      throw new Error('No system metrics or ETH price found after update')
+    }
+    
+    // Calculate totals
+    const totalEthHoldings = companies.reduce((sum, company) => sum + (company.ethHoldings || 0), 0)
+    const totalEthValue = totalEthHoldings * systemMetrics.ethPrice
+    const totalMarketCap = companies.reduce((sum, company) => sum + Number(company.marketCap || 0), 0)
+    
+    // Use a static ETH supply value (120.5M) since it's not in systemMetrics table
+    const ethSupply = 120500000
+    const ethSupplyPercent = ((totalEthHoldings / ethSupply) * 100).toFixed(3) + '%'
+    
     return NextResponse.json({
       success: true,
-      message: 'System metrics updated successfully with live API data',
-      timestamp: new Date().toISOString()
+      message: `Successfully updated ${companies.length} companies with live API data`,
+      timestamp: new Date().toISOString(),
+      stats: {
+        companiesUpdated: companies.length,
+        totalCompanies: companies.length,
+        ethPrice: systemMetrics.ethPrice,
+        totalEthHoldings,
+        totalEthValue,
+        totalMarketCap,
+        ethSupplyPercent
+      },
+      companies: companies.map(company => ({
+        name: company.name,
+        ticker: company.ticker,
+        ethHoldings: company.ethHoldings,
+        ethValue: (company.ethHoldings || 0) * (systemMetrics.ethPrice || 0),
+        marketCap: company.marketCap ? Number(company.marketCap) : null,
+        lastUpdated: company.lastUpdated.toISOString()
+      }))
     })
     
   } catch (error) {

@@ -254,24 +254,57 @@ FMP_API_KEY="your-fmp-api-key"                 # ETF data
 ### GET `/api/companies`
 Returns all active companies ordered by ETH holdings (descending) with live stock prices and website links
 
-### GET `/api/metrics`
-Returns system-wide metrics including:
-- Total ETH holdings across all companies
-- Total USD value of ETH holdings
-- Total market cap of all tracked companies
-- Percentage of total ETH supply held
-- Current ETH price
-- Number of companies tracked
+### GET `/api/etfs`
+Returns all active Ethereum ETFs with holdings and market data
 
-### POST `/api/update-data`
-Triggers live data updates for ETH price, stock prices, and system metrics
-- Supports `?forceStockUpdate=true` parameter for manual stock data refresh
-- Implements daily rate limiting for stock API calls
+### GET `/api/ecosystem/summary`
+Returns comprehensive ecosystem overview including:
+- Current ETH price and supply
+- Total tracked ETH across companies and ETFs
+- Breakdown by treasury companies vs ETFs
+- Formatted values and percentages
+
+### GET `/api/news`
+Returns latest Ethereum and treasury-related news articles
 
 ### Admin Endpoints (Authentication Required)
+- `POST /api/admin/update-metrics` - **Manual data update endpoint**
 - `GET/POST/PUT/DELETE /api/admin/companies` - Company management
 - `POST /api/admin/login` - Admin authentication
 - `POST /api/admin/logout` - Session termination
+
+## 📊 **Manual Data Updates** (IMPORTANT)
+
+**Database-First Architecture**: All user-facing data comes exclusively from the database. No hardcoded fallbacks.
+
+### **Update Live Data Manually**:
+
+**Option 1: API Endpoint**
+```bash
+curl -X POST http://localhost:3000/api/admin/update-metrics
+```
+
+**Option 2: Scheduled Script**
+```bash
+node scripts/update-live-data.js
+```
+
+### **What Gets Updated**:
+- **ETH Price**: Live data from CoinGecko API
+- **ETH Supply**: Current supply from Etherscan API
+- **System Metrics**: Calculated totals from database records
+- **Company/ETF Valuations**: Recalculated with current ETH price
+
+### **Rate Limiting**:
+- **CoinGecko**: 50 calls/minute (free tier)
+- **Etherscan**: 5 calls/second (free tier)
+- **Updates recommended**: Every 15-30 minutes during active use
+
+### **Data Consistency**:
+- **Homepage summary** numbers will match **detail pages** exactly
+- All components pull from same database tables
+- No hardcoded fallback numbers (removed all `3484.13` etc.)
+- APIs return proper errors if database unavailable
 
 ## 🚀 Deployment
 

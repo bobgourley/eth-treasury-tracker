@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { PrismaClient } from '@prisma/client'
 import { getLatestEthPrice } from '@/lib/dataFetcher'
 
 export async function GET() {
+  const prisma = new PrismaClient()
   try {
     console.log('🌍 Calculating real Ethereum ecosystem summary from database...')
     
+    // Ensure database connection is established before making queries
     await prisma.$connect()
     
     // Fetch real data from companies and ETFs
@@ -104,8 +106,6 @@ export async function GET() {
       message: `Real data: ${companies.length} companies (${companyTotalEth.toFixed(0)} ETH), ${etfs.length} ETFs (${etfTotalEth.toFixed(0)} ETH)`
     }
     
-    await prisma.$disconnect()
-    
     console.log(`✅ Real ecosystem summary calculated: ${totalTrackedEth.toFixed(0)} ETH tracked (${totalTrackedPercentage.toFixed(3)}% of supply)`)
     
     return NextResponse.json(summary)
@@ -121,5 +121,8 @@ export async function GET() {
       message: 'Unable to fetch ecosystem data - database unavailable',
       timestamp: new Date().toISOString()
     }, { status: 500 })
+  } finally {
+    // Always clean up database connection
+    await prisma.$disconnect()
   }
 }
