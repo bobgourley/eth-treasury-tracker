@@ -450,3 +450,355 @@
 .newsDate {
   opacity: 0.7;
 }
+
+/* Enhanced Card Variants */
+.cardSmall {
+  min-height: 120px;
+}
+
+.cardFull {
+  grid-column: 1 / -1;
+}
+
+.cardHighlight {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.cardWarning {
+  border-color: #ff9500;
+  box-shadow: 0 0 20px rgba(255, 149, 0, 0.2);
+}
+
+.cardSuccess {
+  border-color: #00ff88;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+}
+
+.cardInfo {
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 20px rgba(0, 123, 255, 0.2);
+}
+
+.cardLoading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.cardContent {
+  padding: 1rem;
+}
+
+.cardActions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.loadingSpinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  color: var(--neon-cyan);
+  margin-left: 0.5rem;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Page Header Enhancements */
+.pageSubtitle {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin-top: 0.25rem;
+}
+
+.pageActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Futuristic Button Styles */
+.futuristicBtn {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 123, 255, 0.1));
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.futuristicBtn:hover {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(0, 123, 255, 0.2));
+  border-color: var(--neon-cyan);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 255, 255, 0.3);
+}
+
+.btnPrimary {
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+  color: var(--dark-bg);
+  border-color: var(--neon-cyan);
+}
+
+.btnSecondary {
+  background: rgba(26, 31, 46, 0.8);
+  border-color: var(--text-secondary);
+}
+
+.btnDanger {
+  background: linear-gradient(135deg, #ff4757, #ff3838);
+  color: white;
+  border-color: #ff4757;
+}
+
+.btnGhost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.btnSmall {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.btnMedium {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+}
+
+.btnLarge {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+}
+
+.btnLoading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Futuristic Input Styles */
+.inputGroup {
+  margin-bottom: 1rem;
+}
+
+.inputLabel {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.futuristicInput {
+  width: 100%;
+  background: rgba(26, 31, 46, 0.8);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.futuristicInput:focus {
+  outline: none;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.2);
+}
+
+.inputIcon {
+  position: absolute;
+  left: 1rem;
+  color: var(--text-secondary);
+  z-index: 1;
+}
+
+.inputIcon + .futuristicInput {
+  padding-left: 2.5rem;
+}
+
+.inputError .futuristicInput {
+  border-color: #ff4757;
+}
+
+.errorMessage {
+  display: block;
+  color: #ff4757;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Futuristic Badge Styles */
+.futuristicBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badgeDefault {
+  background: rgba(26, 31, 46, 0.8);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.badgeSuccess {
+  background: rgba(0, 255, 136, 0.2);
+  color: #00ff88;
+  border: 1px solid #00ff88;
+}
+
+.badgeWarning {
+  background: rgba(255, 149, 0, 0.2);
+  color: #ff9500;
+  border: 1px solid #ff9500;
+}
+
+.badgeDanger {
+  background: rgba(255, 71, 87, 0.2);
+  color: #ff4757;
+  border: 1px solid #ff4757;
+}
+
+.badgeInfo {
+  background: rgba(0, 123, 255, 0.2);
+  color: var(--neon-blue);
+  border: 1px solid var(--neon-blue);
+}
+
+.badgeLive {
+  background: rgba(0, 255, 255, 0.2);
+  color: var(--neon-cyan);
+  border: 1px solid var(--neon-cyan);
+}
+
+.badgeSmall {
+  padding: 0.125rem 0.5rem;
+  font-size: 0.625rem;
+}
+
+.badgeMedium {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+.badgeLarge {
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+}
+
+.badgePulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Futuristic Table Styles */
+.futuristicTable {
+  background: rgba(26, 31, 46, 0.8);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableHeader {
+  background: rgba(0, 255, 255, 0.1);
+  color: var(--neon-cyan);
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tableRow {
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+}
+
+.tableRow:hover {
+  background: rgba(0, 255, 255, 0.05);
+}
+
+.tableRowClickable {
+  cursor: pointer;
+}
+
+.tableRowClickable:hover {
+  background: rgba(0, 255, 255, 0.1);
+  transform: translateX(2px);
+}
+
+.tableCell {
+  padding: 1rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tableLoading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+  gap: 1rem;
+}
+
+/* Loading Components */
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.loadingText {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.spinnerSmall {
+  font-size: 1rem;
+}
+
+.spinnerMedium {
+  font-size: 1.5rem;
+}
+
+.spinnerLarge {
+  font-size: 2rem;
+}

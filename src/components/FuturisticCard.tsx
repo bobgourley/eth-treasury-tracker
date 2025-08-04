@@ -6,7 +6,10 @@ interface FuturisticCardProps {
   icon?: React.ReactNode
   children: React.ReactNode
   className?: string
-  size?: 'normal' | 'large' | 'wide'
+  size?: 'normal' | 'large' | 'wide' | 'small' | 'full'
+  variant?: 'default' | 'highlight' | 'warning' | 'success' | 'info'
+  loading?: boolean
+  actions?: React.ReactNode
 }
 
 export default function FuturisticCard({ 
@@ -14,19 +17,40 @@ export default function FuturisticCard({
   icon, 
   children, 
   className = '',
-  size = 'normal'
+  size = 'normal',
+  variant = 'default',
+  loading = false,
+  actions
 }: FuturisticCardProps) {
-  const sizeClass = size === 'large' ? styles.cardLarge : size === 'wide' ? styles.cardWide : ''
+  const sizeClass = {
+    small: styles.cardSmall,
+    normal: '',
+    large: styles.cardLarge,
+    wide: styles.cardWide,
+    full: styles.cardFull
+  }[size] || ''
+  
+  const variantClass = {
+    default: '',
+    highlight: styles.cardHighlight,
+    warning: styles.cardWarning,
+    success: styles.cardSuccess,
+    info: styles.cardInfo
+  }[variant] || ''
   
   return (
-    <div className={`${styles.card} ${sizeClass} ${className}`}>
+    <div className={`${styles.card} ${sizeClass} ${variantClass} ${className} ${loading ? styles.cardLoading : ''}`}>
       <div className={styles.cardHeader}>
         <h3 className={styles.cardTitle}>
           {icon && <span className={styles.cardIcon}>{icon}</span>}
           {title}
+          {loading && <span className={styles.loadingSpinner}>⟳</span>}
         </h3>
+        {actions && <div className={styles.cardActions}>{actions}</div>}
       </div>
-      {children}
+      <div className={styles.cardContent}>
+        {children}
+      </div>
     </div>
   )
 }
