@@ -5,6 +5,37 @@ import FuturisticSidebar from '../../components/FuturisticSidebar'
 import FuturisticCard, { MetricDisplay, DataList } from '../../components/FuturisticCard'
 import styles from '../../styles/futuristic.module.css'
 
+// TypeScript interfaces
+interface Company {
+  id: number
+  name: string
+  ticker: string
+  ethHoldings: number
+  isActive: boolean
+}
+
+interface Etf {
+  id: number
+  symbol: string
+  name: string
+  ethHoldings: number
+  aum: number
+  isActive: boolean
+}
+
+interface NewsArticle {
+  title: string
+  description: string
+  url: string
+  urlToImage?: string | null
+  publishedAt: string
+  source: {
+    name: string
+  } | string
+  company?: string
+  ticker?: string
+}
+
 // ETF fallback data for overview page
 const ETF_DATA = {
   'ETHA': { name: 'iShares Ethereum Trust ETF', estimatedEthHoldings: 2730000, estimatedAum: 10490000000 },
@@ -34,9 +65,9 @@ function getFallbackEtfDataForOverview() {
 }
 
 export default function OverviewPage() {
-  const [companies, setCompanies] = useState<any[]>([])
-  const [etfs, setEtfs] = useState<any[]>([])
-  const [news, setNews] = useState<any[]>([])
+  const [companies, setCompanies] = useState<Company[]>([])
+  const [etfs, setEtfs] = useState<Etf[]>([])
+  const [news, setNews] = useState<NewsArticle[]>([])
   const [ethPrice, setEthPrice] = useState<number>(3500)
   const [ethSupply, setEthSupply] = useState<number>(120709652)
   const [loading, setLoading] = useState(true)
@@ -125,19 +156,19 @@ export default function OverviewPage() {
   }
   
   // Calculate totals
-  const companyTotalEth = companies.reduce((sum: number, company: any) => sum + Number(company.ethHoldings || 0), 0)
-  const etfTotalEth = etfs.reduce((sum: number, etf: any) => sum + Number(etf.ethHoldings || 0), 0)
+  const companyTotalEth = companies.reduce((sum: number, company: Company) => sum + Number(company.ethHoldings || 0), 0)
+  const etfTotalEth = etfs.reduce((sum: number, etf: Etf) => sum + Number(etf.ethHoldings || 0), 0)
   const totalTrackedEth = companyTotalEth + etfTotalEth
   const trackedPercentage = (totalTrackedEth / ethSupply) * 100
   
   // Format data for display
-  const topCompanies = companies.slice(0, 5).map((company: any) => ({
+  const topCompanies = companies.slice(0, 5).map((company: Company) => ({
     label: company.name,
     value: `${(Number(company.ethHoldings || 0) / 1000).toFixed(0)}K ETH`,
     href: `/companies/${company.ticker}`
   }))
   
-  const topEtfs = etfs.slice(0, 5).map((etf: any) => ({
+  const topEtfs = etfs.slice(0, 5).map((etf: Etf) => ({
     label: etf.name || etf.symbol,
     value: `${(Number(etf.ethHoldings || 0) / 1000).toFixed(0)}K ETH`
   }))
@@ -194,7 +225,7 @@ export default function OverviewPage() {
         {/* Main Metrics Grid */}
         <div className={styles.cardGrid}>
           {/* ETH Price Card */}
-          <FuturisticCard title="ETH Price" icon="💰" size="small">
+          <FuturisticCard title="ETH Price" icon="💰">
             <MetricDisplay
               value={`$${ethPrice.toFixed(2)}`}
               label="Current Price"
@@ -203,7 +234,7 @@ export default function OverviewPage() {
           </FuturisticCard>
 
           {/* Total Supply Card */}
-          <FuturisticCard title="ETH Supply" icon="🔗" size="small">
+          <FuturisticCard title="ETH Supply" icon="🔗">
             <MetricDisplay
               value={`${(ethSupply / 1000000).toFixed(1)}M`}
               label="Total Supply"
@@ -212,7 +243,7 @@ export default function OverviewPage() {
           </FuturisticCard>
 
           {/* Tracked ETH Card */}
-          <FuturisticCard title="Tracked ETH" icon="📊" size="small">
+          <FuturisticCard title="Tracked ETH" icon="📊">
             <MetricDisplay
               value={`${(totalTrackedEth / 1000).toFixed(0)}K`}
               label="Total Tracked"
@@ -222,7 +253,7 @@ export default function OverviewPage() {
           </FuturisticCard>
 
           {/* Total Value Card */}
-          <FuturisticCard title="Total Value" icon="💎" size="small">
+          <FuturisticCard title="Total Value" icon="💎">
             <MetricDisplay
               value={`$${(totalTrackedEth * ethPrice / 1000000000).toFixed(2)}B`}
               label="USD Value"
@@ -294,7 +325,9 @@ export default function OverviewPage() {
                     <h4 className={styles.newsTitle}>{article.title}</h4>
                     <p className={styles.newsDescription}>{article.description}</p>
                     <div className={styles.newsMeta}>
-                      <span className={styles.newsSource}>{article.source?.name || article.source}</span>
+                      <span className={styles.newsSource}>
+                        {typeof article.source === 'string' ? article.source : article.source?.name || 'Unknown'}
+                      </span>
                       <span className={styles.newsDate}>{new Date(article.publishedAt).toLocaleDateString()}</span>
                     </div>
                   </a>
