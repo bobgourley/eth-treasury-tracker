@@ -62,6 +62,12 @@ export async function GET() {
     return NextResponse.json({
       articles: fallbackNews,
       count: fallbackNews.length,
+      stats: {
+        total: fallbackNews.length,
+        companySpecific: 1,
+        general: 2,
+        companiesTracked: 9
+      },
       message: 'Using fallback news data - deployment fix'
     })
 
@@ -70,6 +76,12 @@ export async function GET() {
     return NextResponse.json({
       articles: fallbackNews,
       count: fallbackNews.length,
+      stats: {
+        total: fallbackNews.length,
+        companySpecific: 1,
+        general: 2,
+        companiesTracked: 9
+      },
       message: 'Using fallback news data due to error'
     })
   }

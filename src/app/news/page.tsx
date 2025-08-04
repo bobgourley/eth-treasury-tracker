@@ -53,6 +53,12 @@ async function getNewsData() {
     return {
       articles: fallbackNews,
       count: fallbackNews.length,
+      stats: {
+        total: fallbackNews.length,
+        companySpecific: 1,
+        general: 2,
+        companiesTracked: 9
+      },
       message: 'Using fallback news data'
     }
   }
