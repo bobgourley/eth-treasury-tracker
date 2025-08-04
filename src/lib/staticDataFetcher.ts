@@ -120,8 +120,8 @@ export async function fetchStaticEcosystemData(): Promise<StaticEcosystemData> {
           totalValue: true
         }
       })
-    } catch (error: any) {
-      console.log('⚠️ ETFs table not found in database, using empty array:', error.code)
+    } catch (error: unknown) {
+      console.log('⚠️ ETFs table not found in database, using empty array:', error instanceof Error ? error.message : 'Unknown error')
       etfs = []
     }
 
@@ -230,14 +230,14 @@ export async function fetchStaticETFsData() {
     await prisma.$connect()
     
     // Try to fetch ETFs data (table may not exist in production yet)
-    let etfs: any[] = []
+    let etfs: Array<{ id: number; symbol: string; name: string | null; ethHoldings: number | null; aum: number | null; totalValue: number | null; expenseRatio: number | null; nav: number | null; isActive: boolean; lastUpdated: Date; createdAt: Date }> = []
     try {
       etfs = await prisma.etf.findMany({
         where: { isActive: true },
         orderBy: { aum: 'desc' }
       })
-    } catch (error: any) {
-      console.log('⚠️ ETFs table not found in database, returning empty result:', error.code)
+    } catch (error: unknown) {
+      console.log('⚠️ ETFs table not found in database, returning empty result:', error instanceof Error ? error.message : 'Unknown error')
       return {
         etfs: [],
         count: 0,
@@ -254,11 +254,17 @@ export async function fetchStaticETFsData() {
     const ethPrice = systemMetrics?.ethPrice || 3500
 
     const serializedEtfs = etfs.map((etf) => ({
-      ...etf,
+      id: etf.id,
+      symbol: etf.symbol,
+      name: etf.name,
+      ethHoldings: etf.ethHoldings,
       aum: etf.aum?.toString() || '0',
       totalValue: (etf.ethHoldings || 0) * ethPrice,
+      expenseRatio: etf.expenseRatio,
+      nav: etf.nav,
       lastUpdated: etf.lastUpdated.toISOString(),
       createdAt: etf.createdAt.toISOString(),
+      isActive: etf.isActive
     })) as StaticETFData[]
 
     return {
