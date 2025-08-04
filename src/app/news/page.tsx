@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Navigation from '@/components/Navigation'
-import { ExternalLink, Calendar, Building2, Globe, TrendingUp, Clock } from 'lucide-react'
+import FuturisticLayout from '@/components/FuturisticLayout'
+import FuturisticCard, { MetricDisplay } from '@/components/FuturisticCard'
+import { FuturisticButton, FuturisticBadge, LoadingSpinner } from '@/components/FuturisticUI'
+import { ExternalLink, Building2, Clock, RefreshCw, Globe, Calendar, TrendingUp } from 'lucide-react'
+import styles from '@/styles/futuristic.module.css'
 
 interface NewsArticle {
   title: string
@@ -88,228 +91,256 @@ export default function NewsPage() {
   const filteredArticles = getFilteredArticles()
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation title="Ethereum Treasury News" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Description */}
-        <div className="mb-8">
-          <p className="text-gray-600 text-lg">
-            Latest news and updates about companies holding Ethereum in their treasuries
+    <FuturisticLayout 
+      title="Ethereum Treasury News" 
+      showLiveIndicator={true}
+    >
+      {/* Page Description */}
+      <div className={styles.cardGrid}>
+        <FuturisticCard 
+          title="News Overview" 
+          icon="📰" 
+          size="full"
+          variant="info"
+        >
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '1.6' }}>
+            Latest news and updates about companies holding Ethereum in their treasuries, 
+            ETF developments, and institutional adoption trends.
           </p>
+        </FuturisticCard>
+      </div>
+
+      {/* Stats and Filters */}
+      {newsData && (
+        <div className={styles.cardGrid}>
+          {/* Stats Cards */}
+          <FuturisticCard title="Total Articles" icon="📊">
+            <MetricDisplay
+              value={newsData.stats.total}
+              label="Articles Tracked"
+              color="cyan"
+            />
+          </FuturisticCard>
+
+          <FuturisticCard title="Company News" icon="🏢">
+            <MetricDisplay
+              value={newsData.stats.companySpecific}
+              label="Company Specific"
+              color="green"
+            />
+          </FuturisticCard>
+
+          <FuturisticCard title="General News" icon="🌐">
+            <MetricDisplay
+              value={newsData.stats.general}
+              label="ETH Treasury News"
+              color="blue"
+            />
+          </FuturisticCard>
+
+          <FuturisticCard title="Companies" icon="📈">
+            <MetricDisplay
+              value={newsData.stats.companiesTracked}
+              label="Companies Tracked"
+              color="orange"
+            />
+          </FuturisticCard>
         </div>
+      )}
 
-        {/* Stats and Filters */}
-        {newsData && (
-          <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-              {/* Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 lg:mb-0">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{newsData.stats.total}</div>
-                  <div className="text-sm text-gray-600">Total Articles</div>
+      {/* Filters and Controls */}
+      {newsData && (
+        <div className={styles.cardGrid}>
+          <FuturisticCard 
+            title="News Filters" 
+            icon="🔍" 
+            size="wide"
+            actions={
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                  <Clock size={16} />
+                  Last updated: {new Date(newsData.lastUpdated).toLocaleString()}
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{newsData.stats.companySpecific}</div>
-                  <div className="text-sm text-gray-600">Company Specific</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">{newsData.stats.general}</div>
-                  <div className="text-sm text-gray-600">General ETH Treasury</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">{newsData.stats.companiesTracked}</div>
-                  <div className="text-sm text-gray-600">Companies Tracked</div>
-                </div>
-              </div>
-
-              {/* Filters */}
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setFilter('all')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    filter === 'all'
-                      ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  All News
-                </button>
-                <button
-                  onClick={() => setFilter('company')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    filter === 'company'
-                      ? 'bg-green-100 text-green-700 border border-green-200'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  Tracked Companies
-                </button>
-                <button
-                  onClick={() => setFilter('general')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    filter === 'general'
-                      ? 'bg-purple-100 text-purple-700 border border-purple-200'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  General ETH Treasury
-                </button>
-              </div>
-            </div>
-
-            {/* Last Updated */}
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="flex items-center text-sm text-gray-500">
-                <Clock className="w-4 h-4 mr-1" />
-                Last updated: {new Date(newsData.lastUpdated).toLocaleString()}
-                <button
+                <FuturisticButton
                   onClick={fetchNews}
-                  className="ml-4 text-blue-600 hover:text-blue-700 font-medium"
+                  variant="secondary"
+                  size="small"
                   disabled={loading}
                 >
+                  <RefreshCw size={16} />
                   {loading ? 'Refreshing...' : 'Refresh'}
-                </button>
+                </FuturisticButton>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Loading State */}
-        {loading && (
-          <div className="bg-white rounded-lg shadow-sm border p-8">
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="ml-3 text-gray-600">Loading latest news...</span>
-            </div>
-          </div>
-        )}
-
-        {/* Error State */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
-            <div className="flex items-center">
-              <div className="text-red-600 font-medium">Error loading news</div>
-            </div>
-            <div className="text-red-700 mt-1">{error}</div>
-            <button
-              onClick={fetchNews}
-              className="mt-3 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-            >
-              Try Again
-            </button>
-          </div>
-        )}
-
-        {/* News Articles */}
-        {!loading && !error && filteredArticles.length > 0 && (
-          <div className="space-y-6">
-            {filteredArticles.map((article, index) => (
-              <article
-                key={`${article.url}-${index}`}
-                className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow"
+            }
+          >
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              <FuturisticButton
+                onClick={() => setFilter('all')}
+                variant={filter === 'all' ? 'primary' : 'ghost'}
+                size="medium"
               >
-                <div className="p-6">
-                  <div className="flex flex-col lg:flex-row lg:space-x-6">
-                    {/* Article Image */}
-                    {article.urlToImage && (
-                      <div className="lg:w-48 lg:flex-shrink-0 mb-4 lg:mb-0">
-                        <img
-                          src={article.urlToImage}
-                          alt={article.title}
-                          className="w-full h-32 lg:h-24 object-cover rounded-lg"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement
-                            target.style.display = 'none'
-                          }}
-                        />
-                      </div>
-                    )}
+                All News ({newsData.stats.total})
+              </FuturisticButton>
+              <FuturisticButton
+                onClick={() => setFilter('company')}
+                variant={filter === 'company' ? 'primary' : 'ghost'}
+                size="medium"
+              >
+                Company News ({newsData.stats.companySpecific})
+              </FuturisticButton>
+              <FuturisticButton
+                onClick={() => setFilter('general')}
+                variant={filter === 'general' ? 'primary' : 'ghost'}
+                size="medium"
+              >
+                General News ({newsData.stats.general})
+              </FuturisticButton>
+            </div>
+          </FuturisticCard>
+        </div>
+      )}
 
-                    {/* Article Content */}
-                    <div className="flex-1">
-                      {/* Company Badge */}
-                      {article.company && (
-                        <div className="flex items-center mb-2">
-                          <Building2 className="w-4 h-4 text-green-600 mr-1" />
-                          <Link
-                            href={`/companies/${article.ticker}`}
-                            className="text-green-600 hover:text-green-700 font-medium text-sm"
-                          >
-                            {article.company} ({article.ticker})
-                          </Link>
-                        </div>
-                      )}
+      {/* Loading State */}
+      {loading && (
+        <div className={styles.cardGrid}>
+          <FuturisticCard title="Loading" icon="⟳" size="full" loading={true}>
+            <LoadingSpinner size="large" text="Loading latest news..." />
+          </FuturisticCard>
+        </div>
+      )}
 
-                      {/* Article Title */}
-                      <h2 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
-                        <a
-                          href={article.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:text-blue-600 transition-colors"
+      {/* Error State */}
+      {error && (
+        <div className={styles.cardGrid}>
+          <FuturisticCard title="Error" icon="❌" variant="warning" size="full">
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>Error loading news</p>
+              <p style={{ marginBottom: '2rem', color: 'var(--text-secondary)' }}>{error}</p>
+              <FuturisticButton
+                onClick={fetchNews}
+                variant="danger"
+                size="medium"
+              >
+                Try Again
+              </FuturisticButton>
+            </div>
+          </FuturisticCard>
+        </div>
+      )}
+
+      {/* News Articles */}
+      {!loading && !error && filteredArticles.length > 0 && (
+        <div className={styles.cardGrid}>
+          {filteredArticles.map((article, index) => (
+            <FuturisticCard
+              key={`${article.url}-${index}`}
+              title={article.title}
+              icon="📰"
+              size="wide"
+              variant="default"
+              actions={
+                <a
+                  href={article.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-cyan)', textDecoration: 'none', fontSize: '0.875rem' }}
+                >
+                  Read Article
+                  <ExternalLink size={16} />
+                </a>
+              }
+            >
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                {/* Article Image */}
+                {article.urlToImage && (
+                  <div style={{ flexShrink: 0, width: '120px', height: '80px', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-primary)' }}>
+                    <img
+                      src={article.urlToImage}
+                      alt={article.title}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement
+                        target.style.display = 'none'
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Article Content */}
+                <div style={{ flex: 1 }}>
+                  {/* Company Badge */}
+                  {article.company && (
+                    <div style={{ marginBottom: '0.75rem' }}>
+                      <FuturisticBadge variant="success" size="small">
+                        <Building2 size={14} style={{ marginRight: '0.25rem' }} />
+                        <Link
+                          href={`/companies/${article.ticker}`}
+                          style={{ color: 'inherit', textDecoration: 'none' }}
                         >
-                          {article.title}
-                        </a>
-                      </h2>
+                          {article.company} ({article.ticker})
+                        </Link>
+                      </FuturisticBadge>
+                    </div>
+                  )}
 
-                      {/* Article Description */}
-                      <p className="text-gray-600 mb-4 line-clamp-3">
-                        {article.description}
-                      </p>
+                  {/* Article Description */}
+                  <p style={{ 
+                    color: 'var(--text-secondary)', 
+                    lineHeight: '1.5', 
+                    marginBottom: '1rem',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden'
+                  }}>
+                    {article.description}
+                  </p>
 
-                      {/* Article Meta */}
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div className="flex items-center space-x-4">
-                          <div className="flex items-center">
-                            <Globe className="w-4 h-4 mr-1" />
-                            {article.source.name}
-                          </div>
-                          <div className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-1" />
-                            {formatDate(article.publishedAt)}
-                          </div>
-                        </div>
-                        <a
-                          href={article.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center text-blue-600 hover:text-blue-700 font-medium"
-                        >
-                          Read Full Article
-                          <ExternalLink className="w-4 h-4 ml-1" />
-                        </a>
-                      </div>
+                  {/* Article Meta */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <Globe size={14} />
+                      {article.source.name}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <Calendar size={14} />
+                      {formatDate(article.publishedAt)}
                     </div>
                   </div>
                 </div>
-              </article>
-            ))}
-          </div>
-        )}
+              </div>
+            </FuturisticCard>
+          ))}
+        </div>
+      )}
 
-        {/* No Articles State */}
-        {!loading && !error && filteredArticles.length === 0 && (
-          <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
-            <TrendingUp className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No articles found</h3>
-            <p className="text-gray-600 mb-4">
-              {filter === 'all' 
-                ? 'No news articles available at the moment.'
-                : filter === 'company'
-                ? 'No news found for tracked companies. Try "All News" or "General ETH Treasury" for broader coverage.'
-                : 'No general ETH treasury articles found. Try switching to a different filter.'
-              }
-            </p>
-            <button
-              onClick={fetchNews}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Refresh News
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
+      {/* No Articles State */}
+      {!loading && !error && filteredArticles.length === 0 && (
+        <div className={styles.cardGrid}>
+          <FuturisticCard title="No Articles Found" icon="📭" size="full" variant="info">
+            <div style={{ textAlign: 'center' }}>
+              <TrendingUp size={48} style={{ color: 'var(--text-muted)', margin: '0 auto 1rem' }} />
+              <h3 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>No articles found</h3>
+              <p style={{ marginBottom: '2rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                {filter === 'all' 
+                  ? 'No news articles available at the moment.'
+                  : filter === 'company'
+                  ? 'No news found for tracked companies. Try "All News" or "General ETH Treasury" for broader coverage.'
+                  : 'No general ETH treasury articles found. Try switching to a different filter.'
+                }
+              </p>
+              <FuturisticButton
+                onClick={fetchNews}
+                variant="primary"
+                size="medium"
+              >
+                <RefreshCw size={16} />
+                Refresh News
+              </FuturisticButton>
+            </div>
+          </FuturisticCard>
+        </div>
+      )}
+    </FuturisticLayout>
   )
 }
