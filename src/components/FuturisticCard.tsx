@@ -100,19 +100,33 @@ interface DataListProps {
     label: string
     value: string | number
     status?: 'active' | 'warning' | 'error'
+    href?: string
   }>
+  linkable?: boolean
 }
 
-export function DataList({ items }: DataListProps) {
+export function DataList({ items, linkable = false }: DataListProps) {
   return (
     <ul className={styles.dataList}>
       {items.map((item, index) => (
         <li key={index} className={styles.dataListItem}>
-          <span className={styles.dataListLabel}>
-            {item.status && <span className={`${styles.statusDot} ${styles[item.status]}`} />}
-            {item.label}
-          </span>
-          <span className={styles.dataListValue}>{item.value}</span>
+          {linkable && item.href ? (
+            <a href={item.href} className={styles.dataListLink}>
+              <span className={styles.dataListLabel}>
+                {item.status && <span className={`${styles.statusDot} ${styles[item.status]}`} />}
+                {item.label}
+              </span>
+              <span className={styles.dataListValue}>{item.value}</span>
+            </a>
+          ) : (
+            <>
+              <span className={styles.dataListLabel}>
+                {item.status && <span className={`${styles.statusDot} ${styles[item.status]}`} />}
+                {item.label}
+              </span>
+              <span className={styles.dataListValue}>{item.value}</span>
+            </>
+          )}
         </li>
       ))}
     </ul>

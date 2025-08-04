@@ -21,6 +21,15 @@
   overflow-y: auto;
 }
 
+.sidebarHead.footer {
+  margin-top: 3rem;
+  padding: 2rem 0;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
 .sidebarHeader {
   padding: 0 2rem 2rem;
   border-bottom: 1px solid var(--border-color);
@@ -351,4 +360,93 @@
   .cardGrid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Data List Link Styles */
+.dataListLink {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  color: inherit;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  padding: 0.25rem 0;
+  border-radius: 4px;
+}
+
+.dataListLink:hover {
+  background: rgba(0, 255, 255, 0.1);
+  color: var(--neon-cyan);
+  transform: translateX(4px);
+}
+
+.dataListLink:hover .dataListValue {
+  color: var(--neon-cyan);
+}
+
+/* News Link Styles */
+.newsLink {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+.newsLink:hover {
+  background: rgba(0, 255, 255, 0.05);
+  border-color: var(--neon-cyan);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 255, 255, 0.2);
+}
+
+.newsLink:hover .newsTitle {
+  color: var(--neon-cyan);
+}
+
+.newsGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.newsItem {
+  background: rgba(26, 31, 46, 0.3);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.newsTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.newsDescription {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.newsMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.newsSource {
+  color: var(--neon-blue);
+  font-weight: 500;
+}
+
+.newsDate {
+  opacity: 0.7;
 }

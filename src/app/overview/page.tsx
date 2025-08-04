@@ -36,6 +36,7 @@ function getFallbackEtfDataForOverview() {
 export default function OverviewPage() {
   const [companies, setCompanies] = useState<any[]>([])
   const [etfs, setEtfs] = useState<any[]>([])
+  const [news, setNews] = useState<any[]>([])
   const [ethPrice, setEthPrice] = useState<number>(3500)
   const [ethSupply, setEthSupply] = useState<number>(120709652)
   const [loading, setLoading] = useState(true)
@@ -47,9 +48,10 @@ export default function OverviewPage() {
         setLoading(true)
         
         // Fetch data from API endpoints instead of direct database queries
-        const [companiesResponse, etfsResponse, metricsResponse] = await Promise.all([
+        const [companiesResponse, etfsResponse, newsResponse, metricsResponse] = await Promise.all([
           fetch('/api/companies'),
           fetch('/api/etfs'),
+          fetch('/api/news'),
           fetch('/api/metrics')
         ])
         
@@ -61,6 +63,11 @@ export default function OverviewPage() {
         if (etfsResponse.ok) {
           const etfsData = await etfsResponse.json()
           setEtfs(etfsData.etfs?.slice(0, 5) || [])
+        }
+        
+        if (newsResponse.ok) {
+          const newsData = await newsResponse.json()
+          setNews(newsData.articles?.slice(0, 3) || [])
         }
         
         if (metricsResponse.ok) {
@@ -126,7 +133,8 @@ export default function OverviewPage() {
   // Format data for display
   const topCompanies = companies.slice(0, 5).map((company: any) => ({
     label: company.name,
-    value: `${(Number(company.ethHoldings || 0) / 1000).toFixed(0)}K ETH`
+    value: `${(Number(company.ethHoldings || 0) / 1000).toFixed(0)}K ETH`,
+    href: `/companies/${company.ticker}`
   }))
   
   const topEtfs = etfs.slice(0, 5).map((etf: any) => ({
@@ -134,25 +142,28 @@ export default function OverviewPage() {
     value: `${(Number(etf.ethHoldings || 0) / 1000).toFixed(0)}K ETH`
   }))
     
-  // Simple news data
-  const newsArticles = [
+  // Use real news data from API
+  const newsArticles = news.length > 0 ? news : [
     {
       title: "Ethereum ETF Market Continues Growth",
       description: "Institutional adoption of Ethereum through ETFs shows strong momentum with increased holdings across major funds.",
-      source: "Crypto News",
-      publishedAt: new Date().toLocaleDateString()
+      source: { name: "Crypto News" },
+      publishedAt: new Date().toISOString(),
+      url: "https://example.com/eth-etf-growth"
     },
     {
       title: "Corporate Treasury Strategies Include ETH",
       description: "More corporations are adding Ethereum to their treasury reserves as a hedge against inflation and currency devaluation.",
-      source: "Business Wire",
-      publishedAt: new Date(Date.now() - 86400000).toLocaleDateString()
+      source: { name: "Business Wire" },
+      publishedAt: new Date(Date.now() - 86400000).toISOString(),
+      url: "https://example.com/corporate-eth-strategy"
     },
     {
       title: "Ethereum Network Upgrade Enhances Efficiency",
       description: "Latest network improvements continue to optimize transaction costs and processing speed for institutional users.",
-      source: "Tech Today",
-      publishedAt: new Date(Date.now() - 172800000).toLocaleDateString()
+      source: { name: "Tech Today" },
+      publishedAt: new Date(Date.now() - 172800000).toISOString(),
+      url: "https://example.com/eth-network-upgrade"
     }
   ]
 
@@ -242,7 +253,7 @@ export default function OverviewPage() {
                 <h4 style={{ color: 'var(--text-secondary)', marginBottom: '1rem', fontSize: '0.9rem' }}>
                   Top Holdings
                 </h4>
-                <DataList items={topCompanies} />
+                <DataList items={topCompanies} linkable={true} />
               </div>
             </div>
           </FuturisticCard>
@@ -279,12 +290,14 @@ export default function OverviewPage() {
             <div className={styles.newsGrid}>
               {newsArticles.map((article, index) => (
                 <div key={index} className={styles.newsItem}>
-                  <h4 className={styles.newsTitle}>{article.title}</h4>
-                  <p className={styles.newsDescription}>{article.description}</p>
-                  <div className={styles.newsMeta}>
-                    <span className={styles.newsSource}>{article.source}</span>
-                    <span className={styles.newsDate}>{article.publishedAt}</span>
-                  </div>
+                  <a href={article.url} target="_blank" rel="noopener noreferrer" className={styles.newsLink}>
+                    <h4 className={styles.newsTitle}>{article.title}</h4>
+                    <p className={styles.newsDescription}>{article.description}</p>
+                    <div className={styles.newsMeta}>
+                      <span className={styles.newsSource}>{article.source?.name || article.source}</span>
+                      <span className={styles.newsDate}>{new Date(article.publishedAt).toLocaleDateString()}</span>
+                    </div>
+                  </a>
                 </div>
               ))}
             </div>
