@@ -3,9 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import CompanyLink from '@/components/CompanyLink'
-import FuturisticLayout from '@/components/FuturisticLayout'
-import FuturisticCard from '@/components/FuturisticCard'
-import styles from '@/styles/futuristic.module.css'
+import Navigation from '@/components/Navigation'
 import {
   Chart as ChartJS,
   ArcElement,
@@ -54,17 +52,14 @@ export default function ChartsPage() {
         const companiesData = await companiesResponse.json()
         const metricsData = await metricsResponse.json()
         
-        // Extract companies array from API response
-        const companies = companiesData.companies || []
-        
         // Calculate totals using live ETH price
-        const totalEthHoldings = companies.reduce((sum: number, company: CompanyData) => 
+        const totalEthHoldings = companiesData.reduce((sum: number, company: CompanyData) => 
           sum + (company.ethHoldings || 0), 0)
-        const ethPrice = metricsData.ethPrice || companiesData.ethPrice || 3500 // Use ETH price from either API
+        const ethPrice = metricsData.ethPrice || 3500 // Fallback to 3500 if API fails
         const totalEthValue = totalEthHoldings * ethPrice
 
         setData({
-          companies: companies,
+          companies: companiesData,
           totalEthHoldings,
           totalEthValue,
           ethPrice
@@ -107,44 +102,34 @@ export default function ChartsPage() {
 
   if (loading) {
     return (
-      <FuturisticLayout title="ETH Holdings Charts" showLiveIndicator={true}>
-        <div className={styles.cardGrid}>
-          <FuturisticCard title="Loading" icon="⟳" size="full" loading={true}>
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
-              <p style={{ color: 'var(--text-secondary)' }}>Loading analytics data...</p>
-            </div>
-          </FuturisticCard>
-        </div>
-      </FuturisticLayout>
+      <div className="min-h-screen bg-gray-50">
+        <Navigation title="ETH Holdings Charts" />
+        
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex justify-center items-center min-h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        </main>
+      </div>
     )
   }
 
   if (error) {
     return (
-      <FuturisticLayout title="ETH Holdings Charts" showLiveIndicator={true}>
-        <div className={styles.cardGrid}>
-          <FuturisticCard title="Error" icon="❌" variant="warning" size="full">
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <div style={{ color: 'var(--text-primary)', fontSize: '1.1rem', marginBottom: '1rem' }}>Error: {error}</div>
-              <button 
-                onClick={() => window.location.reload()} 
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  background: 'var(--accent-cyan)',
-                  color: 'var(--bg-primary)',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: '600'
-                }}
-              >
-                Retry
-              </button>
-            </div>
-          </FuturisticCard>
-        </div>
-      </FuturisticLayout>
+      <div className="min-h-screen bg-gray-50">
+        <Navigation title="ETH Holdings Charts" />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <div className="text-red-600 text-lg font-semibold">Error: {error}</div>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Retry
+            </button>
+          </div>
+        </main>
+      </div>
     )
   }
 
@@ -206,7 +191,8 @@ export default function ChartsPage() {
   }
 
   return (
-    <FuturisticLayout title="ETH Holdings Charts" showLiveIndicator={true}>
+    <div className="min-h-screen bg-gray-50">
+      <Navigation title="ETH Holdings Charts" />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Summary Stats */}
@@ -296,6 +282,6 @@ export default function ChartsPage() {
           </div>
         </div>
       </main>
-    </FuturisticLayout>
+    </div>
   )
 }
