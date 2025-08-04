@@ -1,7 +1,11 @@
 import CompanyList from '@/components/CompanyList'
-import Navigation from '@/components/Navigation'
+import FuturisticLayout from '@/components/FuturisticLayout'
+import FuturisticCard from '@/components/FuturisticCard'
+import { FuturisticButton } from '@/components/FuturisticUI'
 import Link from 'next/link'
 import { prisma } from '@/lib/db'
+import styles from '@/styles/futuristic.module.css'
+import { ArrowRight } from 'lucide-react'
 
 export async function generateMetadata() {
   return {
@@ -49,64 +53,85 @@ export default async function TreasuryCompaniesPage() {
     console.error('Error fetching company data for SSR:', error)
   }
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation title="ETH Treasury Companies" />
+    <FuturisticLayout 
+      title="ETH Treasury Companies" 
+      showLiveIndicator={true}
+    >
+      {/* Page Description */}
+      <div className={styles.cardGrid}>
+        <FuturisticCard 
+          title="Treasury Companies Overview" 
+          icon="🏢" 
+          size="full"
+          variant="info"
+        >
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '1.6' }}>
+            Track public companies holding Ethereum in their treasury reserves. Real-time data on ETH holdings, 
+            market caps, financial metrics, and institutional adoption trends.
+          </p>
+        </FuturisticCard>
+      </div>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <CompanyList />
-        
-        {/* Additional Analysis Tools */}
-        <div className="mt-16 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Advanced Treasury Analysis</h2>
-          <div className="grid md:grid-cols-2 gap-6">
+      {/* Company List Component */}
+      <CompanyList />
+      
+      {/* Advanced Analysis Tools */}
+      <div className={styles.cardGrid}>
+        <FuturisticCard 
+          title="Advanced Treasury Analysis" 
+          icon="📊" 
+          size="full"
+          variant="default"
+        >
+          <div style={{ display: 'grid', gap: '2rem', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
             {/* ETH Basis Analysis */}
-            <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-              <h3 className="font-semibold text-gray-900 mb-2">ETH Basis Analysis</h3>
-              <p className="text-gray-600 text-sm mb-3">
+            <div style={{ 
+              padding: '1.5rem', 
+              border: '1px solid var(--border-primary)', 
+              borderRadius: '12px',
+              background: 'var(--bg-secondary)',
+              transition: 'all 0.3s ease'
+            }}>
+              <h3 style={{ color: 'var(--text-primary)', marginBottom: '1rem', fontSize: '1.1rem', fontWeight: '600' }}>
+                ETH Basis Analysis
+              </h3>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: '1.5' }}>
                 Analyze premium/discount ratios and market-to-NAV relationships for ETH treasury companies. 
                 Track how stock prices compare to underlying ETH holdings value.
               </p>
-              <Link 
-                href="/analytics/premium-discount" 
-                className="inline-flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium"
-              >
-                View ETH Basis Analysis →
+              <Link href="/analytics/premium-discount">
+                <FuturisticButton variant="secondary" size="small">
+                  View Analysis
+                  <ArrowRight size={16} />
+                </FuturisticButton>
               </Link>
             </div>
             
             {/* ETH Exposure Analysis */}
-            <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-              <h3 className="font-semibold text-gray-900 mb-2">ETH Exposure Analysis</h3>
-              <p className="text-gray-600 text-sm mb-3">
+            <div style={{ 
+              padding: '1.5rem', 
+              border: '1px solid var(--border-primary)', 
+              borderRadius: '12px',
+              background: 'var(--bg-secondary)',
+              transition: 'all 0.3s ease'
+            }}>
+              <h3 style={{ color: 'var(--text-primary)', marginBottom: '1rem', fontSize: '1.1rem', fontWeight: '600' }}>
+                ETH Exposure Analysis
+              </h3>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: '1.5' }}>
                 Examine ETH exposure ratios, holdings concentration, and portfolio allocation strategies 
                 across different treasury companies and market segments.
               </p>
-              <Link 
-                href="/analytics/exposure" 
-                className="inline-flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium"
-              >
-                View ETH Exposure Analysis →
+              <Link href="/analytics/exposure">
+                <FuturisticButton variant="secondary" size="small">
+                  View Analysis
+                  <ArrowRight size={16} />
+                </FuturisticButton>
               </Link>
             </div>
           </div>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-500 text-sm">
-            <p>© 2025 Ethereum Treasury Tracker. Data sourced from public APIs, CoinGecko, EtherScan, Alpha Vantage and company websites.</p>
-            <p className="mt-2">
-              Built with Next.js, Tailwind CSS, and Prisma.
-            </p>
-            <p className="mt-2">
-              <Link href="/sitemap.xml" className="text-blue-600 hover:text-blue-700">Sitemap</Link>
-            </p>
-          </div>
-        </div>
-      </footer>
-    </div>
+        </FuturisticCard>
+      </div>
+    </FuturisticLayout>
   )
 }

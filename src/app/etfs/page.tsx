@@ -1,6 +1,7 @@
 import EtfList from '@/components/EtfList'
-import Navigation from '@/components/Navigation'
-import Link from 'next/link'
+import FuturisticLayout from '@/components/FuturisticLayout'
+import FuturisticCard from '@/components/FuturisticCard'
+import styles from '@/styles/futuristic.module.css'
 
 export async function generateMetadata() {
   return {
@@ -11,35 +12,27 @@ export async function generateMetadata() {
 
 export default function EtfsPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation title="Ethereum ETFs" />
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Description */}
-        <div className="mb-8">
-          <p className="text-gray-600 text-lg">
-            Track Ethereum Exchange-Traded Funds (ETFs) and their ETH holdings, total assets under management, and key metrics.
+    <FuturisticLayout 
+      title="Ethereum ETFs" 
+      showLiveIndicator={true}
+    >
+      {/* Page Description */}
+      <div className={styles.cardGrid}>
+        <FuturisticCard 
+          title="ETF Overview" 
+          icon="📈" 
+          size="full"
+          variant="info"
+        >
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '1.6' }}>
+            Track Ethereum Exchange-Traded Funds (ETFs) and their ETH holdings, total assets under management, 
+            and key performance metrics. Real-time data from institutional ETF providers.
           </p>
-        </div>
+        </FuturisticCard>
+      </div>
 
-        <EtfList />
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-500 text-sm">
-            <p>© 2025 Ethereum Treasury Tracker. ETF data sourced from Financial Modeling Prep API.</p>
-            <p className="mt-2">
-              Built with Next.js, Tailwind CSS, and Prisma.
-            </p>
-            <p className="mt-2">
-              <Link href="/sitemap.xml" className="text-blue-600 hover:text-blue-700">Sitemap</Link>
-            </p>
-          </div>
-        </div>
-      </footer>
-    </div>
+      {/* ETF List Component */}
+      <EtfList />
+    </FuturisticLayout>
   )
 }
