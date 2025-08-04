@@ -96,10 +96,12 @@ export interface StaticPageData {
 }
 
 // Fetch ecosystem summary data for static generation
-export async function fetchStaticEcosystemData(): Promise<StaticEcosystemData> {
+export async function fetchStaticEcosystemData() {
   const prisma = new PrismaClient()
   try {
+    // Ensure database connection is established (same pattern as working ETF API)
     await prisma.$connect()
+    console.log('✅ Database connected for ecosystem data')
     
     // Fetch companies data (required table)
     const companies = await prisma.company.findMany({
@@ -192,7 +194,9 @@ export async function fetchStaticEcosystemData(): Promise<StaticEcosystemData> {
 export async function fetchStaticCompaniesData() {
   const prisma = new PrismaClient()
   try {
+    // Ensure database connection is established (same pattern as working ETF API)
     await prisma.$connect()
+    console.log('✅ Database connected for companies data')
     
     const companies = await prisma.company.findMany({
       where: { isActive: true },
@@ -229,7 +233,9 @@ export async function fetchStaticCompaniesData() {
 export async function fetchStaticETFsData() {
   const prisma = new PrismaClient()
   try {
+    // Ensure database connection is established (same pattern as working ETF API)
     await prisma.$connect()
+    console.log('✅ Database connected for ETF static data')
     
     // Try to fetch ETFs data (table may not exist in production yet)
     let etfs: Array<{ id: number; symbol: string; name: string | null; ethHoldings: number | null; aum: number | null; totalValue: number | null; expenseRatio: number | null; nav: number | null; isActive: boolean; lastUpdated: Date; createdAt: Date }> = []
