@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
-import { getLatestEthPrice } from '@/lib/dataFetcher'
+import { getEthPriceFromDatabase } from '@/lib/databaseHelpers'
 
 // Static fallback data for MVP (updated with current holdings as of July 2025)
 const fallbackCompanies = [
@@ -170,7 +170,7 @@ export async function GET() {
     }
 
     // Get ETH price from live API with database backup
-    const ethPrice = await getLatestEthPrice()
+    const ethPrice = await getEthPriceFromDatabase()
 
     // Convert BigInt to string for JSON serialization and add calculated values
     const serializedCompanies = companies.map((company) => ({

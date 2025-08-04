@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
-import { getLatestEthPrice } from '@/lib/dataFetcher'
+import { getEthPriceFromDatabase } from '@/lib/databaseHelpers'
 
 export async function GET() {
   const prisma = new PrismaClient()
@@ -29,7 +29,7 @@ export async function GET() {
     ])
     
     // Get ETH price from live API with database backup
-    const ethPrice = await getLatestEthPrice()
+    const ethPrice = await getEthPriceFromDatabase()
     
     // Calculate company totals
     const companyTotalEth = companies.reduce((sum, company) => sum + (company.ethHoldings || 0), 0)

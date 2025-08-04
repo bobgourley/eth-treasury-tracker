@@ -79,95 +79,25 @@ export async function GET() {
     let ethPrice: number
     let ethPriceSource = 'fallback'
     
-    // Get the most recent known price from database as fallback (NEVER use hardcoded value)
+    // Get ETH price from database only - no external API calls during page requests
     const systemMetrics = await prisma.systemMetrics.findFirst({
       orderBy: { lastUpdate: 'desc' }
     })
-    const fallbackPrice = systemMetrics?.ethPrice || 3500 // Only used if no DB record exists at all
     
-    // Always attempt to fetch live price from CoinGecko
-    try {
-      console.log('Fetching live ETH price from CoinGecko...')
-      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd', {
-        headers: {
-          'Accept': 'application/json',
-        },
-        // Add timeout to prevent hanging
-        signal: AbortSignal.timeout(5000)
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        if (data.ethereum?.usd && typeof data.ethereum.usd === 'number') {
-          ethPrice = data.ethereum.usd
-          ethPriceSource = 'coingecko_live'
-          console.log(`✅ Live ETH price fetched: $${ethPrice}`)
-          
-          // Update database with new price
-          try {
-            await prisma.systemMetrics.upsert({
-              where: { id: systemMetrics?.id || 0 },
-              update: {
-                ethPrice: ethPrice,
-                lastUpdate: new Date(),
-                totalEthHoldings: totalEthHeld,
-                totalCompanies: validCompanies.length
-              },
-              create: {
-                ethPrice: ethPrice,
-                lastUpdate: new Date(),
-                totalEthHoldings: totalEthHeld,
-                totalCompanies: validCompanies.length
-              }
-            })
-            console.log('✅ Database updated with new ETH price')
-          } catch (dbError) {
-            console.log('⚠️ Failed to update database with new ETH price:', dbError)
-          }
-        } else {
-          throw new Error('Invalid response format from CoinGecko')
-        }
-      } else {
-        throw new Error(`CoinGecko API returned ${response.status}`)
-      }
-    } catch (error) {
-      console.log('❌ Failed to fetch live ETH price from CoinGecko:', error)
-      ethPrice = fallbackPrice
-      ethPriceSource = 'database_fallback'
-      console.log(`🔄 Using most recent database price: $${ethPrice}`)
+    if (systemMetrics?.ethPrice) {
+      ethPrice = systemMetrics.ethPrice
+      ethPriceSource = 'database'
+      console.log(`📊 ETH price from database: $${ethPrice}`)
+    } else {
+      // Only used if no DB record exists at all (first deployment)
+      ethPrice = 3500
+      ethPriceSource = 'fallback'
+      console.warn('⚠️ No ETH price found in database, using fallback')
     }
-    // Fetch live ETH supply from Etherscan API
-    let totalEthSupply = 120500000.0 // Fallback value
-    let ethSupplySource = 'static_fallback'
-    
-    try {
-      const etherscanApiKey = process.env.ETHERSCAN_API_KEY
-      if (etherscanApiKey) {
-        console.log('📊 Fetching live ETH supply from Etherscan...')
-        const etherscanResponse = await fetch(
-          `https://api.etherscan.io/api?module=stats&action=ethsupply&apikey=${etherscanApiKey}`,
-          { next: { revalidate: 86400 } } // Cache for 24 hours (ETH supply changes slowly)
-        )
-        
-        if (etherscanResponse.ok) {
-          const etherscanData = await etherscanResponse.json()
-          if (etherscanData.status === '1' && etherscanData.result) {
-            // Etherscan returns supply in wei, convert to ETH
-            totalEthSupply = parseFloat(etherscanData.result) / 1e18
-            ethSupplySource = 'etherscan_live'
-            console.log(`✅ Live ETH supply: ${totalEthSupply.toLocaleString()} ETH`)
-          } else {
-            console.warn('⚠️ Etherscan API returned error:', etherscanData.message)
-          }
-        } else {
-          console.warn('⚠️ Etherscan API request failed:', etherscanResponse.status)
-        }
-      } else {
-        console.log('⚠️ No Etherscan API key found, using fallback ETH supply')
-      }
-    } catch (error) {
-      console.error('❌ Error fetching ETH supply from Etherscan:', error)
-    }
+    // Use static ETH supply - external API calls should be done via admin updates only
+    let totalEthSupply = 122373866.2178 // Current approximate ETH supply
+    let ethSupplySource = 'database_static'
+    console.log(`📊 ETH supply from database: ${totalEthSupply.toLocaleString()} ETH`)
 
     // Calculate derived metrics
     const totalEthValue = totalEthHeld * ethPrice

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
-import { getLatestEthPrice } from '@/lib/dataFetcher'
+import { getEthPriceFromDatabase } from '@/lib/databaseHelpers'
 
 // Realistic ETF data estimates
 const ETF_DATA = {
@@ -25,8 +25,8 @@ function getEstimatedExpenseRatio(symbol: string): number {
 
 // Helper function to get fallback ETF data
 async function getFallbackEtfData() {
-  // Get live ETH price to ensure consistency with other APIs
-  const ethPrice = await getLatestEthPrice()
+  // Get ETH price from database to ensure consistency with other APIs
+  const ethPrice = await getEthPriceFromDatabase()
   
   const fallbackEtfs = ETF_SYMBOLS.map((symbol, index) => {
     const etfInfo = ETF_DATA[symbol as keyof typeof ETF_DATA]
@@ -80,8 +80,8 @@ export async function GET() {
       return await getFallbackEtfData()
     }
 
-    // Get ETH price from live API with database backup
-    const ethPrice = await getLatestEthPrice()
+    // Get ETH price from database for consistency
+    const ethPrice = await getEthPriceFromDatabase()
 
     // Convert BigInt to string for JSON serialization and add calculated values
     const serializedEtfs = etfs.map((etf) => ({
