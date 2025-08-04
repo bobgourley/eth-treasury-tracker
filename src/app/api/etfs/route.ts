@@ -24,13 +24,15 @@ function getEstimatedExpenseRatio(symbol: string): number {
 }
 
 // Helper function to get fallback ETF data
-function getFallbackEtfData() {
+async function getFallbackEtfData() {
+  // Get live ETH price to ensure consistency with other APIs
+  const ethPrice = await getLatestEthPrice()
+  
   const fallbackEtfs = ETF_SYMBOLS.map((symbol, index) => {
     const etfInfo = ETF_DATA[symbol as keyof typeof ETF_DATA]
     const variation = 0.95 + (Math.random() * 0.1) // 95% to 105%
     const ethHoldings = etfInfo.estimatedEthHoldings * variation
     const aum = etfInfo.estimatedAum * variation
-    const ethPrice = 3484.13
     const totalValue = ethHoldings * ethPrice
     
     return {
@@ -53,7 +55,7 @@ function getFallbackEtfData() {
   return NextResponse.json({
     etfs: fallbackEtfs,
     count: fallbackEtfs.length,
-    ethPrice: 3484.13,
+    ethPrice,
     message: 'Using fallback ETF data - FMP API key not available'
   })
 }
@@ -75,7 +77,7 @@ export async function GET() {
     // If database is empty, use fallback data
     if (!etfs || etfs.length === 0) {
       console.log('⚠️ No ETFs in database - using fallback data')
-      return getFallbackEtfData()
+      return await getFallbackEtfData()
     }
 
     // Get ETH price from live API with database backup
@@ -101,7 +103,7 @@ export async function GET() {
     
   } catch (error) {
     console.error('❌ Database error, using fallback ETF data:', error)
-    return getFallbackEtfData()
+    return await getFallbackEtfData()
   } finally {
     // Always clean up database connection
     await prisma.$disconnect()
