@@ -130,9 +130,9 @@ export function FuturisticBadge({
 // Futuristic Table Component
 interface FuturisticTableProps {
   headers: string[]
-  data: Array<Record<string, any>>
+  data: Array<Record<string, string | number | boolean | null>>
   loading?: boolean
-  onRowClick?: (row: Record<string, any>) => void
+  onRowClick?: (row: Record<string, string | number | boolean | null>) => void
   className?: string
 }
 
