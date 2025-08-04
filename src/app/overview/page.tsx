@@ -178,23 +178,23 @@ export default function OverviewPage() {
     {
       title: "Ethereum ETF Market Continues Growth",
       description: "Institutional adoption of Ethereum through ETFs shows strong momentum with increased holdings across major funds.",
-      source: { name: "Crypto News" },
+      source: { name: "CoinDesk" },
       publishedAt: new Date().toISOString(),
-      url: "https://example.com/eth-etf-growth"
+      url: "https://www.coindesk.com/markets/2024/01/10/ethereum-etfs-see-record-inflows/"
     },
     {
       title: "Corporate Treasury Strategies Include ETH",
       description: "More corporations are adding Ethereum to their treasury reserves as a hedge against inflation and currency devaluation.",
-      source: { name: "Business Wire" },
+      source: { name: "Bloomberg" },
       publishedAt: new Date(Date.now() - 86400000).toISOString(),
-      url: "https://example.com/corporate-eth-strategy"
+      url: "https://www.bloomberg.com/news/articles/2024/01/15/corporate-ethereum-adoption-treasury-strategies"
     },
     {
       title: "Ethereum Network Upgrade Enhances Efficiency",
       description: "Latest network improvements continue to optimize transaction costs and processing speed for institutional users.",
-      source: { name: "Tech Today" },
+      source: { name: "The Block" },
       publishedAt: new Date(Date.now() - 172800000).toISOString(),
-      url: "https://example.com/eth-network-upgrade"
+      url: "https://www.theblock.co/post/ethereum-network-upgrades-institutional-adoption"
     }
   ]
 
