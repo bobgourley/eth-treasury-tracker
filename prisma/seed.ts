@@ -12,8 +12,8 @@ async function main() {
       ticker: 'BMNR',
       ethHoldings: 566776.0, // Announced holdings - acquires and stakes ETH as primary reserve
       ethAddresses: JSON.stringify([]), // Empty - using manual admin updates for MVP
-      marketCap: "1600000000", // Estimated market cap
-      sharesOutstanding: "45000000",
+      marketCap: BigInt(1600000000), // Estimated market cap
+      sharesOutstanding: BigInt(45000000),
       ethPerShare: 0.0126,
       mnavRatio: 1.35,
       stakingYield: 4.8,
@@ -26,8 +26,8 @@ async function main() {
       ticker: 'SBET',
       ethHoldings: 360807.0, // Announced holdings - focuses on accumulating and staking Ethereum
       ethAddresses: JSON.stringify([]), // Empty - using manual admin updates for MVP
-      marketCap: "1330000000", // Estimated market cap
-      sharesOutstanding: "152000",
+      marketCap: BigInt(1330000000), // Estimated market cap
+      sharesOutstanding: BigInt(152000),
       ethPerShare: 2.37,
       mnavRatio: 1.15,
       stakingYield: 5.2,
@@ -40,8 +40,8 @@ async function main() {
       ticker: 'BTBT',
       ethHoldings: 120306.0, // Announced holdings - operates as digital asset company
       ethAddresses: JSON.stringify([]), // Empty - using manual admin updates for MVP
-      marketCap: "444000000", // Estimated market cap
-      sharesOutstanding: "85000000",
+      marketCap: BigInt(444000000), // Estimated market cap
+      sharesOutstanding: BigInt(85000000),
       ethPerShare: 0.00142,
       mnavRatio: 1.25,
       stakingYield: 4.5,
@@ -54,8 +54,8 @@ async function main() {
       ticker: 'BTCS',
       ethHoldings: 55788.0, // Announced holdings - blockchain infrastructure with ETH strategy
       ethAddresses: JSON.stringify([]), // Empty - using manual admin updates for MVP
-      marketCap: "200000000", // Estimated market cap
-      sharesOutstanding: "28000000",
+      marketCap: BigInt(200000000), // Estimated market cap
+      sharesOutstanding: BigInt(28000000),
       ethPerShare: 0.00199,
       mnavRatio: 1.18,
       stakingYield: 4.2,
@@ -68,8 +68,8 @@ async function main() {
       ticker: 'GAME',
       ethHoldings: 10170.0, // Announced holdings - pivots to Ethereum-based digital asset treasury
       ethAddresses: JSON.stringify([]), // Empty - using manual admin updates for MVP
-      marketCap: "50000000", // Estimated market cap
-      sharesOutstanding: "15000000",
+      marketCap: BigInt(50000000), // Estimated market cap
+      sharesOutstanding: BigInt(15000000),
       ethPerShare: 0.000678,
       mnavRatio: 1.05,
       stakingYield: 3.5,
@@ -82,8 +82,8 @@ async function main() {
       ticker: 'ICG',
       ethHoldings: 7023.0, // Announced holdings - designs blockchain hardware
       ethAddresses: JSON.stringify([]), // Empty - using manual admin updates for MVP
-      marketCap: "75000000", // Estimated market cap
-      sharesOutstanding: "20000000",
+      marketCap: BigInt(75000000), // Estimated market cap
+      sharesOutstanding: BigInt(20000000),
       ethPerShare: 0.000351,
       mnavRatio: 1.08,
       stakingYield: 3.8,
@@ -96,8 +96,8 @@ async function main() {
       ticker: 'KR1',
       ethHoldings: 5500.0, // Announced holdings - invests in and accumulates ETH
       ethAddresses: JSON.stringify([]), // Empty - using manual admin updates for MVP
-      marketCap: "45000000", // Estimated market cap
-      sharesOutstanding: "12000000",
+      marketCap: BigInt(45000000), // Estimated market cap
+      sharesOutstanding: BigInt(12000000),
       ethPerShare: 0.000458,
       mnavRatio: 1.12,
       stakingYield: 4.0,
@@ -110,8 +110,8 @@ async function main() {
       ticker: 'EXOD',
       ethHoldings: 2550.0, // Announced holdings - crypto wallet platform
       ethAddresses: JSON.stringify([]), // Empty - using manual admin updates for MVP
-      marketCap: "120000000", // Estimated market cap
-      sharesOutstanding: "75000000",
+      marketCap: BigInt(120000000), // Estimated market cap
+      sharesOutstanding: BigInt(75000000),
       ethPerShare: 0.000034,
       mnavRatio: 0.98,
       stakingYield: 3.2,
@@ -124,8 +124,8 @@ async function main() {
       ticker: 'BTCT',
       ethHoldings: 2100.0, // Announced holdings - focuses on acquiring and holding ETH
       ethAddresses: JSON.stringify([]), // Empty - using manual admin updates for MVP
-      marketCap: "35000000", // Estimated market cap
-      sharesOutstanding: "18000000",
+      marketCap: BigInt(35000000), // Estimated market cap
+      sharesOutstanding: BigInt(18000000),
       ethPerShare: 0.000117,
       mnavRatio: 1.02,
       stakingYield: 3.6,

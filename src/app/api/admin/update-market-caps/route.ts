@@ -44,7 +44,7 @@ export async function POST() {
           await prisma.company.update({
             where: { id: company.id },
             data: {
-              marketCap: Math.round(stockData.marketCap).toString(),
+              marketCap: BigInt(Math.round(stockData.marketCap)),
               stockPrice: stockData.price,
               lastUpdated: new Date()
             }
