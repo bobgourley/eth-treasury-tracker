@@ -132,8 +132,8 @@ export async function updateSystemMetrics(): Promise<void> {
       select: { ethHoldings: true, marketCap: true }
     })
     
-    const totalEthHoldings = companies.reduce((sum: number, company: { ethHoldings: number | null; marketCap: bigint | null }) => sum + Number(company.ethHoldings || 0), 0)
-    const totalMarketCap = companies.reduce((sum: number, company: { ethHoldings: number | null; marketCap: bigint | null }) => sum + Number(company.marketCap || 0), 0)
+    const totalEthHoldings = companies.reduce((sum, company) => sum + Number(company.ethHoldings || 0), 0)
+    const totalMarketCap = companies.reduce((sum, company) => sum + Number(company.marketCap || 0), 0)
     const totalEthValue = totalEthHoldings * updatedEthPrice
     const ethSupplyPercent = (totalEthHoldings / updatedEthSupply) * 100
     
