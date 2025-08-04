@@ -101,23 +101,29 @@ export async function fetchStaticEcosystemData(): Promise<StaticEcosystemData> {
   try {
     await prisma.$connect()
     
-    // Fetch companies and ETFs data
-    const [companies, etfs] = await Promise.all([
-      prisma.company.findMany({
-        where: { isActive: true },
-        select: {
-          ethHoldings: true,
-          marketCap: true
-        }
-      }),
-      prisma.etf.findMany({
+    // Fetch companies data (required table)
+    const companies = await prisma.company.findMany({
+      where: { isActive: true },
+      select: {
+        ethHoldings: true,
+        marketCap: true
+      }
+    })
+    
+    // Try to fetch ETFs data (optional table - may not exist in production yet)
+    let etfs: Array<{ ethHoldings: number | null; totalValue: number | null }> = []
+    try {
+      etfs = await prisma.etf.findMany({
         where: { isActive: true },
         select: {
           ethHoldings: true,
           totalValue: true
         }
       })
-    ])
+    } catch (error: any) {
+      console.log('⚠️ ETFs table not found in database, using empty array:', error.code)
+      etfs = []
+    }
 
     // Get ETH price from system metrics and live ETH supply from Etherscan
     const [systemMetrics, liveEthSupply] = await Promise.all([
@@ -223,10 +229,22 @@ export async function fetchStaticETFsData() {
   try {
     await prisma.$connect()
     
-    const etfs = await prisma.etf.findMany({
-      where: { isActive: true },
-      orderBy: { aum: 'desc' }
-    })
+    // Try to fetch ETFs data (table may not exist in production yet)
+    let etfs: any[] = []
+    try {
+      etfs = await prisma.etf.findMany({
+        where: { isActive: true },
+        orderBy: { aum: 'desc' }
+      })
+    } catch (error: any) {
+      console.log('⚠️ ETFs table not found in database, returning empty result:', error.code)
+      return {
+        etfs: [],
+        count: 0,
+        ethPrice: 3500,
+        message: 'ETFs table not found - using empty data'
+      }
+    }
 
     // Get ETH price from system metrics
     const systemMetrics = await prisma.systemMetrics.findFirst({
