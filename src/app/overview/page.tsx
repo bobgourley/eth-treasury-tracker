@@ -5,6 +5,7 @@ import { fetchStaticEcosystemData, fetchStaticCompaniesData, fetchStaticETFsData
 import styles from '../../styles/futuristic.module.css'
 
 // This is a server component that uses ISR
+// Force regeneration to include ETF data from database
 export const revalidate = 300 // 5 minutes
 
 export default async function OverviewPage() {
