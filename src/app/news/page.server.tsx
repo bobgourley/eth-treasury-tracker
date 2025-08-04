@@ -131,7 +131,16 @@ export default async function NewsPage() {
             Latest Articles ({newsData.articles.length})
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {newsData.articles.map((article: any, index: number) => (
+            {newsData.articles.map((article: {
+              title: string;
+              description: string;
+              url: string;
+              urlToImage: string | null;
+              publishedAt: string;
+              source: { name: string };
+              company?: string;
+              ticker?: string;
+            }, index: number) => (
               <article key={index} style={{ 
                 backgroundColor: 'white', 
                 padding: '1.5rem', 
