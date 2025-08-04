@@ -174,9 +174,23 @@ export async function fetchStaticEcosystemData() {
         }
       })
       console.log(`✅ Found ${etfs.length} ETFs in database for ecosystem data`)
+      
+      // If database is empty, use fallback data
+      if (!etfs || etfs.length === 0) {
+        console.log('⚠️ No ETFs in database - using fallback data for ecosystem calculation')
+        const fallbackData = getFallbackStaticEtfData()
+        etfs = fallbackData.etfs.map(etf => ({
+          ethHoldings: etf.ethHoldings,
+          totalValue: etf.totalValue
+        }))
+      }
     } catch (error: unknown) {
-      console.log('⚠️ ETFs table not found in database, using empty array:', error instanceof Error ? error.message : 'Unknown error')
-      etfs = []
+      console.log('⚠️ ETFs table not found in database, using fallback data for ecosystem:', error instanceof Error ? error.message : 'Unknown error')
+      const fallbackData = getFallbackStaticEtfData()
+      etfs = fallbackData.etfs.map(etf => ({
+        ethHoldings: etf.ethHoldings,
+        totalValue: etf.totalValue
+      }))
     }
 
     // Get ETH price from system metrics and live ETH supply from Etherscan
