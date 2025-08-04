@@ -52,12 +52,12 @@ export async function POST() {
     const updatedEtfs: Array<{
       id: number;
       symbol: string;
-      name: string;
-      ethHoldings: number;
-      totalValue: number;
-      aum: number;
-      expenseRatio: number;
-      nav: number;
+      name: string | null;
+      ethHoldings: number | null;
+      totalValue: number | null;
+      aum: number | null;
+      expenseRatio: number | null;
+      nav: number | null;
       lastUpdated: Date;
       createdAt: Date;
       isActive: boolean;
@@ -82,25 +82,32 @@ export async function POST() {
         // Calculate NAV (simplified)
         const nav = aum > 0 ? (aum / 1000000) : 100 // Rough NAV calculation
         
-        // Update or create ETF record
-        const etfData = {
-          symbol,
-          name: etfInfo.name,
-          ethHoldings,
-          totalValue,
-          aum,
-          expenseRatio: etfInfo.expenseRatio,
-          nav,
-          lastUpdated: new Date(),
-          isActive: true
-        }
-        
-        // For now, bypass database and create in-memory record
-        const etf = {
-          id: updatedEtfs.length + 1,
-          ...etfData,
-          createdAt: new Date()
-        }
+        // Update or create ETF record in database
+        const etf = await prisma.etf.upsert({
+          where: { symbol },
+          update: {
+            name: etfInfo.name,
+            ethHoldings,
+            totalValue,
+            aum,
+            expenseRatio: etfInfo.expenseRatio,
+            nav,
+            lastUpdated: new Date(),
+            isActive: true
+          },
+          create: {
+            symbol,
+            name: etfInfo.name,
+            ethHoldings,
+            totalValue,
+            aum,
+            expenseRatio: etfInfo.expenseRatio,
+            nav,
+            lastUpdated: new Date(),
+            createdAt: new Date(),
+            isActive: true
+          }
+        })
         
         updatedEtfs.push(etf)
         console.log(`✅ ${symbol}: ${ethHoldings.toFixed(2)} ETH, $${totalValue.toLocaleString()}`)
@@ -108,23 +115,39 @@ export async function POST() {
       } catch (error: unknown) {
         console.error(`❌ Error updating ${symbol}:`, error)
         
-        // Create placeholder record if update fails
+        // Create placeholder record in database if update fails
         const fallbackInfo = ETF_DATA[symbol as keyof typeof ETF_DATA]
         if (fallbackInfo) {
-          const etf = {
-            id: updatedEtfs.length + 1,
-            symbol,
-            name: `${symbol} ETF`,
-            ethHoldings: 0,
-            totalValue: 0,
-            aum: 0,
-            expenseRatio: 0.75,
-            nav: 100,
-            lastUpdated: new Date(),
-            createdAt: new Date(),
-            isActive: true
+          try {
+            const etf = await prisma.etf.upsert({
+              where: { symbol },
+              update: {
+                name: `${symbol} ETF`,
+                ethHoldings: 0,
+                totalValue: 0,
+                aum: 0,
+                expenseRatio: 0.75,
+                nav: 100,
+                lastUpdated: new Date(),
+                isActive: true
+              },
+              create: {
+                symbol,
+                name: `${symbol} ETF`,
+                ethHoldings: 0,
+                totalValue: 0,
+                aum: 0,
+                expenseRatio: 0.75,
+                nav: 100,
+                lastUpdated: new Date(),
+                createdAt: new Date(),
+                isActive: true
+              }
+            })
+            updatedEtfs.push(etf)
+          } catch (dbError) {
+            console.error(`❌ Failed to create fallback record for ${symbol}:`, dbError)
           }
-          updatedEtfs.push(etf)
         }
       }
     }
