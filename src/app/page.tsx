@@ -88,7 +88,7 @@ export default async function Home() {
                 color="cyan"
               />
               <MetricDisplay
-                value={`${(staticData.companies.companies.reduce((sum, c) => sum + (c.ethHoldings || 0), 0) / 1000).toFixed(0)}K`}
+                value={`${(staticData.companies.companies.reduce((sum, c) => sum + (c.ethHoldings || 0), 0) / 1000000).toFixed(1)}M`}
                 label="Total ETH Holdings"
                 subtext={`$${(staticData.companies.companies.reduce((sum, c) => sum + (c.ethHoldings || 0), 0) * ethPrice / 1000000000).toFixed(2)}B value`}
                 color="green"
@@ -168,12 +168,39 @@ export default async function Home() {
           />
         </FuturisticCard>
 
-        {/* Total Value Card */}
-        <FuturisticCard title="Total Value" icon="💎">
+        {/* ETH and Treasury Reserves Card */}
+        <FuturisticCard title="ETH and Treasury Reserves" icon="💎">
           <MetricDisplay
             value={`$${(totalValueUsd / 1000000000).toFixed(2)}B`}
             label="USD Value"
             color="orange"
+          />
+        </FuturisticCard>
+
+        {/* Token Market Cap Card */}
+        <FuturisticCard title="Token Market Cap" icon="🪙">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <MetricDisplay
+              value={`$${((ethPrice * ethSupply) / 1000000000000).toFixed(2)}T`}
+              label="ETH Market Cap"
+              color="cyan"
+            />
+            <MetricDisplay
+              value="$2.1T"
+              label="BTC Market Cap"
+              subtext="Estimated"
+              color="orange"
+            />
+          </div>
+        </FuturisticCard>
+
+        {/* ETH-BTC Ratio Card */}
+        <FuturisticCard title="ETH-BTC Ratio" icon="⚖️">
+          <MetricDisplay
+            value={`${(ethPrice / 105000).toFixed(3)}`}
+            label="ETH/BTC Price Ratio"
+            subtext={`1 BTC = ${(105000 / ethPrice).toFixed(1)} ETH`}
+            color="blue"
           />
         </FuturisticCard>
       </div>
