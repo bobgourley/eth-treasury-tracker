@@ -66,6 +66,7 @@ function getFallbackEtfDataForOverview() {
 
 export default function OverviewPage() {
   const [companies, setCompanies] = useState<Company[]>([])
+  const [totalCompanyCount, setTotalCompanyCount] = useState<number>(0)
   const [etfs, setEtfs] = useState<Etf[]>([])
   const [news, setNews] = useState<NewsArticle[]>([])
   const [ethPrice, setEthPrice] = useState<number>(3500)
@@ -89,6 +90,7 @@ export default function OverviewPage() {
         if (companiesResponse.ok) {
           const companiesData = await companiesResponse.json()
           setCompanies(companiesData.companies?.slice(0, 5) || [])
+          setTotalCompanyCount(companiesData.count || companiesData.companies?.length || 0)
         }
         
         if (etfsResponse.ok) {
@@ -269,7 +271,7 @@ export default function OverviewPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
               <div>
                 <MetricDisplay
-                  value={companies.length}
+                  value={totalCompanyCount}
                   label="Active Companies"
                   color="cyan"
                 />
