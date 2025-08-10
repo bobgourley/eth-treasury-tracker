@@ -6,11 +6,6 @@ const ALLOWED_ADMIN_EMAILS = [
   process.env.ADMIN_EMAIL, // Your email from environment variable
 ].filter(Boolean) as string[]
 
-// Debug logging for environment variables
-console.log('🔍 Auth Debug - Environment variables loaded:')
-console.log('ADMIN_EMAIL:', process.env.ADMIN_EMAIL)
-console.log('ALLOWED_ADMIN_EMAILS:', ALLOWED_ADMIN_EMAILS)
-
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
@@ -20,20 +15,9 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      // Enhanced debug logging
-      console.log('🔍 SignIn Debug - Full details:')
-      console.log('User email:', user.email)
-      console.log('User email type:', typeof user.email)
-      console.log('ALLOWED_ADMIN_EMAILS:', ALLOWED_ADMIN_EMAILS)
-      console.log('ALLOWED_ADMIN_EMAILS length:', ALLOWED_ADMIN_EMAILS.length)
-      console.log('Email includes check:', ALLOWED_ADMIN_EMAILS.includes(user.email || ''))
-      console.log('Account provider:', account?.provider)
-      console.log('Profile email:', profile?.email)
-      
       // Only allow sign-in for allowed admin emails
       if (!user.email || !ALLOWED_ADMIN_EMAILS.includes(user.email)) {
         console.log(`🚫 Unauthorized login attempt from: ${user.email}`)
-        console.log('🚫 Reason: Email not in allowlist or email is null/undefined')
         return false
       }
       
