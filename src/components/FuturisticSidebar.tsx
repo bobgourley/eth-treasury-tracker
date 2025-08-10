@@ -41,6 +41,11 @@ const navItems: NavItem[] = [
     href: '/analytics/charts',
     label: 'Analytics',
     icon: <span>📊</span>
+  },
+  {
+    href: '/cards',
+    label: 'Cards',
+    icon: <span>🎴</span>
   }
 ]
 

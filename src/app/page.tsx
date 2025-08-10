@@ -247,7 +247,9 @@ export default async function Home() {
           minute: '2-digit',
           second: '2-digit',
           hour12: false
-        })} UTC • <FuturisticBadge variant="live" size="small" pulse>Statically Generated</FuturisticBadge> • Auto-refreshes every 5 minutes</p>
+        })} UTC •{' '}
+        <FuturisticBadge variant="live" size="small" pulse>Statically Generated</FuturisticBadge>
+        {' '}• Auto-refreshes every 5 minutes</p>
         <p style={{ marginTop: '1rem' }}>© 2025 Ethereum List. Comprehensive Ethereum ecosystem tracking.</p>
         <p style={{ marginTop: '0.5rem' }}>
           Data sourced from public APIs, CoinGecko, EtherScan, Alpha Vantage, Financial Modeling Prep, and NewsAPI.
