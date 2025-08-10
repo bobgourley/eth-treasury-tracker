@@ -77,7 +77,7 @@ export default function CardsPage() {
     fetchCardData()
   }, [])
 
-  const downloadCard = async (ref: React.RefObject<HTMLDivElement>, filename: string) => {
+  const downloadCard = async (ref: React.RefObject<HTMLDivElement | null>, filename: string) => {
     if (!ref.current) return
     
     try {
@@ -151,13 +151,12 @@ export default function CardsPage() {
           title="Company Summary Card" 
           icon="🏢"
           actions={
-            <FuturisticBadge 
-              variant="info" 
+            <button 
               onClick={() => downloadCard(companySummaryRef, 'company-summary')}
-              style={{ cursor: 'pointer' }}
+              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md cursor-pointer transition-colors"
             >
               Download PNG
-            </FuturisticBadge>
+            </button>
           }
         >
           <div ref={companySummaryRef} style={{ padding: '2rem', background: '#0F1419', borderRadius: '12px' }}>
@@ -193,13 +192,12 @@ export default function CardsPage() {
           title="ETF Summary Card" 
           icon="📈"
           actions={
-            <FuturisticBadge 
-              variant="info" 
+            <button 
               onClick={() => downloadCard(etfSummaryRef, 'etf-summary')}
-              style={{ cursor: 'pointer' }}
+              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md cursor-pointer transition-colors"
             >
               Download PNG
-            </FuturisticBadge>
+            </button>
           }
         >
           <div ref={etfSummaryRef} style={{ padding: '2rem', background: '#0F1419', borderRadius: '12px' }}>
@@ -236,13 +234,12 @@ export default function CardsPage() {
           icon="📋"
           size="large"
           actions={
-            <FuturisticBadge 
-              variant="info" 
+            <button 
               onClick={() => downloadCard(companyListRef, 'company-list')}
-              style={{ cursor: 'pointer' }}
+              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md cursor-pointer transition-colors"
             >
               Download PNG
-            </FuturisticBadge>
+            </button>
           }
         >
           <div ref={companyListRef} style={{ padding: '2rem', background: '#0F1419', borderRadius: '12px', minHeight: '400px' }}>
@@ -302,13 +299,12 @@ export default function CardsPage() {
           icon="📊"
           size="large"
           actions={
-            <FuturisticBadge 
-              variant="info" 
+            <button 
               onClick={() => downloadCard(etfListRef, 'etf-list')}
-              style={{ cursor: 'pointer' }}
+              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md cursor-pointer transition-colors"
             >
               Download PNG
-            </FuturisticBadge>
+            </button>
           }
         >
           <div ref={etfListRef} style={{ padding: '2rem', background: '#0F1419', borderRadius: '12px', minHeight: '400px' }}>
@@ -360,13 +356,12 @@ export default function CardsPage() {
           icon="🥧"
           size="large"
           actions={
-            <FuturisticBadge 
-              variant="info" 
+            <button 
               onClick={() => downloadCard(marketShareRef, 'market-share')}
-              style={{ cursor: 'pointer' }}
+              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md cursor-pointer transition-colors"
             >
               Download PNG
-            </FuturisticBadge>
+            </button>
           }
         >
           <div ref={marketShareRef} style={{ padding: '2rem', background: '#0F1419', borderRadius: '12px', minHeight: '400px' }}>
