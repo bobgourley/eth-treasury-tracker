@@ -157,6 +157,8 @@ export async function PUT(request: NextRequest) {
 
     const data = await request.json()
     
+    console.log('🔍 PUT /api/admin/companies - Update data received:', JSON.stringify(data, null, 2))
+    
     if (!data.id) {
       return NextResponse.json({
         success: false,

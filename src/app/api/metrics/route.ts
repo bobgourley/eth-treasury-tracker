@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/db'
+import { ETH_SUPPLY } from '@/lib/constants'
 
 type CompanyData = {
   id: number;
@@ -13,7 +14,6 @@ type CompanyData = {
 export async function GET() {
   try {
     // Fetch live data from database
-    const prisma = new PrismaClient()
     
     const companies = await prisma.company.findMany({
       select: {
@@ -95,7 +95,7 @@ export async function GET() {
       console.warn('⚠️ No ETH price found in database, using fallback')
     }
     // Use static ETH supply - external API calls should be done via admin updates only
-    const totalEthSupply = 122373866.2178 // Current approximate ETH supply
+    const totalEthSupply = ETH_SUPPLY // Current approximate ETH supply from centralized constant
     const ethSupplySource = 'database_static'
     console.log(`📊 ETH supply from database: ${totalEthSupply.toLocaleString()} ETH`)
 

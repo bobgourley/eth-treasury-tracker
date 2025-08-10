@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { updateSystemMetrics } from '@/lib/dataFetcher'
 import { prisma } from '@/lib/db'
 import { formatNumber, formatEth } from '@/lib/utils'
+import { ETH_SUPPLY } from '@/lib/constants'
 
 export async function POST() {
   try {
@@ -30,7 +31,7 @@ export async function POST() {
     const totalMarketCap = companies.reduce((sum, company) => sum + Number(company.marketCap || 0), 0)
     
     // Use a static ETH supply value (120.5M) since it's not in systemMetrics table
-    const ethSupply = 120500000
+    const ethSupply = ETH_SUPPLY
     const ethSupplyPercent = ((totalEthHoldings / ethSupply) * 100).toFixed(3) + '%'
     
     return NextResponse.json({
