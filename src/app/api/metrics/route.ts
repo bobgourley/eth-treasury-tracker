@@ -95,8 +95,8 @@ export async function GET() {
       console.warn('⚠️ No ETH price found in database, using fallback')
     }
     // Use static ETH supply - external API calls should be done via admin updates only
-    let totalEthSupply = 122373866.2178 // Current approximate ETH supply
-    let ethSupplySource = 'database_static'
+    const totalEthSupply = 122373866.2178 // Current approximate ETH supply
+    const ethSupplySource = 'database_static'
     console.log(`📊 ETH supply from database: ${totalEthSupply.toLocaleString()} ETH`)
 
     // Calculate derived metrics
