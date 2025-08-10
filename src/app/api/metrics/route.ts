@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { PrismaClient } from '@prisma/client'
+import { getEthPriceFromDatabase } from '@/lib/databaseHelpers'
 import { ETH_SUPPLY } from '@/lib/constants'
 
-type CompanyData = {
+interface CompanyData {
   id: number;
   ticker: string | null;
   name: string;
@@ -12,6 +13,7 @@ type CompanyData = {
 };
 
 export async function GET() {
+  const prisma = new PrismaClient()
   try {
     // Fetch live data from database
     
@@ -30,7 +32,7 @@ export async function GET() {
     
     console.log(`\n=== METRICS API DIRECT APPROACH ===`)
     console.log(`Using ${companies.length} companies from known working data`)
-    console.log(`Companies: ${companies.map((c) => c.ticker || 'N/A').join(', ')}`)
+    console.log(`Companies: ${companies.map((c: CompanyData) => c.ticker || 'N/A').join(', ')}`)
     console.log('====================================\n')
 
     // COMPREHENSIVE DEBUGGING to identify company count discrepancy
@@ -45,35 +47,32 @@ export async function GET() {
     }
     
     console.log('\nAll companies with full details:')
-    companies.forEach((c, i) => {
+    companies.forEach((c: CompanyData, i: number) => {
       console.log(`  ${i+1}. ID:${c.id} ${c.ticker || 'N/A'} (${c.name}) - ETH: ${c.ethHoldings || 0}, Active: ${c.isActive}, MarketCap: ${c.marketCap?.toString() || 'N/A'}`)
     })
 
-    const validCompanies = companies
-    console.log(`\nValid companies count (should be 9): ${validCompanies.length}`)
-    console.log(`Valid companies === companies: ${validCompanies === companies}`)
+    const activeCompanies = companies.filter((c: CompanyData) => c.isActive)
+    console.log(`\nValid companies count (should be 9): ${activeCompanies.length}`)
+    console.log(`Valid companies === companies: ${activeCompanies === companies}`)
 
-    const companiesWithEth = validCompanies.filter((c) => (c.ethHoldings ?? 0) > 0)
+    const companiesWithEth = activeCompanies.filter((c: CompanyData) => (c.ethHoldings ?? 0) > 0)
     console.log(`Companies with ETH holdings > 0: ${companiesWithEth.length}`)
 
     console.log('\nCompanies contributing to totals:')
-    validCompanies.forEach((c, i) => {
+    activeCompanies.forEach((c, i) => {
       const ethValue = (c.ethHoldings || 0)
       const marketCap = c.marketCap || BigInt(0)
       console.log(`  ${i+1}. ${c.ticker || 'N/A'}: ETH=${ethValue}, MarketCap=${marketCap.toString()}`)
     })
     
     console.log(`\nFinal metrics calculation inputs:`)
-    console.log(`- validCompanies.length: ${validCompanies.length}`)
-    console.log(`- This will be returned as totalCompanies: ${validCompanies.length}`)
+    console.log(`- activeCompanies.length: ${activeCompanies.length}`)
+    console.log(`- This will be returned as totalCompanies: ${activeCompanies.length}`)
     console.log('================================\n')
 
     // Calculate totals using ALL companies
-    const totalEthHeld = validCompanies.reduce((sum, company) => sum + (company.ethHoldings ?? 0), 0)
-    const totalMarketCap = validCompanies.reduce((sum, company) => {
-      const marketCap = company.marketCap || BigInt(0)
-      return sum + marketCap
-    }, BigInt(0))
+    const totalEthHeld = activeCompanies.reduce((sum: number, company: CompanyData) => sum + Number(company.ethHoldings || 0), 0)
+    const totalMarketCap = activeCompanies.reduce((sum: number, company: CompanyData) => sum + Number(company.marketCap || 0), 0)
 
     // ALWAYS try to get the latest ETH price from CoinGecko first
     let ethPrice: number
@@ -87,12 +86,12 @@ export async function GET() {
     if (systemMetrics?.ethPrice) {
       ethPrice = systemMetrics.ethPrice
       ethPriceSource = 'database'
-      console.log(`📊 ETH price from database: $${ethPrice}`)
+      console.log(` ETH price from database: $${ethPrice}`)
     } else {
       // Only used if no DB record exists at all (first deployment)
       ethPrice = 3500
       ethPriceSource = 'fallback'
-      console.warn('⚠️ No ETH price found in database, using fallback')
+      console.warn(' No ETH price found in database, using fallback')
     }
     // Get ETH supply from database (stored by admin updates from Etherscan API)
     const ecosystemData = await prisma.ecosystemSummary.findFirst({
@@ -102,7 +101,7 @@ export async function GET() {
     
     const totalEthSupply = ecosystemData?.ethSupply || ETH_SUPPLY // Fallback only if no database data
     const ethSupplySource = ecosystemData ? 'database_live' : 'fallback_constant'
-    console.log(`📊 ETH supply from ${ethSupplySource}: ${totalEthSupply.toLocaleString()} ETH`)
+    console.log(` ETH supply from ${ethSupplySource}: ${totalEthSupply.toLocaleString()} ETH`)
 
     // Calculate derived metrics
     const totalEthValue = totalEthHeld * ethPrice
@@ -116,17 +115,17 @@ export async function GET() {
       ethSupplyPercent: ethSupplyPercentage,
       totalEthSupply,
       ethSupplySource,
-      totalCompanies: validCompanies.length, // Use validCompanies count, not companies.length
+      totalCompanies: activeCompanies.length, // Use activeCompanies count, not companies.length
       lastUpdate: new Date(),
       // TEMPORARY DEBUG: Include raw company data to diagnose count issue
-      debugCompanies: validCompanies.map((c) => ({
+      debugCompanies: activeCompanies.map((c) => ({
         id: c.id,
         ticker: c.ticker || 'N/A',
         name: c.name,
         ethHoldings: c.ethHoldings || 0,
         isActive: c.isActive
       })),
-      debugCompanyCount: validCompanies.length,
+      debugCompanyCount: activeCompanies.length,
       debugRawCount: companies.length,
       // ETH price tracking fields (will be enabled after schema migration)
       // ethPriceLastUpdate: systemMetrics?.ethPriceLastUpdate || new Date(),
