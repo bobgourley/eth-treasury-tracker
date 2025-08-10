@@ -30,8 +30,12 @@ export async function POST() {
     const totalEthValue = totalEthHoldings * systemMetrics.ethPrice
     const totalMarketCap = companies.reduce((sum, company) => sum + Number(company.marketCap || 0), 0)
     
-    // Use a static ETH supply value (120.5M) since it's not in systemMetrics table
-    const ethSupply = ETH_SUPPLY
+    // Get ETH supply from database (updated by updateSystemMetrics function)
+    const ecosystemData = await prisma.ecosystemSummary.findFirst({
+      orderBy: { lastUpdated: 'desc' },
+      select: { ethSupply: true }
+    })
+    const ethSupply = ecosystemData?.ethSupply || ETH_SUPPLY // Fallback only if no database data
     const ethSupplyPercent = ((totalEthHoldings / ethSupply) * 100).toFixed(3) + '%'
     
     return NextResponse.json({

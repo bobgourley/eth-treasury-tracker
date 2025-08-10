@@ -94,10 +94,15 @@ export async function GET() {
       ethPriceSource = 'fallback'
       console.warn('⚠️ No ETH price found in database, using fallback')
     }
-    // Use static ETH supply - external API calls should be done via admin updates only
-    const totalEthSupply = ETH_SUPPLY // Current approximate ETH supply from centralized constant
-    const ethSupplySource = 'database_static'
-    console.log(`📊 ETH supply from database: ${totalEthSupply.toLocaleString()} ETH`)
+    // Get ETH supply from database (stored by admin updates from Etherscan API)
+    const ecosystemData = await prisma.ecosystemSummary.findFirst({
+      orderBy: { lastUpdated: 'desc' },
+      select: { ethSupply: true, lastUpdated: true }
+    })
+    
+    const totalEthSupply = ecosystemData?.ethSupply || ETH_SUPPLY // Fallback only if no database data
+    const ethSupplySource = ecosystemData ? 'database_live' : 'fallback_constant'
+    console.log(`📊 ETH supply from ${ethSupplySource}: ${totalEthSupply.toLocaleString()} ETH`)
 
     // Calculate derived metrics
     const totalEthValue = totalEthHeld * ethPrice

@@ -124,7 +124,17 @@ export async function updateSystemMetrics(): Promise<void> {
       throw new Error('No ETH price available from API or database - cannot update system metrics')
     }
     
-    const updatedEthSupply = ethSupply || 120500000 // Fallback to approximate current supply
+    // Use live ETH supply from API, or get from database if API fails
+    let updatedEthSupply = ethSupply
+    if (!updatedEthSupply) {
+      // Try to get the last known ETH supply from EcosystemSummary table
+      const lastEcosystemData = await prisma.ecosystemSummary.findFirst({
+        orderBy: { lastUpdated: 'desc' },
+        select: { ethSupply: true }
+      })
+      updatedEthSupply = lastEcosystemData?.ethSupply || 120709652 // Only fallback if no database data exists
+      console.log(`📊 Using ETH supply from database: ${updatedEthSupply.toLocaleString()} ETH`)
+    }
     
     // Calculate company totals for system metrics
     const companies = await prisma.company.findMany({
@@ -157,6 +167,42 @@ export async function updateSystemMetrics(): Promise<void> {
         totalMarketCap,
         ethSupplyPercent,
         lastUpdate: new Date()
+      }
+    })
+    
+    // Also update/create EcosystemSummary with the latest ETH supply data
+    // This ensures all pages can read ETH supply from database consistently
+    await prisma.ecosystemSummary.upsert({
+      where: { id: 1 }, // Single record for ecosystem data
+      update: {
+        ethPrice: updatedEthPrice,
+        ethSupply: updatedEthSupply,
+        totalTrackedEth: totalEthHoldings,
+        totalTrackedPercentage: ethSupplyPercent,
+        companyCount: companies.length,
+        companyTotalEth: totalEthHoldings,
+        companyTotalValue: totalEthValue,
+        companyPercentage: ethSupplyPercent,
+        etfCount: 0, // Will be updated by ETF system separately
+        etfTotalEth: 0,
+        etfTotalValue: 0,
+        etfPercentage: 0,
+        lastUpdated: new Date()
+      },
+      create: {
+        ethPrice: updatedEthPrice,
+        ethSupply: updatedEthSupply,
+        totalTrackedEth: totalEthHoldings,
+        totalTrackedPercentage: ethSupplyPercent,
+        companyCount: companies.length,
+        companyTotalEth: totalEthHoldings,
+        companyTotalValue: totalEthValue,
+        companyPercentage: ethSupplyPercent,
+        etfCount: 0,
+        etfTotalEth: 0,
+        etfTotalValue: 0,
+        etfPercentage: 0,
+        lastUpdated: new Date()
       }
     })
     
