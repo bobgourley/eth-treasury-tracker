@@ -48,22 +48,23 @@ interface SecFilingData {
 export async function searchEthereumFilings(
   startDate?: string,
   endDate?: string,
-  maxResults: number = 100
+  maxResults: number = 500
 ): Promise<SecFilingData[]> {
   try {
-    console.log('🔍 Searching SEC EDGAR for Ethereum-related filings...')
+    console.log('🔍 Searching SEC EDGAR for Ethereum-related filings (COMPREHENSIVE)...')
     
     const filings: SecFilingData[] = []
     const currentYear = new Date().getFullYear()
-    const startYear = startDate ? parseInt(startDate.split('-')[0]) : 2020
+    const startYear = startDate ? parseInt(startDate.split('-')[0]) : 2015 // Start from 2015 when Ethereum launched
     
     console.log(`📅 Search parameters:`, {
       dateRange: `${startYear} to ${currentYear}`,
-      maxResults
+      maxResults,
+      note: 'Comprehensive search for ALL Ethereum mentions'
     })
 
-    // Search through recent quarterly master index files
-    for (let year = Math.max(startYear, currentYear - 2); year <= currentYear; year++) {
+    // Search through ALL quarterly master index files since Ethereum's launch
+    for (let year = startYear; year <= currentYear; year++) {
       for (let quarter = 1; quarter <= 4; quarter++) {
         if (filings.length >= maxResults) break
         
