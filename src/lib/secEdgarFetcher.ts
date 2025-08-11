@@ -164,41 +164,34 @@ export async function searchEthereumFilings(
 
 /**
  * Helper function to determine if we should check a filing for Ethereum mentions
- * FOCUSED APPROACH: Only check major forms from known relevant companies
+ * BALANCED APPROACH: Check major forms, prioritize known companies but don't exclude others
  */
 function shouldCheckFiling(formType: string, companyName: string): boolean {
-  // Focus ONLY on major filing types (10-K, 10-Q, 8-K)
-  const relevantForms = ['10-K', '10-Q', '8-K']
+  // Focus on major filing types (10-K, 10-Q, 8-K) but be more inclusive
+  const relevantForms = ['10-K', '10-Q', '8-K', 'S-1', 'DEF 14A']
   
-  // Known companies that have mentioned crypto/Ethereum in filings
-  const knownCryptoCompanies = [
-    'tesla', 'microstrategy', 'coinbase', 'paypal', 'block', 'square',
-    'marathon', 'riot', 'nvidia', 'amd', 'robinhood', 'grayscale',
-    'galaxy', 'silvergate', 'signature', 'jpmorgan', 'goldman sachs', 
-    'morgan stanley', 'blackrock', 'fidelity', 'proshares', 'vaneck', 
-    'bitwise', 'invesco', 'meta', 'alphabet', 'google', 'microsoft',
-    'intel', 'mastercard', 'visa'
-  ]
-  
-  // Additional keywords that might indicate crypto relevance
-  const cryptoKeywords = [
-    'crypto', 'blockchain', 'digital asset', 'bitcoin', 'ethereum',
-    'mining', 'trust', 'etf', 'fund'
-  ]
-  
+  // Check if it's a relevant form type first
   const isRelevantForm = relevantForms.includes(formType.toUpperCase())
+  if (!isRelevantForm) return false
+  
+  // For major forms, check ALL companies (don't pre-filter by company name)
+  // This ensures we don't miss any company that mentions Ethereum
+  // The actual Ethereum content check will filter out irrelevant filings
+  
   const companyLower = companyName.toLowerCase()
   
-  const isKnownCryptoCompany = knownCryptoCompanies.some(company => 
-    companyLower.includes(company)
-  )
+  // Skip obvious non-relevant companies to save processing time
+  const skipCompanies = [
+    'restaurant', 'retail', 'clothing', 'food', 'beverage', 'hotel',
+    'airline', 'railroad', 'utility', 'real estate', 'reit'
+  ]
   
-  const hasCryptoKeywords = cryptoKeywords.some(keyword => 
-    companyLower.includes(keyword)
-  )
+  const shouldSkip = skipCompanies.some(skip => companyLower.includes(skip))
+  if (shouldSkip) return false
   
-  // Only check relevant forms, and prioritize known crypto companies
-  return isRelevantForm && (isKnownCryptoCompany || hasCryptoKeywords)
+  // For balanced approach: check ALL companies with major forms
+  // The actual Ethereum content verification will filter out irrelevant results
+  return true
 }
 
 /**
