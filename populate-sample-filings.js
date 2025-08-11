@@ -13,7 +13,7 @@ const sampleFilings = [
     formType: "10-K",
     filingDate: "2024-02-26",
     reportTitle: "Annual Report - Mentions cryptocurrency and Ethereum investments",
-    edgarUrl: "https://www.sec.gov/Archives/edgar/data/1318605/000119312524123456/d123456d10k.htm"
+    edgarUrl: "https://www.sec.gov/Archives/edgar/data/1318605/000095017024020336/tsla-20231231.htm"
   },
   {
     accessionNumber: "0001193125-24-234567",
@@ -22,7 +22,7 @@ const sampleFilings = [
     formType: "10-Q",
     filingDate: "2024-05-01",
     reportTitle: "Quarterly Report - Digital asset strategy including Ethereum considerations",
-    edgarUrl: "https://www.sec.gov/Archives/edgar/data/1050446/000119312524234567/d234567d10q.htm"
+    edgarUrl: "https://www.sec.gov/Archives/edgar/data/1050446/000105044624000040/mstr-20240331.htm"
   },
   {
     accessionNumber: "0001193125-24-345678",
@@ -31,7 +31,7 @@ const sampleFilings = [
     formType: "8-K",
     filingDate: "2024-07-15",
     reportTitle: "Current Report - Ethereum staking services and regulatory updates",
-    edgarUrl: "https://www.sec.gov/Archives/edgar/data/1679788/000119312524345678/d345678d8k.htm"
+    edgarUrl: "https://www.sec.gov/Archives/edgar/data/1679788/000167978824000119/coin-20240630.htm"
   },
   {
     accessionNumber: "0001193125-24-456789",
@@ -40,7 +40,7 @@ const sampleFilings = [
     formType: "10-Q",
     filingDate: "2024-08-05",
     reportTitle: "Quarterly Report - Cryptocurrency services including Ethereum",
-    edgarUrl: "https://www.sec.gov/Archives/edgar/data/1512673/000119312524456789/d456789d10q.htm"
+    edgarUrl: "https://www.sec.gov/Archives/edgar/data/1512673/000151267324000026/sq-20240331.htm"
   },
   {
     accessionNumber: "0001193125-24-567890",
@@ -49,7 +49,7 @@ const sampleFilings = [
     formType: "10-K",
     filingDate: "2024-01-30",
     reportTitle: "Annual Report - Digital currency initiatives including Ethereum support",
-    edgarUrl: "https://www.sec.gov/Archives/edgar/data/1633917/000119312524567890/d567890d10k.htm"
+    edgarUrl: "https://www.sec.gov/Archives/edgar/data/1633917/000163391724000006/pypl-20231231.htm"
   },
   {
     accessionNumber: "0001193125-24-678901",
@@ -58,7 +58,7 @@ const sampleFilings = [
     formType: "8-K",
     filingDate: "2024-06-20",
     reportTitle: "Current Report - Expansion into Ethereum mining operations",
-    edgarUrl: "https://www.sec.gov/Archives/edgar/data/1507605/000119312524678901/d678901d8k.htm"
+    edgarUrl: "https://www.sec.gov/Archives/edgar/data/1507605/000150760524000045/mara-20240331.htm"
   },
   {
     accessionNumber: "0001193125-24-789012",
@@ -67,7 +67,7 @@ const sampleFilings = [
     formType: "10-Q",
     filingDate: "2024-03-12",
     reportTitle: "Quarterly Report - Cryptocurrency mining including Ethereum considerations",
-    edgarUrl: "https://www.sec.gov/Archives/edgar/data/1167419/000119312524789012/d789012d10q.htm"
+    edgarUrl: "https://www.sec.gov/Archives/edgar/data/1167419/000116741924000020/riot-20240331.htm"
   },
   {
     accessionNumber: "0001193125-24-890123",
@@ -76,7 +76,7 @@ const sampleFilings = [
     formType: "10-K",
     filingDate: "2024-02-15",
     reportTitle: "Annual Report - Cryptocurrency trading platform including Ethereum",
-    edgarUrl: "https://www.sec.gov/Archives/edgar/data/1783879/000119312524890123/d890123d10k.htm"
+    edgarUrl: "https://www.sec.gov/Archives/edgar/data/1783879/000178387924000013/hood-20231231.htm"
   }
 ]
 

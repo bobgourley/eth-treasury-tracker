@@ -172,8 +172,11 @@ export async function GET(request: NextRequest) {
  * Supports both automated SEC EDGAR fetching and manual sample data insertion
  */
 export async function POST(request: NextRequest) {
+  console.log('🔄 POST /api/sec-filings endpoint called')
   try {
+    console.log('📥 Parsing request body...')
     const body = await request.json()
+    console.log('📋 Request body:', JSON.stringify(body, null, 2))
     
     // Handle sample data insertion
     if (body.action === 'add_sample' && body.filing) {
@@ -218,62 +221,91 @@ export async function POST(request: NextRequest) {
     // Automated SEC EDGAR fetching using corrected API approach
     console.log('🔄 Starting SEC filings refresh...')
     
-    // Import here to avoid issues during build
-    const { searchEthereumFilings, formatFilingForDatabase, validateSecFiling } = await import('@/lib/secEdgarFetcher')
+    try {
+      console.log('📦 Importing SEC EDGAR fetcher...')
+      // Import here to avoid issues during build
+      const { searchEthereumFilings, formatFilingForDatabase, validateSecFiling } = await import('@/lib/secEdgarFetcher')
+      console.log('✅ SEC EDGAR fetcher imported successfully')
 
-    // Fetch recent filings from SEC EDGAR
-    const recentFilings = await searchEthereumFilings(
-      new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 90 days ago
-      new Date().toISOString().split('T')[0], // Today
-      50 // Reasonable limit for testing
-    )
+      // Fetch recent filings from SEC EDGAR
+      console.log('🔍 Searching for Ethereum filings...')
+      const recentFilings = await searchEthereumFilings(
+        new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 90 days ago
+        new Date().toISOString().split('T')[0], // Today
+        50 // Reasonable limit for testing
+      )
+      console.log('✅ SEC EDGAR search completed')
 
-    console.log(`📥 Found ${recentFilings.length} recent filings from SEC EDGAR`)
+      console.log(`📥 Found ${recentFilings.length} recent filings from SEC EDGAR`)
 
-    let newFilingsCount = 0
-    let updatedFilingsCount = 0
-    let skippedFilingsCount = 0
+      let newFilingsCount = 0
+      let updatedFilingsCount = 0
+      let skippedFilingsCount = 0
 
-    for (const filing of recentFilings) {
-      try {
-        // Validate filing data
-        if (!validateSecFiling(filing)) {
-          console.log(`⚠️ Skipping invalid filing: ${filing.accessionNumber}`)
+      for (const filing of recentFilings) {
+        try {
+          // Validate filing data
+          if (!validateSecFiling(filing)) {
+            console.log(`⚠️ Skipping invalid filing: ${filing.accessionNumber}`)
+            skippedFilingsCount++
+            continue
+          }
+
+          // Format for database
+          const formattedFiling = formatFilingForDatabase(filing)
+
+          // Upsert filing (insert if new, update if exists)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const result = await (prisma as any).secFiling.upsert({
+            where: {
+              accessionNumber: formattedFiling.accessionNumber
+            },
+            update: {
+              companyName: formattedFiling.companyName,
+              reportTitle: formattedFiling.reportTitle,
+              edgarUrl: formattedFiling.edgarUrl,
+              fullTextUrl: formattedFiling.fullTextUrl,
+              updatedAt: new Date()
+            },
+            create: formattedFiling
+          })
+
+          if (result.createdAt && result.createdAt.getTime() === result.updatedAt.getTime()) {
+            newFilingsCount++
+            console.log(`✅ Added new filing: ${filing.companyName} - ${filing.formType}`)
+          } else {
+            updatedFilingsCount++
+            console.log(`🔄 Updated filing: ${filing.companyName} - ${filing.formType}`)
+          }
+
+        } catch (error) {
+          console.error(`❌ Error processing filing ${filing.accessionNumber}:`, error)
           skippedFilingsCount++
-          continue
         }
-
-        // Format for database
-        const formattedFiling = formatFilingForDatabase(filing)
-
-        // Upsert filing (insert if new, update if exists)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const result = await (prisma as any).secFiling.upsert({
-          where: {
-            accessionNumber: formattedFiling.accessionNumber
-          },
-          update: {
-            companyName: formattedFiling.companyName,
-            reportTitle: formattedFiling.reportTitle,
-            edgarUrl: formattedFiling.edgarUrl,
-            fullTextUrl: formattedFiling.fullTextUrl,
-            updatedAt: new Date()
-          },
-          create: formattedFiling
-        })
-
-        if (result.createdAt && result.createdAt.getTime() === result.updatedAt.getTime()) {
-          newFilingsCount++
-          console.log(`✅ Added new filing: ${filing.companyName} - ${filing.formType}`)
-        } else {
-          updatedFilingsCount++
-          console.log(`🔄 Updated filing: ${filing.companyName} - ${filing.formType}`)
-        }
-
-      } catch (error) {
-        console.error(`❌ Error processing filing ${filing.accessionNumber}:`, error)
-        skippedFilingsCount++
       }
+
+      // Return success response for automated fetching
+      return NextResponse.json({
+        success: true,
+        message: 'SEC filings refresh completed',
+        data: {
+          newFilings: newFilingsCount,
+          updatedFilings: updatedFilingsCount,
+          skippedFilings: skippedFilingsCount,
+          totalProcessed: recentFilings.length
+        }
+      })
+
+    } catch (importError) {
+      console.error('❌ Error importing SEC EDGAR fetcher:', importError)
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Failed to import SEC EDGAR fetcher',
+          details: importError instanceof Error ? importError.message : 'Unknown import error'
+        },
+        { status: 500 }
+      )
     }
 
     /*
