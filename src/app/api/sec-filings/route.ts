@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const endDate = searchParams.get('endDate')
 
     // Build where clause
-    const where: any = {
+    const where: Record<string, any> = {
       isActive: true
     }
 
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build orderBy clause
-    const orderBy: any = {}
+    const orderBy: Record<string, any> = {}
     if (sortBy === 'filingDate') {
       orderBy.filingDate = sortOrder
     } else if (sortBy === 'companyName') {
@@ -66,12 +66,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Execute queries (with error handling for missing table)
-    let filings: any[] = []
+    let filings: Array<Record<string, any>> = []
     let totalCount = 0
     
     try {
       [filings, totalCount] = await Promise.all([
-        (prisma as any).secFiling.findMany({
+        (prisma as Record<string, any>).secFiling.findMany({
           where,
           orderBy,
           skip,
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
             createdAt: true
           }
         }),
-        (prisma as any).secFiling.count({ where })
+        (prisma as Record<string, any>).secFiling.count({ where })
       ])
     } catch (dbError) {
       console.log('⚠️ SEC filings table not yet created in database')
@@ -148,7 +148,7 @@ export async function GET(request: NextRequest) {
  * Admin endpoint to refresh SEC filings data
  * Searches for new filings and updates database
  */
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // Import here to avoid issues during build
     const { searchEthereumFilings, formatFilingForDatabase, validateSecFiling } = await import('@/lib/secEdgarFetcher')
@@ -181,7 +181,7 @@ export async function POST(request: NextRequest) {
         const formattedFiling = formatFilingForDatabase(filing)
 
         // Upsert filing (insert if new, update if exists)
-        const result = await (prisma as any).secFiling.upsert({
+        const result = await (prisma as Record<string, any>).secFiling.upsert({
           where: {
             accessionNumber: formattedFiling.accessionNumber
           },
@@ -216,8 +216,8 @@ export async function POST(request: NextRequest) {
     let recentFilingsCount = 0
     
     try {
-      totalFilings = await (prisma as any).secFiling.count({ where: { isActive: true } })
-      recentFilingsCount = await (prisma as any).secFiling.count({
+      totalFilings = await (prisma as Record<string, any>).secFiling.count({ where: { isActive: true } })
+      recentFilingsCount = await (prisma as Record<string, any>).secFiling.count({
         where: {
           isActive: true,
           filingDate: {

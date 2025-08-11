@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import FuturisticCard from '@/components/FuturisticCard'
 import styles from '@/styles/futuristic.module.css'
 
@@ -71,7 +71,7 @@ export default function SecFilingsPage() {
   const [currentPage, setCurrentPage] = useState(1)
 
   // Fetch filings data
-  const fetchFilings = async () => {
+  const fetchFilings = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -106,12 +106,12 @@ export default function SecFilingsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentPage, sortBy, sortOrder, formTypeFilter, companyFilter])
 
   // Effect to fetch data when filters change
   useEffect(() => {
     fetchFilings()
-  }, [currentPage, sortBy, sortOrder, formTypeFilter, companyFilter])
+  }, [fetchFilings])
 
   // Handle sort change
   const handleSort = (field: string) => {
