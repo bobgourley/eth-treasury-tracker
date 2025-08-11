@@ -196,7 +196,10 @@ function shouldCheckFiling(formType: string, companyName: string): boolean {
 }
 
 /**
- * Helper function to check if a filing contains Ethereum mentions
+ * Helper function to check if a SEC filing contains the specific word "ethereum"
+ * Downloads the filing content and searches for exact word match only
+ * @param documentPath - The SEC EDGAR document path
+ * @returns Promise<boolean> - True if filing contains the word "ethereum"
  */
 async function checkFilingForEthereum(documentPath: string): Promise<boolean> {
   try {
@@ -218,34 +221,9 @@ async function checkFilingForEthereum(documentPath: string): Promise<boolean> {
     const content = await response.text()
     const contentLower = content.toLowerCase()
     
-    // Search for specific Ethereum-related terms (avoid "eth" to prevent false positives)
-    const ethereumTerms = [
-      'ethereum',
-      'ether cryptocurrency',
-      'ether digital',
-      'smart contract',
-      'decentralized finance',
-      'defi',
-      'web3',
-      'blockchain ethereum',
-      'ethereum network',
-      'ethereum protocol',
-      'ethereum blockchain',
-      'ethereum foundation',
-      'ethereum virtual machine',
-      'evm'
-    ]
-    
-    // Use more precise matching to avoid false positives
-    const hasEthereumMention = ethereumTerms.some(term => {
-      // For single words, use word boundaries to ensure exact matches
-      if (!term.includes(' ')) {
-        const regex = new RegExp(`\\b${term}\\b`, 'i')
-        return regex.test(content)
-      }
-      // For phrases, use simple includes
-      return contentLower.includes(term)
-    })
+    // Search for ONLY the specific word "ethereum" (case-insensitive, word boundaries)
+    const ethereumRegex = /\bethereum\b/i
+    const hasEthereumMention = ethereumRegex.test(content)
     
     if (hasEthereumMention) {
       console.log(`✅ Found Ethereum mention in ${documentPath}`)
