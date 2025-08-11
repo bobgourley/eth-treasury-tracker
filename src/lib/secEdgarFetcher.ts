@@ -109,9 +109,16 @@ export async function searchEthereumFilings(
                   const accessionNumber = extractAccessionNumber(documentPath)
                   const cikPadded = cik.padStart(10, '0')
                   
-                  // Generate human-readable HTML URL instead of raw text
+                  // Generate human-readable HTML URL using the correct SEC EDGAR format
+                  // The documentPath already contains the correct path structure
+                  const baseUrl = `https://www.sec.gov/Archives/${documentPath}`
+                  const pathParts = documentPath.split('/')
+                  const fileName = pathParts[pathParts.length - 1]
+                  const directory = pathParts.slice(0, -1).join('/')
+                  
+                  // Generate index URL by replacing the filename with accession-index.htm
                   const accessionNoHyphens = accessionNumber.replace(/-/g, '')
-                  const humanReadableUrl = `https://www.sec.gov/Archives/edgar/data/${cikPadded}/${accessionNoHyphens}/${accessionNoHyphens}-index.htm`
+                  const humanReadableUrl = `https://www.sec.gov/Archives/${directory}/${accessionNoHyphens}-index.htm`
                   
                   const filing: SecFilingData = {
                     accessionNumber: accessionNumber,
