@@ -105,15 +105,22 @@ export async function searchEthereumFilings(
               try {
                 const hasEthereum = await checkFilingForEthereum(documentPath)
                 if (hasEthereum) {
+                  const accessionNumber = extractAccessionNumber(documentPath)
+                  const cikPadded = cik.padStart(10, '0')
+                  
+                  // Generate human-readable HTML URL instead of raw text
+                  const accessionNoHyphens = accessionNumber.replace(/-/g, '')
+                  const humanReadableUrl = `https://www.sec.gov/Archives/edgar/data/${cikPadded}/${accessionNoHyphens}/${accessionNoHyphens}-index.htm`
+                  
                   const filing: SecFilingData = {
-                    accessionNumber: extractAccessionNumber(documentPath),
+                    accessionNumber: accessionNumber,
                     companyName: companyName.trim(),
-                    cik: cik.padStart(10, '0'),
+                    cik: cikPadded,
                     formType: formType.trim(),
                     filingDate: new Date(filingDate),
                     reportTitle: `${formType} - Contains references to Ethereum`,
-                    edgarUrl: `https://www.sec.gov/Archives/${documentPath}`,
-                    fullTextUrl: `https://www.sec.gov/Archives/${documentPath}`
+                    edgarUrl: humanReadableUrl,
+                    fullTextUrl: `https://www.sec.gov/Archives/${documentPath}` // Keep raw text as fallback
                   }
                   
                   filings.push(filing)
@@ -203,21 +210,34 @@ async function checkFilingForEthereum(documentPath: string): Promise<boolean> {
     const content = await response.text()
     const contentLower = content.toLowerCase()
     
-    // Search for various Ethereum-related terms
+    // Search for specific Ethereum-related terms (avoid "eth" to prevent false positives)
     const ethereumTerms = [
       'ethereum',
-      'ether',
-      'eth ',
+      'ether cryptocurrency',
+      'ether digital',
       'smart contract',
       'decentralized finance',
       'defi',
       'web3',
       'blockchain ethereum',
       'ethereum network',
-      'ethereum protocol'
+      'ethereum protocol',
+      'ethereum blockchain',
+      'ethereum foundation',
+      'ethereum virtual machine',
+      'evm'
     ]
     
-    const hasEthereumMention = ethereumTerms.some(term => contentLower.includes(term))
+    // Use more precise matching to avoid false positives
+    const hasEthereumMention = ethereumTerms.some(term => {
+      // For single words, use word boundaries to ensure exact matches
+      if (!term.includes(' ')) {
+        const regex = new RegExp(`\\b${term}\\b`, 'i')
+        return regex.test(content)
+      }
+      // For phrases, use simple includes
+      return contentLower.includes(term)
+    })
     
     if (hasEthereumMention) {
       console.log(`✅ Found Ethereum mention in ${documentPath}`)
@@ -245,8 +265,25 @@ function extractAccessionNumber(documentPath: string): string {
     }
   }
   
+  // Try to extract from filename if path method fails
+  const filename = pathParts[pathParts.length - 1]
+  if (filename) {
+    // Look for accession number pattern in filename (e.g., "0001193125-25-017726.txt")
+    const accessionMatch = filename.match(/(\d{10}-\d{2}-\d{6})/)
+    if (accessionMatch) {
+      return accessionMatch[1]
+    }
+    
+    // Look for raw accession number pattern (18 digits)
+    const rawAccessionMatch = filename.match(/(\d{18})/)
+    if (rawAccessionMatch) {
+      const raw = rawAccessionMatch[1]
+      return `${raw.slice(0, 10)}-${raw.slice(10, 12)}-${raw.slice(12, 18)}`
+    }
+  }
+  
   // Fallback: use the filename or a generated ID
-  return pathParts[pathParts.length - 1]?.split('.')[0] || `unknown-${Date.now()}`
+  return filename?.split('.')[0] || `unknown-${Date.now()}`
 }
 
 /**
