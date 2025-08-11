@@ -3,6 +3,26 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
+// Type definitions for SEC filings
+interface WhereClause {
+  isActive: boolean
+  formType?: string
+  companyName?: {
+    contains: string
+    mode: 'insensitive'
+  }
+  filingDate?: {
+    gte?: Date
+    lte?: Date
+  }
+}
+
+interface OrderByClause {
+  filingDate?: 'asc' | 'desc'
+  companyName?: 'asc' | 'desc'
+  formType?: 'asc' | 'desc'
+}
+
 /**
  * GET /api/sec-filings
  * Returns paginated list of SEC filings mentioning Ethereum
@@ -28,7 +48,7 @@ export async function GET(request: NextRequest) {
     const endDate = searchParams.get('endDate')
 
     // Build where clause
-    const where: Record<string, any> = {
+    const where: WhereClause = {
       isActive: true
     }
 
@@ -54,24 +74,24 @@ export async function GET(request: NextRequest) {
     }
 
     // Build orderBy clause
-    const orderBy: Record<string, any> = {}
+    const orderBy: OrderByClause = {}
     if (sortBy === 'filingDate') {
-      orderBy.filingDate = sortOrder
+      orderBy.filingDate = sortOrder as 'asc' | 'desc'
     } else if (sortBy === 'companyName') {
-      orderBy.companyName = sortOrder
+      orderBy.companyName = sortOrder as 'asc' | 'desc'
     } else if (sortBy === 'formType') {
-      orderBy.formType = sortOrder
+      orderBy.formType = sortOrder as 'asc' | 'desc'
     } else {
       orderBy.filingDate = 'desc' // Default sort
     }
 
     // Execute queries (with error handling for missing table)
-    let filings: Array<Record<string, any>> = []
+    let filings: unknown[] = []
     let totalCount = 0
     
     try {
       [filings, totalCount] = await Promise.all([
-        (prisma as Record<string, any>).secFiling.findMany({
+        (prisma as any).secFiling.findMany({
           where,
           orderBy,
           skip,
@@ -89,7 +109,7 @@ export async function GET(request: NextRequest) {
             createdAt: true
           }
         }),
-        (prisma as Record<string, any>).secFiling.count({ where })
+        (prisma as any).secFiling.count({ where })
       ])
     } catch (dbError) {
       console.log('⚠️ SEC filings table not yet created in database')
@@ -181,7 +201,7 @@ export async function POST() {
         const formattedFiling = formatFilingForDatabase(filing)
 
         // Upsert filing (insert if new, update if exists)
-        const result = await (prisma as Record<string, any>).secFiling.upsert({
+        const result = await (prisma as any).secFiling.upsert({
           where: {
             accessionNumber: formattedFiling.accessionNumber
           },
@@ -216,8 +236,8 @@ export async function POST() {
     let recentFilingsCount = 0
     
     try {
-      totalFilings = await (prisma as Record<string, any>).secFiling.count({ where: { isActive: true } })
-      recentFilingsCount = await (prisma as Record<string, any>).secFiling.count({
+      totalFilings = await (prisma as any).secFiling.count({ where: { isActive: true } })
+      recentFilingsCount = await (prisma as any).secFiling.count({
         where: {
           isActive: true,
           filingDate: {
