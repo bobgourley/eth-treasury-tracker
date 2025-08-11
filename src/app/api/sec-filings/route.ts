@@ -178,6 +178,20 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     console.log('📋 Request body:', JSON.stringify(body, null, 2))
     
+    // Handle clearing all SEC filings data
+    if (body.action === 'clear_all') {
+      console.log('🗑️ CLEAR ALL: Removing all SEC filings from database...')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const deleteResult = await (prisma as any).secFiling.deleteMany({})
+      console.log(`✅ Successfully cleared ${deleteResult.count} SEC filing records`)
+      
+      return NextResponse.json({
+        success: true,
+        message: `Cleared all SEC filings data`,
+        data: { deletedCount: deleteResult.count }
+      })
+    }
+
     // Handle sample data insertion
     if (body.action === 'add_sample' && body.filing) {
       console.log(`📄 Adding sample filing: ${body.filing.companyName} - ${body.filing.formType}`)
