@@ -147,17 +147,37 @@ export async function searchEthereumFilings(
  * Helper function to determine if we should check a filing for Ethereum mentions
  */
 function shouldCheckFiling(formType: string, companyName: string): boolean {
-  // Focus on major filing types and known crypto-related companies
-  const relevantForms = ['10-K', '10-Q', '8-K', 'S-1', 'DEF 14A', '20-F', '40-F']
-  const cryptoKeywords = ['crypto', 'blockchain', 'digital', 'bitcoin', 'ethereum', 'coinbase', 'microstrategy', 'tesla', 'paypal', 'square', 'block', 'marathon', 'riot']
+  // Focus on major filing types that are likely to contain meaningful Ethereum mentions
+  const relevantForms = ['10-K', '10-Q', '8-K', 'S-1', 'DEF 14A']
+  
+  // Known companies that have mentioned crypto/Ethereum in filings
+  const knownCryptoCompanies = [
+    'tesla', 'microstrategy', 'coinbase', 'paypal', 'block', 'square',
+    'marathon', 'riot', 'nvidia', 'amd', 'robinhood', 'grayscale',
+    'galaxy', 'silvergate', 'signature', 'first republic', 'jpmorgan',
+    'goldman sachs', 'morgan stanley', 'blackrock', 'fidelity',
+    'ark invest', 'proshares', 'vaneck', 'bitwise', 'invesco'
+  ]
+  
+  // Additional keywords that might indicate crypto relevance
+  const cryptoKeywords = [
+    'crypto', 'blockchain', 'digital asset', 'bitcoin', 'ethereum',
+    'mining', 'staking', 'defi', 'web3', 'nft'
+  ]
   
   const isRelevantForm = relevantForms.includes(formType.toUpperCase())
-  const isCryptoRelated = cryptoKeywords.some(keyword => 
-    companyName.toLowerCase().includes(keyword)
+  const companyLower = companyName.toLowerCase()
+  
+  const isKnownCryptoCompany = knownCryptoCompanies.some(company => 
+    companyLower.includes(company)
   )
   
-  // Check major forms for all companies, or any form for crypto-related companies
-  return isRelevantForm || isCryptoRelated
+  const hasCryptoKeywords = cryptoKeywords.some(keyword => 
+    companyLower.includes(keyword)
+  )
+  
+  // Only check relevant forms, and prioritize known crypto companies
+  return isRelevantForm && (isKnownCryptoCompany || hasCryptoKeywords)
 }
 
 /**
@@ -165,28 +185,48 @@ function shouldCheckFiling(formType: string, companyName: string): boolean {
  */
 async function checkFilingForEthereum(documentPath: string): Promise<boolean> {
   try {
-    // For now, return true for known crypto-related companies to avoid excessive API calls
-    // In production, this would fetch and search the actual filing content
-    const cryptoCompanies = [
-      'TESLA', 'MICROSTRATEGY', 'COINBASE', 'PAYPAL', 'BLOCK', 'SQUARE',
-      'MARATHON', 'RIOT', 'NVIDIA', 'AMD', 'ROBINHOOD'
-    ]
-    
-    const pathUpper = documentPath.toUpperCase()
-    return cryptoCompanies.some(company => pathUpper.includes(company))
-    
-    /* Future implementation for full text search:
+    // Fetch and search the actual filing content for "ethereum"
     const fileUrl = `https://www.sec.gov/Archives/${documentPath}`
+    
     const response = await fetch(fileUrl, {
-      headers: { 'User-Agent': 'EthereumList.com admin@ethereumlist.com' }
+      headers: { 
+        'User-Agent': 'EthereumList.com admin@ethereumlist.com',
+        'Accept': 'text/html,text/plain,*/*'
+      }
     })
     
-    if (!response.ok) return false
+    if (!response.ok) {
+      console.log(`⚠️ Could not fetch filing ${documentPath}: ${response.status}`)
+      return false
+    }
     
     const content = await response.text()
-    return content.toLowerCase().includes('ethereum')
-    */
+    const contentLower = content.toLowerCase()
+    
+    // Search for various Ethereum-related terms
+    const ethereumTerms = [
+      'ethereum',
+      'ether',
+      'eth ',
+      'smart contract',
+      'decentralized finance',
+      'defi',
+      'web3',
+      'blockchain ethereum',
+      'ethereum network',
+      'ethereum protocol'
+    ]
+    
+    const hasEthereumMention = ethereumTerms.some(term => contentLower.includes(term))
+    
+    if (hasEthereumMention) {
+      console.log(`✅ Found Ethereum mention in ${documentPath}`)
+    }
+    
+    return hasEthereumMention
+    
   } catch (error) {
+    console.log(`❌ Error checking filing ${documentPath}:`, error)
     return false
   }
 }
