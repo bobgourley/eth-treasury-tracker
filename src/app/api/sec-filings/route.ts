@@ -221,19 +221,43 @@ export async function POST(request: NextRequest) {
     // Automated SEC EDGAR fetching using corrected API approach
     console.log('🔄 Starting SEC filings refresh...')
     
+    // Check if comprehensive search is requested
+    const isComprehensive = body.action === 'comprehensive_refresh' || body.comprehensive === true
+    const shouldClearExisting = body.clearExisting === true || isComprehensive
+    
+    if (shouldClearExisting) {
+      console.log('🗑️ Clearing existing SEC filings data...')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const deleteResult = await (prisma as any).secFiling.deleteMany({})
+      console.log(`✅ Cleared ${deleteResult.count} existing SEC filing records`)
+    }
+    
     try {
       console.log('📦 Importing SEC EDGAR fetcher...')
       // Import here to avoid issues during build
       const { searchEthereumFilings, formatFilingForDatabase, validateSecFiling } = await import('@/lib/secEdgarFetcher')
       console.log('✅ SEC EDGAR fetcher imported successfully')
 
-      // Fetch recent filings from SEC EDGAR
+      // Determine search parameters based on request type
+      let startDate: string | undefined
+      let endDate: string | undefined
+      let maxResults = 50
+      
+      if (isComprehensive) {
+        console.log('🌍 COMPREHENSIVE SEARCH: Searching ALL Ethereum filings since 2015...')
+        startDate = '2015-01-01' // Ethereum launch year
+        endDate = new Date().toISOString().split('T')[0] // Today
+        maxResults = 500 // Much higher limit for comprehensive search
+      } else {
+        console.log('📅 RECENT SEARCH: Searching last 90 days...')
+        startDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 90 days ago
+        endDate = new Date().toISOString().split('T')[0] // Today
+        maxResults = 50 // Standard limit for recent search
+      }
+
+      // Fetch filings from SEC EDGAR
       console.log('🔍 Searching for Ethereum filings...')
-      const recentFilings = await searchEthereumFilings(
-        new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 90 days ago
-        new Date().toISOString().split('T')[0], // Today
-        50 // Reasonable limit for testing
-      )
+      const recentFilings = await searchEthereumFilings(startDate, endDate, maxResults)
       console.log('✅ SEC EDGAR search completed')
 
       console.log(`📥 Found ${recentFilings.length} recent filings from SEC EDGAR`)
