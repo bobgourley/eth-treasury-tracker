@@ -303,7 +303,7 @@ The platform performs numerous real-time calculations:
 ### **Backend & Database**
 - **Next.js API Routes** - Serverless API endpoints with Edge Runtime
 - **Prisma ORM 5.0** - Type-safe database toolkit with PostgreSQL
-- **PostgreSQL 16** - Production database with full ACID compliance
+- **Supabase PostgreSQL** - Cloud-hosted PostgreSQL database with full ACID compliance
 - **NextAuth.js** - Authentication with Google OAuth integration
 
 ### **External Integrations**
@@ -544,8 +544,8 @@ Local Development → Git Commit → GitHub Push → Vercel Build → Live Deplo
 
 **Production Environment Variables (Vercel Dashboard)**:
 ```bash
-# Database
-DATABASE_URL="postgresql://user:password@host:port/database"
+# Database (Supabase PostgreSQL)
+DATABASE_URL="postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
 
 # External API Keys
 ETHERSCAN_API_KEY="your-etherscan-api-key"
