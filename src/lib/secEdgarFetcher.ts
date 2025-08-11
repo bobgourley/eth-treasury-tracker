@@ -48,23 +48,27 @@ interface SecFilingData {
 export async function searchEthereumFilings(
   startDate?: string,
   endDate?: string,
-  maxResults: number = 500
+  maxResults: number = 200
 ): Promise<SecFilingData[]> {
   try {
-    console.log('🔍 Searching SEC EDGAR for Ethereum-related filings (COMPREHENSIVE)...')
+    console.log('🔍 Searching SEC EDGAR for Ethereum filings (LAST YEAR ONLY)...')
     
     const filings: SecFilingData[] = []
     const currentYear = new Date().getFullYear()
-    const startYear = startDate ? parseInt(startDate.split('-')[0]) : 2015 // Start from 2015 when Ethereum launched
+    const currentDate = new Date()
+    
+    // Default to last year only to keep results manageable
+    const startYear = startDate ? parseInt(startDate.split('-')[0]) : currentYear - 1
+    const endYear = endDate ? parseInt(endDate.split('-')[0]) : currentYear
     
     console.log(`📅 Search parameters:`, {
-      dateRange: `${startYear} to ${currentYear}`,
+      dateRange: `${startYear} to ${endYear}`,
       maxResults,
-      note: 'Comprehensive search for ALL Ethereum mentions'
+      note: 'Limited to recent filings for manageability'
     })
 
-    // Search through ALL quarterly master index files since Ethereum's launch
-    for (let year = startYear; year <= currentYear; year++) {
+    // Search through quarterly master index files for the specified date range
+    for (let year = startYear; year <= endYear; year++) {
       for (let quarter = 1; quarter <= 4; quarter++) {
         if (filings.length >= maxResults) break
         
@@ -160,24 +164,26 @@ export async function searchEthereumFilings(
 
 /**
  * Helper function to determine if we should check a filing for Ethereum mentions
+ * FOCUSED APPROACH: Only check major forms from known relevant companies
  */
 function shouldCheckFiling(formType: string, companyName: string): boolean {
-  // Focus on major filing types that are likely to contain meaningful Ethereum mentions
-  const relevantForms = ['10-K', '10-Q', '8-K', 'S-1', 'DEF 14A']
+  // Focus ONLY on major filing types (10-K, 10-Q, 8-K)
+  const relevantForms = ['10-K', '10-Q', '8-K']
   
   // Known companies that have mentioned crypto/Ethereum in filings
   const knownCryptoCompanies = [
     'tesla', 'microstrategy', 'coinbase', 'paypal', 'block', 'square',
     'marathon', 'riot', 'nvidia', 'amd', 'robinhood', 'grayscale',
-    'galaxy', 'silvergate', 'signature', 'first republic', 'jpmorgan',
-    'goldman sachs', 'morgan stanley', 'blackrock', 'fidelity',
-    'ark invest', 'proshares', 'vaneck', 'bitwise', 'invesco'
+    'galaxy', 'silvergate', 'signature', 'jpmorgan', 'goldman sachs', 
+    'morgan stanley', 'blackrock', 'fidelity', 'proshares', 'vaneck', 
+    'bitwise', 'invesco', 'meta', 'alphabet', 'google', 'microsoft',
+    'intel', 'mastercard', 'visa'
   ]
   
   // Additional keywords that might indicate crypto relevance
   const cryptoKeywords = [
     'crypto', 'blockchain', 'digital asset', 'bitcoin', 'ethereum',
-    'mining', 'staking', 'defi', 'web3', 'nft'
+    'mining', 'trust', 'etf', 'fund'
   ]
   
   const isRelevantForm = relevantForms.includes(formType.toUpperCase())
