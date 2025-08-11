@@ -215,22 +215,66 @@ export async function POST(request: NextRequest) {
       })
     }
     
-    // Original automated SEC EDGAR fetching (currently disabled due to API auth requirements)
+    // Automated SEC EDGAR fetching using corrected API approach
     console.log('🔄 Starting SEC filings refresh...')
-    console.log('⚠️ SEC EDGAR API currently requires authentication - using fallback approach')
     
-    // For now, return success message indicating manual population is needed
-    return NextResponse.json({
-      success: true,
-      message: 'SEC EDGAR API requires authentication. Please use sample data population.',
-      data: {
-        newFilings: 0,
-        updatedFilings: 0,
-        skippedFilings: 0,
-        totalFilings: 0,
-        recentFilings: 0
+    // Import here to avoid issues during build
+    const { searchEthereumFilings, formatFilingForDatabase, validateSecFiling } = await import('@/lib/secEdgarFetcher')
+
+    // Fetch recent filings from SEC EDGAR
+    const recentFilings = await searchEthereumFilings(
+      new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 90 days ago
+      new Date().toISOString().split('T')[0], // Today
+      50 // Reasonable limit for testing
+    )
+
+    console.log(`📥 Found ${recentFilings.length} recent filings from SEC EDGAR`)
+
+    let newFilingsCount = 0
+    let updatedFilingsCount = 0
+    let skippedFilingsCount = 0
+
+    for (const filing of recentFilings) {
+      try {
+        // Validate filing data
+        if (!validateSecFiling(filing)) {
+          console.log(`⚠️ Skipping invalid filing: ${filing.accessionNumber}`)
+          skippedFilingsCount++
+          continue
+        }
+
+        // Format for database
+        const formattedFiling = formatFilingForDatabase(filing)
+
+        // Upsert filing (insert if new, update if exists)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const result = await (prisma as any).secFiling.upsert({
+          where: {
+            accessionNumber: formattedFiling.accessionNumber
+          },
+          update: {
+            companyName: formattedFiling.companyName,
+            reportTitle: formattedFiling.reportTitle,
+            edgarUrl: formattedFiling.edgarUrl,
+            fullTextUrl: formattedFiling.fullTextUrl,
+            updatedAt: new Date()
+          },
+          create: formattedFiling
+        })
+
+        if (result.createdAt && result.createdAt.getTime() === result.updatedAt.getTime()) {
+          newFilingsCount++
+          console.log(`✅ Added new filing: ${filing.companyName} - ${filing.formType}`)
+        } else {
+          updatedFilingsCount++
+          console.log(`🔄 Updated filing: ${filing.companyName} - ${filing.formType}`)
+        }
+
+      } catch (error) {
+        console.error(`❌ Error processing filing ${filing.accessionNumber}:`, error)
+        skippedFilingsCount++
       }
-    })
+    }
 
     /*
     // Original SEC EDGAR API code (disabled until authentication is resolved)
