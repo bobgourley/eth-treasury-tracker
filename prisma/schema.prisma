@@ -140,6 +140,31 @@ model EcosystemSummary {
   @@map("ecosystem_summaries")
 }
 
+// SEC Filings (comprehensive Ethereum-related SEC filings)
+model SecFiling {
+  id               Int      @id @default(autoincrement())
+  accessionNumber  String   @unique @map("accession_number") // SEC accession number (unique identifier)
+  companyName      String   @map("company_name")
+  cik              String   // Central Index Key
+  formType         String   @map("form_type")              // 10-K, 10-Q, 8-K, etc.
+  filingDate       DateTime @map("filing_date")
+  reportTitle      String?  @map("report_title")           // Title of the report/filing
+  edgarUrl         String   @map("edgar_url")              // Direct link to SEC EDGAR filing
+  fullTextUrl      String?  @map("full_text_url")          // Link to full text version
+  localContentPath String?  @map("local_content_path")     // Future: path to locally stored content
+  contentCached    Boolean  @default(false) @map("content_cached") // Future: whether content is stored locally
+  isActive         Boolean  @default(true) @map("is_active")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @default(now()) @map("updated_at")
+
+  @@index([filingDate])
+  @@index([companyName])
+  @@index([formType])
+  @@index([isActive])
+  @@index([isActive, filingDate])
+  @@map("sec_filings")
+}
+
 // NextAuth.js required models
 model Account {
   id                String  @id @default(cuid())

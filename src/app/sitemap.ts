@@ -74,6 +74,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
       },
       {
+        url: `${baseUrl}/sec-filings`,
+        lastModified: new Date(),
+        changeFrequency: 'daily', // SEC filings updated daily
+        priority: 0.8,
+      },
+      {
         url: `${baseUrl}/sitemap-html`,
         lastModified: new Date(),
         changeFrequency: 'weekly',
@@ -155,6 +161,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: new Date(),
         changeFrequency: 'daily', // Cards page updates with live data daily
         priority: 0.7,
+      },
+      {
+        url: `${baseUrl}/sec-filings`,
+        lastModified: new Date(),
+        changeFrequency: 'daily', // SEC filings updated daily
+        priority: 0.8,
       },
       // Static fallback company pages
       {
