@@ -3,9 +3,12 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import Navigation from '../../../components/Navigation'
+import FuturisticLayout from '../../../components/FuturisticLayout'
+import FuturisticCard, { MetricDisplay, DataList } from '../../../components/FuturisticCard'
+import { FuturisticBadge } from '../../../components/FuturisticUI'
 import SECFilings from '../../../components/SECFilings'
 import CompanyNews from '../../../components/CompanyNews'
+import styles from '../../../styles/futuristic.module.css'
 
 interface CompanyProfile {
   id: number
@@ -83,133 +86,79 @@ export default function CompanyProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="flex justify-between items-center">
-              <h1 className="text-4xl font-bold text-gray-900">Loading...</h1>
-              <div className="flex items-center space-x-3 text-xs text-gray-500">
-                <Link href="/" className="hover:text-blue-600 transition-colors">
-                  Dashboard
-                </Link>
-              </div>
-            </div>
+      <FuturisticLayout title="Loading Company..." showLiveIndicator={false}>
+        <FuturisticCard title="Loading" icon="⏳">
+          <div className="text-center">
+            <p>Loading company data...</p>
           </div>
-        </header>
-        
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex justify-center items-center min-h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          </div>
-        </main>
-      </div>
+        </FuturisticCard>
+      </FuturisticLayout>
     )
   }
 
   if (error || !company) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="flex justify-between items-center">
-              <h1 className="text-4xl font-bold text-gray-900">Company Not Found</h1>
-              <div className="flex items-center space-x-3 text-xs text-gray-500">
-                <Link href="/" className="hover:text-blue-600 transition-colors">
-                  Dashboard
-                </Link>
-              </div>
-            </div>
-          </div>
-        </header>
-        
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-12">
-            <div className="text-red-600 text-lg font-semibold">Error: {error}</div>
-            <Link 
-              href="/" 
-              className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Back to Dashboard
+      <FuturisticLayout title="Company Not Found" showLiveIndicator={false}>
+        <FuturisticCard title="Error" icon="❌" variant="warning">
+          <div className="text-center">
+            <p>Error: {error}</p>
+            <Link href="/">
+              <FuturisticBadge variant="info">Back to Dashboard</FuturisticBadge>
             </Link>
           </div>
-        </main>
-      </div>
+        </FuturisticCard>
+      </FuturisticLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <div className="flex items-center space-x-3 text-xs text-gray-500 mb-2">
-                <Link href="/" className="hover:text-blue-600 transition-colors">
-                  Dashboard
-                </Link>
-                <span>•</span>
-                <Link href="/analytics/premium-discount" className="hover:text-blue-600 transition-colors">
-                  Premium/Discount
-                </Link>
-                <span>•</span>
-                <Link href="/analytics/exposure" className="hover:text-blue-600 transition-colors">
-                  ETH Exposure
-                </Link>
-                <span>•</span>
-                <Link href="/analytics/charts" className="hover:text-blue-600 transition-colors">
-                  Charts
-                </Link>
-                <span>•</span>
-                <Link href="/about" className="hover:text-blue-600 transition-colors">
-                  About
-                </Link>
-              </div>
-              <h1 className="text-4xl font-bold text-gray-900">{company.name}</h1>
-              <p className="text-xl text-gray-600">{company.ticker}</p>
-            </div>
-            <div className="text-right">
-              <div className="text-3xl font-bold text-gray-900">
-                ${company.stockPrice.toFixed(2)}
-              </div>
-              <div className="text-sm text-gray-500">Stock Price</div>
-            </div>
-          </div>
-        </div>
-      </header>
+    <FuturisticLayout title={`${company.name} (${company.ticker})`} showLiveIndicator={true}>
+      {/* Company Overview Cards */}
+      <div className={styles.cardGrid}>
+        {/* Stock Price */}
+        <FuturisticCard title="Stock Price" icon="💰">
+          <MetricDisplay 
+            value={`$${company.stockPrice.toFixed(2)}`} 
+            label="Current Price" 
+          />
+        </FuturisticCard>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Company Overview Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Market Cap */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Market Cap</h3>
-            <div className="text-2xl font-bold text-blue-600">{company.marketCap}</div>
-          </div>
+        {/* Market Cap */}
+        <FuturisticCard title="Market Cap" icon="📊">
+          <MetricDisplay 
+            value={company.marketCap} 
+            label="Total Market Value" 
+          />
+        </FuturisticCard>
 
-          {/* ETH Holdings */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">ETH Holdings</h3>
-            <div className="text-2xl font-bold text-purple-600">{company.ethHoldingsFormatted}</div>
-            <div className="text-sm text-gray-500 mt-1">{company.ethValueFormatted}</div>
-          </div>
+        {/* ETH Holdings */}
+        <FuturisticCard title="ETH Holdings" icon="Ξ">
+          <MetricDisplay 
+            value={company.ethHoldingsFormatted} 
+            label="Total ETH" 
+          />
+          <MetricDisplay 
+            value={company.ethValueFormatted} 
+            label="USD Value" 
+          />
+        </FuturisticCard>
 
-          {/* ETH Exposure */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">ETH Exposure</h3>
-            <div className="text-2xl font-bold text-green-600">{formatPercentage(company.ecmcPercentage)}</div>
-            <div className="text-sm text-gray-500 mt-1">of Market Cap</div>
-          </div>
+        {/* ETH Exposure */}
+        <FuturisticCard title="ETH Exposure" icon="📈">
+          <MetricDisplay 
+            value={formatPercentage(company.ecmcPercentage)} 
+            label="of Market Cap" 
+          />
+        </FuturisticCard>
 
-          {/* Premium/Discount */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Premium/Discount</h3>
-            <div className={`text-2xl font-bold ${getPremiumDiscountColor(company.premiumDiscount)}`}>
-              {company.premiumDiscount > 0 ? '+' : ''}{formatPercentage(company.premiumDiscount)}
-            </div>
-            <div className="text-sm text-gray-500 mt-1">vs ETH Value</div>
-          </div>
-        </div>
+        {/* Premium/Discount */}
+        <FuturisticCard title="Premium/Discount" icon="⚖️">
+          <MetricDisplay 
+            value={`${company.premiumDiscount > 0 ? '+' : ''}${formatPercentage(company.premiumDiscount)}`} 
+            label="vs ETH Value" 
+          />
+        </FuturisticCard>
+      </div>
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -377,17 +326,45 @@ export default function CompanyProfilePage() {
           </div>
         </div>
 
-        {/* SEC Filings and News Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* SEC Filings */}
-            <SECFilings ticker={company.ticker} />
-            
-            {/* Company News */}
-            <CompanyNews ticker={company.ticker} />
+      {/* Company Details */}
+      <FuturisticCard title="Company Overview" icon="🏢" size="large">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+          <div>
+            <MetricDisplay 
+              value={company.sector} 
+              label="Sector" 
+            />
+            <MetricDisplay 
+              value={company.headquarters} 
+              label="Headquarters" 
+            />
+          </div>
+          <div>
+            <MetricDisplay 
+              value={company.riskLevel} 
+              label="Risk Level" 
+            />
+            <div style={{ marginTop: '1rem' }}>
+              <a href={company.website} target="_blank" rel="noopener noreferrer">
+                <FuturisticBadge variant="info">Company Website →</FuturisticBadge>
+              </a>
+            </div>
           </div>
         </div>
-      </main>
-    </div>
+        <div style={{ marginTop: '1.5rem' }}>
+          <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>{company.description}</p>
+        </div>
+      </FuturisticCard>
+
+      {/* SEC Filings and News */}
+      <div className={styles.cardGrid}>
+        <div style={{ gridColumn: 'span 1' }}>
+          <SECFilings ticker={company.ticker} />
+        </div>
+        <div style={{ gridColumn: 'span 1' }}>
+          <CompanyNews ticker={company.ticker} />
+        </div>
+      </div>
+    </FuturisticLayout>
   )
 }
