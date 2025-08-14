@@ -46,11 +46,6 @@ const navItems: NavItem[] = [
     href: '/cards',
     label: 'Cards',
     icon: <span>🎴</span>
-  },
-  {
-    href: '/sec-filings',
-    label: 'SEC ETH Filings',
-    icon: <span>🏛️</span>
   }
 ]
 

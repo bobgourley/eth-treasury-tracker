@@ -26,7 +26,9 @@ function getFallbackStaticEtfData() {
     const variation = 0.95 + (Math.random() * 0.1) // 95% to 105%
     const ethHoldings = etfInfo.estimatedEthHoldings * variation
     const aum = etfInfo.estimatedAum * variation
-    const ethPrice = 3484.13
+    // ETH price should be fetched from database, not hardcoded
+    // This is a fallback for static generation only
+    const ethPrice = 3500
     const totalValue = ethHoldings * ethPrice
     
     return {
@@ -202,8 +204,17 @@ export async function fetchStaticEcosystemData() {
       fetchEthSupply()
     ])
 
+    // CRITICAL: Always use database ETH price for consistency with dashboard
+    // Only use fallback if database is completely unavailable
     const ethPrice = systemMetrics?.ethPrice || 3500
     const ethSupply = liveEthSupply || 120709652 // Live ETH supply from Etherscan, fallback to current estimate
+    
+    if (!systemMetrics?.ethPrice) {
+      console.log('⚠️ WARNING: Using fallback ETH price instead of database value!')
+      console.log('⚠️ This causes inconsistency between homepage and dashboard')
+    } else {
+      console.log('✅ Using database ETH price:', ethPrice)
+    }
 
     // Calculate totals
     const companyTotalEth = companies.reduce((sum, company) => sum + Number(company.ethHoldings || 0), 0)
