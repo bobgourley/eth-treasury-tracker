@@ -285,7 +285,7 @@ export default function Home() {
 
       {/* Footer */}
       <div className={styles.footer}>
-        <p>Page generated: {new Date(staticData.generatedAt).toLocaleString('en-US', { 
+        <p>Page updated: {new Date().toLocaleString('en-US', { 
           timeZone: 'UTC',
           year: 'numeric',
           month: '2-digit', 
@@ -294,17 +294,11 @@ export default function Home() {
           minute: '2-digit',
           second: '2-digit',
           hour12: false
-        })} UTC •{' '}
-        <FuturisticBadge variant="live" size="small" pulse>Statically Generated</FuturisticBadge>
-        {' '}• Auto-refreshes every 5 minutes</p>
-        <p style={{ marginTop: '1rem' }}>© 2025 Ethereum List. Comprehensive Ethereum ecosystem tracking.</p>
-        <p style={{ marginTop: '0.5rem' }}>
-          Data sourced from public APIs, CoinGecko, EtherScan, Alpha Vantage, Financial Modeling Prep, and NewsAPI.
-        </p>
-        <p style={{ marginTop: '0.5rem' }}>
-          Built with Next.js, Tailwind CSS, and Prisma. 
-          <Link href="/sitemap.xml" style={{ color: 'var(--neon-cyan)', marginLeft: '0.5rem' }}>Sitemap</Link>
-        </p>
+        })} UTC</p>
+        <div className={styles.liveIndicator}>
+          <span className={styles.liveDot}></span>
+          LIVE
+        </div>
       </div>
     </FuturisticLayout>
   )
