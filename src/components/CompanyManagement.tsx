@@ -75,28 +75,41 @@ export default function CompanyManagement() {
       const url = '/api/admin/companies'
       const method = isEditing ? 'PUT' : 'POST'
 
+      const payload = {
+        ...companyData,
+        id: isEditing ? editingCompany.id : undefined
+      }
+
+      console.log('🚀 CompanyManagement - handleSave called')
+      console.log('📊 CompanyManagement - Company data to save:', JSON.stringify(companyData, null, 2))
+      console.log('📊 CompanyManagement - ETH Holdings value:', companyData.ethHoldings, 'Type:', typeof companyData.ethHoldings)
+      console.log('📊 CompanyManagement - Full payload:', JSON.stringify(payload, null, 2))
+      console.log('📊 CompanyManagement - Method:', method, 'URL:', url)
+
       const response = await fetch(url, {
         method,
         credentials: 'include', // Ensure cookies are sent
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          ...companyData,
-          id: isEditing ? editingCompany.id : undefined
-        })
+        body: JSON.stringify(payload)
       })
 
+      console.log('📡 CompanyManagement - Response status:', response.status)
       const result = await response.json()
+      console.log('📡 CompanyManagement - Response result:', JSON.stringify(result, null, 2))
 
       if (result.success) {
+        console.log('✅ CompanyManagement - Save successful, refreshing companies list')
         await fetchCompanies()
         setEditingCompany(null)
         setShowAddForm(false)
       } else {
+        console.log('❌ CompanyManagement - Save failed:', result.error)
         setError(result.error || 'Failed to save company')
       }
     } catch (error) {
+      console.error('❌ CompanyManagement - Network error:', error)
       setError('Network error')
     }
   }

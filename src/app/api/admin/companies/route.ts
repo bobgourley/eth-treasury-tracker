@@ -158,6 +158,7 @@ export async function PUT(request: NextRequest) {
     const data = await request.json()
     
     console.log('🔍 PUT /api/admin/companies - Update data received:', JSON.stringify(data, null, 2))
+    console.log('🔍 PUT /api/admin/companies - ETH Holdings value:', data.ethHoldings, 'Type:', typeof data.ethHoldings)
     
     if (!data.id) {
       return NextResponse.json({
@@ -165,6 +166,23 @@ export async function PUT(request: NextRequest) {
         error: 'Company ID is required'
       }, { status: 400 })
     }
+
+    // Find existing company for comparison
+    const existingCompany = await prisma.company.findUnique({
+      where: { id: data.id }
+    })
+    
+    if (!existingCompany) {
+      console.log('❌ PUT /api/admin/companies - Company not found with ID:', data.id)
+      return NextResponse.json({
+        success: false,
+        error: 'Company not found'
+      }, { status: 404 })
+    }
+    
+    console.log('📊 PUT /api/admin/companies - Existing company:', existingCompany.name)
+    console.log('📊 PUT /api/admin/companies - Current ETH Holdings:', existingCompany.ethHoldings)
+    console.log('📊 PUT /api/admin/companies - New ETH Holdings:', data.ethHoldings)
 
     const company = await prisma.company.update({
       where: { id: data.id },
