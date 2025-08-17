@@ -11,20 +11,38 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
     }),
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
+      console.log('🔐 Sign-in attempt:', {
+        email: user.email,
+        provider: account?.provider,
+        allowedEmails: ALLOWED_ADMIN_EMAILS
+      })
+      
       // Only allow sign-in for allowed admin emails
       if (!user.email || !ALLOWED_ADMIN_EMAILS.includes(user.email)) {
         console.log(`🚫 Unauthorized login attempt from: ${user.email}`)
-        return false
+        return '/admin/login?error=AccessDenied'
       }
       
       console.log(`✅ Authorized admin login: ${user.email}`)
       return true
     },
     async session({ session, token }) {
+      console.log('📋 Session callback:', {
+        email: session.user?.email,
+        tokenIsAdmin: token.isAdmin
+      })
+      
       // Add isAdmin flag to session using JWT token
       if (session.user?.email && ALLOWED_ADMIN_EMAILS.includes(session.user.email)) {
         session.user.isAdmin = true
@@ -36,6 +54,10 @@ export const authOptions: NextAuthOptions = {
       // Store user info in JWT token
       if (user) {
         token.isAdmin = ALLOWED_ADMIN_EMAILS.includes(user.email || '')
+        console.log('🎫 JWT token created:', {
+          email: user.email,
+          isAdmin: token.isAdmin
+        })
       }
       return token
     },
@@ -46,8 +68,10 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
-    maxAge: 4 * 60 * 60, // 4 hours
+    maxAge: 24 * 60 * 60, // 24 hours (increased from 4)
   },
+  debug: process.env.NODE_ENV === 'development',
+  secret: process.env.NEXTAUTH_SECRET,
 }
 
 /**

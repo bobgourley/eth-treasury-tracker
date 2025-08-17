@@ -2,41 +2,71 @@
 
 import { signIn, signOut, getSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [debugInfo, setDebugInfo] = useState('')
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   useEffect(() => {
+    // Check for error parameters
+    const errorParam = searchParams.get('error')
+    if (errorParam === 'AccessDenied') {
+      setError('Access denied. Your email is not authorized for admin access.')
+    } else if (errorParam) {
+      setError(`Authentication error: ${errorParam}`)
+    }
+
     // Check if user is already logged in
     const checkSession = async () => {
-      const session = await getSession()
-      if (session?.user?.isAdmin) {
-        router.push('/admin')
+      try {
+        const session = await getSession()
+        setDebugInfo(`Session check: ${session ? 'Found session' : 'No session'} - Admin: ${session?.user?.isAdmin || 'false'}`)
+        
+        if (session?.user?.isAdmin) {
+          router.push('/admin')
+        }
+      } catch (err) {
+        console.error('Session check error:', err)
+        setDebugInfo(`Session error: ${err}`)
       }
     }
     checkSession()
-  }, [router])
+  }, [router, searchParams])
 
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true)
       setError('')
+      setDebugInfo('Starting Google sign-in...')
       
       const result = await signIn('google', {
         callbackUrl: '/admin',
         redirect: false,
       })
 
+      setDebugInfo(`Sign-in result: ${JSON.stringify(result)}`)
+
       if (result?.error) {
-        setError('Access denied. Only authorized administrators can log in.')
+        if (result.error === 'AccessDenied') {
+          setError('Access denied. Your email is not authorized for admin access.')
+        } else {
+          setError(`Authentication error: ${result.error}`)
+        }
       } else if (result?.url) {
+        setDebugInfo('Redirecting to admin...')
         router.push(result.url)
+      } else {
+        // Force page reload to check session
+        window.location.reload()
       }
     } catch (error) {
+      console.error('Sign-in error:', error)
       setError('An error occurred during sign in. Please try again.')
+      setDebugInfo(`Error: ${error}`)
     } finally {
       setIsLoading(false)
     }
@@ -44,12 +74,49 @@ export default function AdminLogin() {
 
   const handleLogout = async () => {
     try {
+      setDebugInfo('Clearing session...')
       await signOut({ redirect: false })
       setError('')
+      setDebugInfo('')
+      
+      // Clear browser storage
+      localStorage.clear()
+      sessionStorage.clear()
+      
       // Clear any cached session data
       window.location.reload()
     } catch (error) {
       console.error('Logout error:', error)
+      setDebugInfo(`Logout error: ${error}`)
+    }
+  }
+
+  const handleClearAll = async () => {
+    try {
+      setDebugInfo('Clearing all data...')
+      
+      // Sign out first
+      await signOut({ redirect: false })
+      
+      // Clear all browser storage
+      localStorage.clear()
+      sessionStorage.clear()
+      
+      // Clear cookies by setting them to expire
+      document.cookie.split(";").forEach(function(c) { 
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+      });
+      
+      setError('')
+      setDebugInfo('All data cleared. Please try signing in again.')
+      
+      // Wait a moment then reload
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
+    } catch (error) {
+      console.error('Clear all error:', error)
+      setDebugInfo(`Clear error: ${error}`)
     }
   }
 
@@ -113,18 +180,36 @@ export default function AdminLogin() {
               )}
             </button>
 
-            <button
-              onClick={handleLogout}
-              className="w-full flex justify-center items-center py-2 px-4 border border-red-300 rounded-md shadow-sm bg-red-50 text-sm font-medium text-red-700 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-            >
-              Clear Session / Logout
-            </button>
+            <div className="space-y-2">
+              <button
+                onClick={handleLogout}
+                className="w-full flex justify-center items-center py-2 px-4 border border-red-300 rounded-md shadow-sm bg-red-50 text-sm font-medium text-red-700 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Clear Session / Logout
+              </button>
+              
+              <button
+                onClick={handleClearAll}
+                className="w-full flex justify-center items-center py-2 px-4 border border-orange-300 rounded-md shadow-sm bg-orange-50 text-sm font-medium text-orange-700 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+              >
+                🧹 Clear All Data & Cookies
+              </button>
+            </div>
+
+            {debugInfo && (
+              <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded text-xs">
+                <strong>Debug:</strong> {debugInfo}
+              </div>
+            )}
 
             <div className="text-center">
               <p className="text-xs text-gray-500">
                 Only authorized administrators can access this area.
                 <br />
                 Contact the system administrator if you need access.
+              </p>
+              <p className="text-xs text-gray-400 mt-2">
+                Having trouble? Try "Clear All Data & Cookies" then sign in again.
               </p>
             </div>
           </div>
