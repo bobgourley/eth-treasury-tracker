@@ -1,10 +1,10 @@
 'use client'
 
 import { signIn, signOut, getSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function AdminLogin() {
+function AdminLoginContent() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [debugInfo, setDebugInfo] = useState('')
@@ -216,5 +216,26 @@ export default function AdminLogin() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AdminLogin() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Ethereum Treasury Tracker
+            </h1>
+            <h2 className="text-xl font-semibold text-gray-700">
+              Loading...
+            </h2>
+          </div>
+        </div>
+      </div>
+    }>
+      <AdminLoginContent />
+    </Suspense>
   )
 }
