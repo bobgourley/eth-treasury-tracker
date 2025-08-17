@@ -209,7 +209,7 @@ export default function AdminLogin() {
                 Contact the system administrator if you need access.
               </p>
               <p className="text-xs text-gray-400 mt-2">
-                Having trouble? Try "Clear All Data & Cookies" then sign in again.
+                Having trouble? Try &quot;Clear All Data &amp; Cookies&quot; then sign in again.
               </p>
             </div>
           </div>
