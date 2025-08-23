@@ -30,10 +30,13 @@ export default function AdminBypass() {
 
       if (response.ok) {
         setMessage('Admin access granted! Redirecting...')
+        console.log('Bypass successful, redirecting to /admin')
+        // Force a page reload to ensure cookies are properly set
         setTimeout(() => {
-          router.push('/admin')
+          window.location.href = '/admin'
         }, 1000)
       } else {
+        console.error('Bypass failed:', data)
         setError(data.error || 'Authentication failed')
       }
     } catch (error) {

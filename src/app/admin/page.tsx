@@ -21,7 +21,10 @@ export default function AdminPage() {
         const response = await fetch('/api/admin/bypass-check')
         if (response.ok) {
           const data = await response.json()
+          console.log('Bypass check result:', data)
           setBypassSession(data)
+        } else {
+          console.log('Bypass check failed with status:', response.status)
         }
       } catch (error) {
         console.error('Bypass session check failed:', error)
@@ -40,7 +43,16 @@ export default function AdminPage() {
     const isOAuthAuthenticated = status === 'authenticated' && session?.user?.isAdmin
     const isBypassAuthenticated = bypassSession?.isAdmin
     
+    console.log('Auth check:', {
+      status,
+      isOAuthAuthenticated,
+      isBypassAuthenticated,
+      sessionUser: session?.user,
+      bypassSession
+    })
+    
     if (!isOAuthAuthenticated && !isBypassAuthenticated) {
+      console.log('No valid authentication, redirecting to login')
       router.push('/admin/login')
     }
   }, [session, status, router, bypassSession, isCheckingBypass])
