@@ -26,16 +26,12 @@ export const authOptions: NextAuthOptions = {
       console.log('🔐 Sign-in attempt:', {
         email: user.email,
         provider: account?.provider,
-        allowedEmails: ALLOWED_ADMIN_EMAILS,
-        userObject: user,
-        accountObject: account
       })
       
-      // Only allow sign-in for allowed admin emails
       if (!user.email || !ALLOWED_ADMIN_EMAILS.includes(user.email)) {
         console.log(`🚫 Unauthorized login attempt from: ${user.email}`)
         console.log(`🚫 Allowed emails: ${JSON.stringify(ALLOWED_ADMIN_EMAILS)}`)
-        return false // Changed from redirect to false to prevent silent failures
+        return '/admin/login?error=unauthorized'
       }
       
       console.log(`✅ Authorized admin login: ${user.email}`)
@@ -76,32 +72,12 @@ export const authOptions: NextAuthOptions = {
   },
   cookies: {
     sessionToken: {
-      name: `__Secure-next-auth.session-token`,
+      name: `next-auth.session-token`,
       options: {
         httpOnly: true,
         sameSite: 'lax',
         path: '/',
-        secure: true,
-        domain: process.env.NODE_ENV === 'production' ? '.ethereumlist.com' : undefined
-      }
-    },
-    callbackUrl: {
-      name: `__Secure-next-auth.callback-url`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: true,
-        domain: process.env.NODE_ENV === 'production' ? '.ethereumlist.com' : undefined
-      }
-    },
-    csrfToken: {
-      name: `__Host-next-auth.csrf-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: true
+        secure: process.env.NODE_ENV === 'production'
       }
     }
   },
