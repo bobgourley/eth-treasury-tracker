@@ -1,88 +1,60 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import AdminDashboard from '@/components/AdminDashboard'
 import CompanyManagement from '@/components/CompanyManagement'
 
 export default function AdminPage() {
-  const { data: session, status } = useSession()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'dashboard' | 'companies'>('dashboard')
-  const [bypassSession, setBypassSession] = useState<{ isAdmin: boolean; email?: string } | null>(null)
-  const [isCheckingBypass, setIsCheckingBypass] = useState(true)
+  const [adminSession, setAdminSession] = useState<{ isAdmin: boolean; email?: string } | null>(null)
+  const [isCheckingSession, setIsCheckingSession] = useState(true)
 
-  // Check for bypass session
+  // Check for admin session
   useEffect(() => {
-    const checkBypassSession = async () => {
+    const checkAdminSession = async () => {
       try {
         const response = await fetch('/api/admin/bypass-check')
         if (response.ok) {
           const data = await response.json()
-          console.log('Bypass check result:', data)
-          setBypassSession(data)
+          console.log('Admin session check result:', data)
+          setAdminSession(data)
         } else {
-          console.log('Bypass check failed with status:', response.status)
+          console.log('Admin session check failed with status:', response.status)
         }
       } catch (error) {
-        console.error('Bypass session check failed:', error)
+        console.error('Admin session check failed:', error)
       } finally {
-        setIsCheckingBypass(false)
+        setIsCheckingSession(false)
       }
     }
     
-    checkBypassSession()
+    checkAdminSession()
   }, [])
 
   useEffect(() => {
-    if (status === 'loading' || isCheckingBypass) return // Still loading
+    if (isCheckingSession) return // Still loading
     
-    // Check if user is authenticated via OAuth or bypass
-    const isOAuthAuthenticated = status === 'authenticated' && session?.user?.isAdmin
-    const isBypassAuthenticated = bypassSession?.isAdmin
-    
-    console.log('Auth check:', {
-      status,
-      isOAuthAuthenticated,
-      isBypassAuthenticated,
-      sessionUser: session?.user,
-      bypassSession
-    })
-    
-    if (!isOAuthAuthenticated && !isBypassAuthenticated) {
-      console.log('No valid authentication, redirecting to login')
+    if (!adminSession?.isAdmin) {
+      console.log('No valid admin authentication, redirecting to login')
       router.push('/admin/login')
     }
-  }, [session, status, router, bypassSession, isCheckingBypass])
+  }, [router, adminSession, isCheckingSession])
 
   const handleLogout = async () => {
     try {
-      // Clear bypass session if it exists
-      if (bypassSession?.isAdmin) {
-        await fetch('/api/admin/bypass-logout', { method: 'POST' })
-        console.log('Bypass session cleared')
-        // Force page reload after clearing bypass session
-        window.location.href = '/admin/login'
-        return
-      }
-      
-      // Sign out of OAuth session (if exists)
-      if (session?.user) {
-        await signOut({ callbackUrl: '/admin/login' })
-      } else {
-        // Fallback redirect
-        window.location.href = '/admin/login'
-      }
+      await fetch('/api/admin/bypass-logout', { method: 'POST' })
+      console.log('Admin session cleared')
+      window.location.href = '/admin/login'
     } catch (error) {
       console.error('Logout error:', error)
-      // Force redirect on error
       window.location.href = '/admin/login'
     }
   }
 
-  if (status === 'loading' || isCheckingBypass) {
+  if (isCheckingSession) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-lg">Loading...</div>
@@ -90,11 +62,7 @@ export default function AdminPage() {
     )
   }
 
-  // Check if user is authenticated via OAuth or bypass
-  const isOAuthAuthenticated = status === 'authenticated' && session?.user?.isAdmin
-  const isBypassAuthenticated = bypassSession?.isAdmin
-  
-  if (!isOAuthAuthenticated && !isBypassAuthenticated) {
+  if (!adminSession?.isAdmin) {
     return null // Will redirect to login via useEffect
   }
 

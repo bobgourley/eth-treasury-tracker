@@ -1,35 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const bypassCookie = cookieStore.get('admin-bypass')
+    // Check for admin session cookie
+    const sessionCookie = request.cookies.get('admin-session')
     
-    if (!bypassCookie) {
-      return NextResponse.json({ isAdmin: false }, { status: 200 })
+    if (!sessionCookie) {
+      return NextResponse.json({ isAdmin: false, message: 'No admin session found' })
     }
 
     try {
-      const bypassData = JSON.parse(bypassCookie.value)
+      const sessionData = JSON.parse(sessionCookie.value)
       
-      // Check if bypass session is still valid (24 hours)
-      const now = Date.now()
-      if (now > bypassData.expires) {
-        return NextResponse.json({ isAdmin: false }, { status: 200 })
+      // Check if session is still valid (24 hours)
+      const sessionAge = Date.now() - sessionData.timestamp
+      const maxAge = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
+      
+      if (sessionAge > maxAge) {
+        return NextResponse.json({ 
+          isAdmin: false, 
+          message: 'Admin session expired' 
+        })
       }
-
+      
+      if (sessionData.isAdmin && sessionData.email) {
+        return NextResponse.json({ 
+          isAdmin: true, 
+          email: sessionData.email,
+          message: 'Valid admin session found'
+        })
+      }
+      
       return NextResponse.json({ 
-        isAdmin: true, 
-        email: bypassData.email,
-        method: 'bypass'
-      }, { status: 200 })
+        isAdmin: false, 
+        message: 'Invalid admin session data' 
+      })
+      
     } catch (parseError) {
-      console.error('Failed to parse bypass cookie:', parseError)
-      return NextResponse.json({ isAdmin: false }, { status: 200 })
+      console.error('Error parsing admin session cookie:', parseError)
+      return NextResponse.json({ 
+        isAdmin: false, 
+        message: 'Invalid admin session format' 
+      })
     }
+    
   } catch (error) {
-    console.error('Bypass check error:', error)
-    return NextResponse.json({ isAdmin: false }, { status: 200 })
+    console.error('Admin session check error:', error)
+    return NextResponse.json({ 
+      isAdmin: false, 
+      error: 'Internal server error' 
+    }, { status: 500 })
   }
 }

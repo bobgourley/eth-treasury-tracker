@@ -1,26 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
+import { isAdminEmail } from '@/lib/auth'
 
 /**
- * Middleware to check admin authentication using NextAuth.js
+ * Middleware to check admin authentication using session cookies
  */
-async function checkAuth(): Promise<boolean> {
+async function checkAuth(request: NextRequest): Promise<boolean> {
   try {
-    const session = await getServerSession(authOptions)
+    const sessionCookie = request.cookies.get('admin-session')
     
-    if (!session?.user?.email) {
-      console.log('❌ checkAuth - No session or email found')
+    if (!sessionCookie) {
+      console.log('❌ checkAuth - No admin session found')
+      return false
+    }
+
+    const sessionData = JSON.parse(sessionCookie.value)
+    
+    // Check if session is still valid (24 hours)
+    const sessionAge = Date.now() - sessionData.timestamp
+    const maxAge = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
+    
+    if (sessionAge > maxAge) {
+      console.log('❌ checkAuth - Admin session expired')
       return false
     }
     
-    if (!session.user.isAdmin) {
-      console.log('❌ checkAuth - User is not admin:', session.user.email)
+    if (!sessionData.isAdmin || !sessionData.email) {
+      console.log('❌ checkAuth - Invalid session data')
       return false
     }
     
-    console.log('✅ checkAuth - Admin authenticated:', session.user.email)
+    if (!isAdminEmail(sessionData.email)) {
+      console.log('❌ checkAuth - User is not admin:', sessionData.email)
+      return false
+    }
+    
+    console.log('✅ checkAuth - Admin authenticated:', sessionData.email)
     return true
   } catch (error: unknown) {
     console.error('❌ checkAuth - Error:', error)
@@ -32,9 +47,9 @@ async function checkAuth(): Promise<boolean> {
  * GET /api/admin/companies
  * Get all companies for admin management
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const isAuthenticated = await checkAuth()
+    const isAuthenticated = await checkAuth(request)
     
     console.log('🔍 GET /api/admin/companies - isAuthenticated:', isAuthenticated)
     
@@ -73,7 +88,7 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
-    const isAuthenticated = await checkAuth()
+    const isAuthenticated = await checkAuth(request)
     
     if (!isAuthenticated) {
       return NextResponse.json({
@@ -147,7 +162,7 @@ export async function POST(request: NextRequest) {
  */
 export async function PUT(request: NextRequest) {
   try {
-    const isAuthenticated = await checkAuth()
+    const isAuthenticated = await checkAuth(request)
     
     if (!isAuthenticated) {
       return NextResponse.json({
@@ -230,7 +245,7 @@ export async function PUT(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
-    const isAuthenticated = await checkAuth()
+    const isAuthenticated = await checkAuth(request)
     
     if (!isAuthenticated) {
       return NextResponse.json({
