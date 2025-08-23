@@ -1,5 +1,6 @@
 import { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
+import { cookies } from "next/headers"
 
 // List of allowed admin email addresses
 const ALLOWED_ADMIN_EMAILS = [
