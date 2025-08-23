@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
+import type { NextAuthOptions } from 'next-auth'
 import { prisma } from '@/lib/db'
 
 // NextAuth configuration for server-side session validation
 const ALLOWED_ADMIN_EMAILS = process.env.ADMIN_EMAIL?.split(',') || []
 
-const authOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -15,16 +15,16 @@ const authOptions = {
     })
   ],
   callbacks: {
-    async signIn({ user }: { user: { email?: string | null } }) {
+    async signIn({ user }) {
       return ALLOWED_ADMIN_EMAILS.includes(user.email || '')
     },
-    async jwt({ token, user }: { token: any; user?: { email?: string | null } }) {
+    async jwt({ token, user }) {
       if (user) {
         token.isAdmin = ALLOWED_ADMIN_EMAILS.includes(user.email || '')
       }
       return token
     },
-    async session({ session, token }: { session: any; token: any }) {
+    async session({ session, token }) {
       if (session.user && token.isAdmin) {
         session.user.isAdmin = true
       }
