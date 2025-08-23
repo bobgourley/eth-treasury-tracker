@@ -191,8 +191,8 @@ export async function GET() {
       if (companiesResponse.ok) {
         const companiesData = await companiesResponse.json()
         const companies = companiesData.companies || []
-        fallbackEthHoldings = companies.reduce((sum: number, company: any) => sum + (company.ethHoldings || 0), 0)
-        fallbackMarketCap = companies.reduce((sum: number, company: any) => sum + Number(company.marketCap || 0), 0).toString()
+        fallbackEthHoldings = companies.reduce((sum: number, company: { ethHoldings?: number }) => sum + (company.ethHoldings || 0), 0)
+        fallbackMarketCap = companies.reduce((sum: number, company: { marketCap?: string | number }) => sum + Number(company.marketCap || 0), 0).toString()
         console.log(`📊 Using live companies data in fallback: ${fallbackEthHoldings} ETH from ${companies.length} companies`)
       }
     } catch (error) {
