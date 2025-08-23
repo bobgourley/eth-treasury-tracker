@@ -42,6 +42,9 @@ interface HomePageData {
   news: NewsArticle[]
   ethPrice: number
   ethSupply: number
+  bitcoinPrice: number
+  bitcoinMarketCap: number
+  ethereumMarketCap: number
 }
 
 async function getHomePageData(): Promise<HomePageData> {
@@ -61,12 +64,36 @@ async function getHomePageData(): Promise<HomePageData> {
       metricsResponse.ok ? metricsResponse.json() : { ethPrice: 3500, totalEthSupply: 120709652 }
     ])
 
+    // Fetch Bitcoin and crypto market data from CoinGecko
+    let bitcoinPrice = 95000
+    let bitcoinMarketCap = 1800000000000 // $1.8T
+    let ethereumMarketCap = 420000000000 // $420B
+    
+    try {
+      const cryptoResponse = await fetch(
+        'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_market_cap=true',
+        { cache: 'no-store' }
+      )
+      
+      if (cryptoResponse.ok) {
+        const cryptoData = await cryptoResponse.json()
+        bitcoinPrice = cryptoData.bitcoin?.usd || bitcoinPrice
+        bitcoinMarketCap = cryptoData.bitcoin?.usd_market_cap || bitcoinMarketCap
+        ethereumMarketCap = cryptoData.ethereum?.usd_market_cap || ethereumMarketCap
+      }
+    } catch (cryptoError) {
+      console.error('Error fetching crypto market data:', cryptoError)
+    }
+
     return {
       companies: companiesData.companies || [],
       etfs: etfsData.etfs || [],
       news: newsData.articles?.slice(0, 3) || [],
       ethPrice: metricsData.ethPrice || 3500,
-      ethSupply: metricsData.totalEthSupply || metricsData.ethSupply || 120709652
+      ethSupply: metricsData.totalEthSupply || metricsData.ethSupply || 120709652,
+      bitcoinPrice,
+      bitcoinMarketCap,
+      ethereumMarketCap
     }
   } catch (error) {
     console.error('Error fetching homepage data:', error)
@@ -76,13 +103,16 @@ async function getHomePageData(): Promise<HomePageData> {
       etfs: [],
       news: [],
       ethPrice: 3500,
-      ethSupply: 120709652
+      ethSupply: 120709652,
+      bitcoinPrice: 95000,
+      bitcoinMarketCap: 1800000000000,
+      ethereumMarketCap: 420000000000
     }
   }
 }
 
 export default async function Home() {
-  const { companies, etfs, news, ethPrice, ethSupply } = await getHomePageData()
+  const { companies, etfs, news, ethPrice, ethSupply, bitcoinPrice, bitcoinMarketCap, ethereumMarketCap } = await getHomePageData()
 
   // Calculate totals and metrics
   const totalEthTracked = companies.reduce((sum: number, company: Company) => sum + (company.ethHoldings || 0), 0) + 
@@ -195,24 +225,28 @@ export default async function Home() {
         {/* Token Market Cap Card */}
         <FuturisticCard title="Token Market Cap" icon="💰" size="large">
           <MetricDisplay 
-            value="Loading..." 
+            value={`$${(bitcoinMarketCap / 1000000000000).toFixed(2)}T`}
             label="Bitcoin Market Cap" 
+            color="orange"
           />
           <MetricDisplay 
-            value="Loading..." 
+            value={`$${(ethereumMarketCap / 1000000000).toFixed(0)}B`}
             label="Ethereum Market Cap" 
+            color="blue"
           />
         </FuturisticCard>
 
         {/* ETH-BTC Ratio */}
         <FuturisticCard title="ETH-BTC" icon="⚖️" size="large">
           <MetricDisplay 
-            value="Loading..." 
+            value={(ethPrice / bitcoinPrice).toFixed(4)}
             label="ETH/BTC Ratio" 
+            color="cyan"
           />
           <MetricDisplay 
-            value="Loading..." 
+            value={`$${bitcoinPrice.toLocaleString()}`}
             label="Bitcoin Price" 
+            color="orange"
           />
         </FuturisticCard>
       </div>
