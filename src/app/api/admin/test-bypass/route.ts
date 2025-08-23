@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     const cookieStore = await cookies()
     const bypassCookie = cookieStore.get('admin-bypass')
     
-    const result = {
+    const result: any = {
       hasBypassCookie: !!bypassCookie,
       cookieValue: bypassCookie?.value || null,
       adminEmail: process.env.ADMIN_EMAIL || 'NOT_SET',
@@ -27,10 +27,10 @@ export async function GET(request: NextRequest) {
     }
     
     return NextResponse.json(result, { status: 200 })
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ 
-      error: error.message,
-      stack: error.stack 
+      error: error?.message || 'Unknown error',
+      stack: error?.stack || 'No stack trace'
     }, { status: 500 })
   }
 }

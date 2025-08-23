@@ -20,15 +20,29 @@ function AdminLoginContent() {
       setError(`Authentication error: ${errorParam}`)
     }
 
-    // Check if user is already logged in
+    // Check if user is already logged in (OAuth or bypass)
     const checkSession = async () => {
       try {
+        // Check OAuth session
         const session = await getSession()
-        setDebugInfo(`Session check: ${session ? 'Found session' : 'No session'} - Admin: ${session?.user?.isAdmin || 'false'}`)
-        
         if (session?.user?.isAdmin) {
+          setDebugInfo('OAuth session found, redirecting...')
           router.push('/admin')
+          return
         }
+
+        // Check bypass session
+        const bypassResponse = await fetch('/api/admin/bypass-check')
+        if (bypassResponse.ok) {
+          const bypassData = await bypassResponse.json()
+          if (bypassData.isAdmin) {
+            setDebugInfo('Bypass session found, redirecting...')
+            router.push('/admin')
+            return
+          }
+        }
+
+        setDebugInfo(`Session check: ${session ? 'OAuth session exists but not admin' : 'No OAuth session'} - Bypass: ${bypassResponse.ok ? 'checked' : 'failed'}`)
       } catch (err) {
         console.error('Session check error:', err)
         setDebugInfo(`Session error: ${err}`)
