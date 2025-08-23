@@ -1,60 +1,36 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import AdminDashboard from '@/components/AdminDashboard'
 import CompanyManagement from '@/components/CompanyManagement'
 
 export default function AdminPage() {
+  const { data: session, status } = useSession()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'dashboard' | 'companies'>('dashboard')
-  const [adminSession, setAdminSession] = useState<{ isAdmin: boolean; email?: string } | null>(null)
-  const [isCheckingSession, setIsCheckingSession] = useState(true)
-
-  // Check for admin session
-  useEffect(() => {
-    const checkAdminSession = async () => {
-      try {
-        const response = await fetch('/api/admin/bypass-check')
-        if (response.ok) {
-          const data = await response.json()
-          console.log('Admin session check result:', data)
-          setAdminSession(data)
-        } else {
-          console.log('Admin session check failed with status:', response.status)
-        }
-      } catch (error) {
-        console.error('Admin session check failed:', error)
-      } finally {
-        setIsCheckingSession(false)
-      }
-    }
-    
-    checkAdminSession()
-  }, [])
 
   useEffect(() => {
-    if (isCheckingSession) return // Still loading
+    if (status === 'loading') return // Still loading
     
-    if (!adminSession?.isAdmin) {
+    if (!session?.user?.isAdmin) {
       console.log('No valid admin authentication, redirecting to login')
       router.push('/admin/login')
     }
-  }, [router, adminSession, isCheckingSession])
+  }, [session, status, router])
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/admin/bypass-logout', { method: 'POST' })
-      console.log('Admin session cleared')
-      window.location.href = '/admin/login'
+      await signOut({ callbackUrl: '/admin/login' })
     } catch (error) {
       console.error('Logout error:', error)
       window.location.href = '/admin/login'
     }
   }
 
-  if (isCheckingSession) {
+  if (status === 'loading') {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-lg">Loading...</div>
@@ -62,7 +38,7 @@ export default function AdminPage() {
     )
   }
 
-  if (!adminSession?.isAdmin) {
+  if (!session?.user?.isAdmin) {
     return null // Will redirect to login via useEffect
   }
 

@@ -1,41 +1,67 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import NextAuth from 'next-auth'
+import GoogleProvider from 'next-auth/providers/google'
 import { prisma } from '@/lib/db'
-import { isAdminEmail } from '@/lib/auth'
+
+// NextAuth configuration for server-side session validation
+const ALLOWED_ADMIN_EMAILS = process.env.ADMIN_EMAIL?.split(',') || []
+
+const authOptions = {
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    })
+  ],
+  callbacks: {
+    async signIn({ user }: any) {
+      return ALLOWED_ADMIN_EMAILS.includes(user.email || '')
+    },
+    async jwt({ token, user }: any) {
+      if (user) {
+        token.isAdmin = ALLOWED_ADMIN_EMAILS.includes(user.email || '')
+      }
+      return token
+    },
+    async session({ session, token }: any) {
+      if (session.user && token.isAdmin) {
+        session.user.isAdmin = true
+      }
+      return session
+    }
+  },
+  session: {
+    strategy: 'jwt' as const,
+  },
+}
 
 /**
- * Middleware to check admin authentication using session cookies
+ * Middleware to check admin authentication using NextAuth session
  */
 async function checkAuth(request: NextRequest): Promise<boolean> {
   try {
-    const sessionCookie = request.cookies.get('admin-session')
+    const session = await getServerSession(authOptions)
     
-    if (!sessionCookie) {
-      console.log('❌ checkAuth - No admin session found')
-      return false
-    }
-
-    const sessionData = JSON.parse(sessionCookie.value)
+    console.log('🔍 checkAuth - Session:', session)
+    console.log('🔍 checkAuth - ALLOWED_ADMIN_EMAILS:', ALLOWED_ADMIN_EMAILS)
+    console.log('🔍 checkAuth - Request cookies:', request.cookies.getAll())
     
-    // Check if session is still valid (24 hours)
-    const sessionAge = Date.now() - sessionData.timestamp
-    const maxAge = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
-    
-    if (sessionAge > maxAge) {
-      console.log('❌ checkAuth - Admin session expired')
+    if (!session?.user?.email) {
+      console.log('❌ checkAuth - No session found')
       return false
     }
     
-    if (!sessionData.isAdmin || !sessionData.email) {
-      console.log('❌ checkAuth - Invalid session data')
+    console.log('🔍 checkAuth - User email:', session.user.email)
+    console.log('🔍 checkAuth - Email in allowed list:', ALLOWED_ADMIN_EMAILS.includes(session.user.email))
+    
+    // Check if user email is in allowed admin list
+    if (!ALLOWED_ADMIN_EMAILS.includes(session.user.email)) {
+      console.log('❌ checkAuth - User is not admin:', session.user.email)
       return false
     }
     
-    if (!isAdminEmail(sessionData.email)) {
-      console.log('❌ checkAuth - User is not admin:', sessionData.email)
-      return false
-    }
-    
-    console.log('✅ checkAuth - Admin authenticated:', sessionData.email)
+    console.log('✅ checkAuth - Admin authenticated:', session.user.email)
     return true
   } catch (error: unknown) {
     console.error('❌ checkAuth - Error:', error)

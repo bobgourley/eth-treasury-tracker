@@ -1,65 +1,59 @@
 'use client'
 
 import { useEffect, useState, Suspense } from 'react'
-import { useRouter } from 'next/navigation'
+import { useSession, signIn, signOut } from 'next-auth/react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 function AdminLoginContent() {
-  const [email, setEmail] = useState('')
-  const [secret, setSecret] = useState('')
+  const { data: session, status } = useSession()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [debugInfo, setDebugInfo] = useState('')
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   useEffect(() => {
-    // Check existing admin session
-    const checkSession = async () => {
-      try {
-        const response = await fetch('/api/admin/bypass-check')
-        if (response.ok) {
-          const data = await response.json()
-          if (data.isAdmin) {
-            setDebugInfo('Admin session found, redirecting...')
-            router.push('/admin')
-            return
-          }
-        }
-        setDebugInfo('No active admin session')
-      } catch (err) {
-        console.error('Session check error:', err)
-        setDebugInfo(`Session error: ${err}`)
-      }
+    // Check for error parameters from OAuth
+    const errorParam = searchParams.get('error')
+    if (errorParam) {
+      setError(`Authentication error: ${errorParam}`)
+      console.log('❌ OAuth Error from URL:', errorParam)
     }
-    checkSession()
-  }, [router])
 
-  const handleAdminLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
+    // Check existing session
+    if (status === 'loading') return // Still loading
+
+    if (session?.user?.isAdmin) {
+      setDebugInfo('Admin session found, redirecting...')
+      router.push('/admin')
+      return
+    }
+
+    if (status === 'authenticated' && !session?.user?.isAdmin) {
+      setError('Your account is not authorized for admin access')
+      setDebugInfo('User authenticated but not admin')
+    }
+
+    if (status === 'unauthenticated') {
+      setDebugInfo('No active session')
+    }
+  }, [session, status, router, searchParams])
+
+  const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true)
       setError('')
-      setDebugInfo('Attempting admin login...')
+      setDebugInfo('Starting Google sign-in...')
+      console.log('🚀 Starting Google OAuth sign-in')
       
-      const response = await fetch('/api/admin/bypass', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, secret }),
+      await signIn('google', { 
+        callbackUrl: '/admin',
+        redirect: true 
       })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setDebugInfo('Admin login successful! Redirecting...')
-        router.push('/admin')
-      } else {
-        setError(data.error || 'Login failed')
-        setDebugInfo(`Login failed: ${data.error}`)
-      }
+      
     } catch (err) {
-      console.error('Login error:', err)
-      setError('Login failed')
+      console.error('💥 Sign-in exception:', err)
+      setError('Sign-in failed')
       setDebugInfo(`Exception: ${err}`)
     } finally {
       setIsLoading(false)
@@ -69,10 +63,9 @@ function AdminLoginContent() {
   const handleLogout = async () => {
     try {
       setDebugInfo('Clearing session...')
-      await fetch('/api/admin/bypass-logout', { method: 'POST' })
+      await signOut({ callbackUrl: '/admin/login' })
       setError('')
       setDebugInfo('Logged out successfully')
-      router.refresh()
     } catch (err) {
       console.error('Logout error:', err)
       setError('Failed to logout')
@@ -104,7 +97,7 @@ function AdminLoginContent() {
             Admin Login
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Enter your admin credentials
+            Sign in with your authorized Google account
           </p>
         </div>
       </div>
@@ -118,54 +111,15 @@ function AdminLoginContent() {
             </div>
           )}
 
-          <form onSubmit={handleAdminLogin} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Admin Email
-              </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="your-admin@email.com"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="secret" className="block text-sm font-medium text-gray-700">
-                Admin Secret
-              </label>
-              <div className="mt-1">
-                <input
-                  id="secret"
-                  name="secret"
-                  type="password"
-                  required
-                  value={secret}
-                  onChange={(e) => setSecret(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="Enter admin secret"
-                />
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? 'Signing in...' : 'Sign In'}
-              </button>
-            </div>
-          </form>
+          <div className="space-y-6">
+            <button
+              onClick={handleGoogleSignIn}
+              disabled={isLoading || status === 'loading'}
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? 'Signing in...' : 'Sign in with Google'}
+            </button>
+          </div>
 
           <div className="mt-6 flex space-x-2">
             <button
