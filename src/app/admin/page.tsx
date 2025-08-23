@@ -63,13 +63,16 @@ export default function AdminPage() {
       if (bypassSession?.isAdmin) {
         await fetch('/api/admin/bypass-logout', { method: 'POST' })
         console.log('Bypass session cleared')
+        // Force page reload after clearing bypass session
+        window.location.href = '/admin/login'
+        return
       }
       
       // Sign out of OAuth session (if exists)
       if (session?.user) {
         await signOut({ callbackUrl: '/admin/login' })
       } else {
-        // If only bypass session, redirect manually
+        // Fallback redirect
         window.location.href = '/admin/login'
       }
     } catch (error) {
