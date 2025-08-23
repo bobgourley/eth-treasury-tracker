@@ -60,7 +60,7 @@ function AdminLoginContent() {
       
       const result = await signIn('google', {
         callbackUrl: '/admin',
-        redirect: false
+        redirect: true
       })
       
       console.log('📋 Sign-in result:', result)
