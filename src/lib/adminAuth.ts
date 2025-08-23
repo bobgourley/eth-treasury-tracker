@@ -2,7 +2,7 @@ import { cookies } from 'next/headers'
 
 export async function checkAdminBypass(): Promise<{ isAdmin: boolean; email?: string }> {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const bypassCookie = cookieStore.get('admin-bypass-session')
     
     if (!bypassCookie?.value) {
