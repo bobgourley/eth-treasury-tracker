@@ -56,31 +56,43 @@ function AdminLoginContent() {
       setIsLoading(true)
       setError('')
       setDebugInfo('Starting Google sign-in...')
+      console.log('🚀 Starting Google OAuth sign-in')
       
       const result = await signIn('google', {
         callbackUrl: '/admin',
-        redirect: false,
+        redirect: false
       })
-
+      
+      console.log('📋 Sign-in result:', result)
       setDebugInfo(`Sign-in result: ${JSON.stringify(result)}`)
-
+      
       if (result?.error) {
-        if (result.error === 'AccessDenied') {
-          setError('Access denied. Your email is not authorized for admin access.')
-        } else {
-          setError(`Authentication error: ${result.error}`)
-        }
-      } else if (result?.url) {
-        setDebugInfo('Redirecting to admin...')
-        router.push(result.url)
-      } else {
-        // Force page reload to check session
-        window.location.reload()
+        console.error('❌ Sign-in error:', result.error)
+        setError(`Sign-in failed: ${result.error}`)
+        setDebugInfo(`Error details: ${result.error}`)
+      } else if (result?.ok) {
+        console.log('✅ Sign-in successful, checking session...')
+        setDebugInfo('Sign-in successful, checking session...')
+        
+        // Wait a moment for session to be created
+        setTimeout(async () => {
+          const session = await getSession()
+          console.log('📋 Session after sign-in:', session)
+          setDebugInfo(`Session: ${JSON.stringify(session)}`)
+          
+          if (session?.user) {
+            console.log('✅ Session found, redirecting to admin')
+            router.push('/admin')
+          } else {
+            console.log('❌ No session found after sign-in')
+            setError('Session not created after sign-in')
+          }
+        }, 1000)
       }
-    } catch (error) {
-      console.error('Sign-in error:', error)
-      setError('An error occurred during sign in. Please try again.')
-      setDebugInfo(`Error: ${error}`)
+    } catch (err) {
+      console.error('💥 Sign-in exception:', err)
+      setError('Sign-in failed')
+      setDebugInfo(`Exception: ${err}`)
     } finally {
       setIsLoading(false)
     }

@@ -11,6 +11,11 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          scope: "openid email profile"
+        }
+      }
     }),
   ],
   callbacks: {
@@ -23,7 +28,7 @@ export const authOptions: NextAuthOptions = {
       if (!user.email || !ALLOWED_ADMIN_EMAILS.includes(user.email)) {
         console.log(`🚫 Unauthorized login attempt from: ${user.email}`)
         console.log(`🚫 Allowed emails: ${JSON.stringify(ALLOWED_ADMIN_EMAILS)}`)
-        return '/admin/login?error=unauthorized'
+        return false
       }
       
       console.log(`✅ Authorized admin login: ${user.email}`)
@@ -73,7 +78,7 @@ export const authOptions: NextAuthOptions = {
       }
     }
   },
-  debug: false,
+  debug: true,
   secret: process.env.NEXTAUTH_SECRET,
 }
 
