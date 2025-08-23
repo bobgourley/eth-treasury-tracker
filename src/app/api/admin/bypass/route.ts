@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       redirectUrl: '/admin'
     })
     
-    response.cookies.set('admin-bypass-session', JSON.stringify({
+    response.cookies.set('admin-bypass', JSON.stringify({
       email: email,
       isAdmin: true,
       expires: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
@@ -31,7 +31,8 @@ export async function POST(request: Request) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 24 * 60 * 60 // 24 hours
+      maxAge: 24 * 60 * 60, // 24 hours
+      path: '/'
     })
     
     return response
