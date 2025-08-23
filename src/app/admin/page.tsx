@@ -58,17 +58,25 @@ export default function AdminPage() {
   }, [session, status, router, bypassSession, isCheckingBypass])
 
   const handleLogout = async () => {
-    // Clear bypass session if it exists
-    if (bypassSession?.isAdmin) {
-      try {
+    try {
+      // Clear bypass session if it exists
+      if (bypassSession?.isAdmin) {
         await fetch('/api/admin/bypass-logout', { method: 'POST' })
-      } catch (error) {
-        console.error('Failed to clear bypass session:', error)
+        console.log('Bypass session cleared')
       }
+      
+      // Sign out of OAuth session (if exists)
+      if (session?.user) {
+        await signOut({ callbackUrl: '/admin/login' })
+      } else {
+        // If only bypass session, redirect manually
+        window.location.href = '/admin/login'
+      }
+    } catch (error) {
+      console.error('Logout error:', error)
+      // Force redirect on error
+      window.location.href = '/admin/login'
     }
-    
-    // Sign out of OAuth session
-    await signOut({ callbackUrl: '/admin/login' })
   }
 
   if (status === 'loading' || isCheckingBypass) {
