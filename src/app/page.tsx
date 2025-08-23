@@ -1,6 +1,4 @@
-'use client'
-
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import FuturisticLayout from '@/components/FuturisticLayout'
 import FuturisticCard, { MetricDisplay, DataList } from '@/components/FuturisticCard'
 import { FuturisticBadge } from '@/components/FuturisticUI'
@@ -38,86 +36,53 @@ interface NewsArticle {
   ticker?: string
 }
 
-export default function Home() {
-  const [companies, setCompanies] = useState<Company[]>([])
-  const [etfs, setEtfs] = useState<Etf[]>([])
-  const [news, setNews] = useState<NewsArticle[]>([])
-  const [ethPrice, setEthPrice] = useState<number>(3500)
-  const [ethSupply, setEthSupply] = useState<number>(120709652)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+interface HomePageData {
+  companies: Company[]
+  etfs: Etf[]
+  news: NewsArticle[]
+  ethPrice: number
+  ethSupply: number
+}
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true)
-        
-        // Fetch data from API endpoints - SAME AS DASHBOARD
-        const [companiesResponse, etfsResponse, newsResponse, metricsResponse] = await Promise.all([
-          fetch('/api/companies'),
-          fetch('/api/etfs'),
-          fetch('/api/news'),
-          fetch('/api/metrics')
-        ])
-        
-        if (companiesResponse.ok) {
-          const companiesData = await companiesResponse.json()
-          setCompanies(companiesData.companies || [])
-        }
-        
-        if (etfsResponse.ok) {
-          const etfsData = await etfsResponse.json()
-          setEtfs(etfsData.etfs || [])
-        }
-        
-        if (newsResponse.ok) {
-          const newsData = await newsResponse.json()
-          setNews(newsData.articles?.slice(0, 3) || [])
-        }
-        
-        if (metricsResponse.ok) {
-          const metricsData = await metricsResponse.json()
-          console.log('📊 Homepage ETH price from /api/metrics:', metricsData.ethPrice)
-          setEthPrice(metricsData.ethPrice || 3500)
-          setEthSupply(metricsData.totalEthSupply || metricsData.ethSupply || 120709652)
-        }
-        
-        setError(null)
-      } catch (err) {
-        console.error('Error fetching homepage data:', err)
-        setError('Failed to load data')
-      } finally {
-        setLoading(false)
-      }
+async function getHomePageData(): Promise<HomePageData> {
+  try {
+    // Fetch data from API endpoints on the server
+    const [companiesResponse, etfsResponse, newsResponse, metricsResponse] = await Promise.all([
+      fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/companies`, { cache: 'no-store' }),
+      fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/etfs`, { cache: 'no-store' }),
+      fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/news`, { cache: 'no-store' }),
+      fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/metrics`, { cache: 'no-store' })
+    ])
+    
+    const [companiesData, etfsData, newsData, metricsData] = await Promise.all([
+      companiesResponse.ok ? companiesResponse.json() : { companies: [] },
+      etfsResponse.ok ? etfsResponse.json() : { etfs: [] },
+      newsResponse.ok ? newsResponse.json() : { articles: [] },
+      metricsResponse.ok ? metricsResponse.json() : { ethPrice: 3500, totalEthSupply: 120709652 }
+    ])
+
+    return {
+      companies: companiesData.companies || [],
+      etfs: etfsData.etfs || [],
+      news: newsData.articles?.slice(0, 3) || [],
+      ethPrice: metricsData.ethPrice || 3500,
+      ethSupply: metricsData.totalEthSupply || metricsData.ethSupply || 120709652
     }
-
-    fetchData()
-  }, [])
-
-  if (loading) {
-    return (
-      <FuturisticLayout title="Ethereum Ecosystem" showLiveIndicator={true}>
-        <FuturisticCard title="Loading..." icon="⏳">
-          <div className="text-center">
-            <p>Loading ecosystem data...</p>
-          </div>
-        </FuturisticCard>
-      </FuturisticLayout>
-    )
+  } catch (error) {
+    console.error('Error fetching homepage data:', error)
+    // Return fallback data
+    return {
+      companies: [],
+      etfs: [],
+      news: [],
+      ethPrice: 3500,
+      ethSupply: 120709652
+    }
   }
+}
 
-  if (error) {
-    return (
-      <FuturisticLayout title="Ethereum Ecosystem" showLiveIndicator={true}>
-        <FuturisticCard title="Error" icon="❌" variant="warning">
-          <div className="text-center">
-            <p>{error}</p>
-            <p className="text-sm mt-1">Please try refreshing the page</p>
-          </div>
-        </FuturisticCard>
-      </FuturisticLayout>
-    )
-  }
+export default async function Home() {
+  const { companies, etfs, news, ethPrice, ethSupply } = await getHomePageData()
 
   // Calculate totals and metrics
   const totalEthTracked = companies.reduce((sum: number, company: Company) => sum + (company.ethHoldings || 0), 0) + 
