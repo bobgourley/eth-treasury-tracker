@@ -15,16 +15,16 @@ const authOptions = {
     })
   ],
   callbacks: {
-    async signIn({ user }: any) {
+    async signIn({ user }: { user: { email?: string | null } }) {
       return ALLOWED_ADMIN_EMAILS.includes(user.email || '')
     },
-    async jwt({ token, user }: any) {
+    async jwt({ token, user }: { token: any; user?: { email?: string | null } }) {
       if (user) {
         token.isAdmin = ALLOWED_ADMIN_EMAILS.includes(user.email || '')
       }
       return token
     },
-    async session({ session, token }: any) {
+    async session({ session, token }: { session: any; token: any }) {
       if (session.user && token.isAdmin) {
         session.user.isAdmin = true
       }
