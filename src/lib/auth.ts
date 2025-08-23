@@ -25,13 +25,16 @@ export const authOptions: NextAuthOptions = {
       console.log('🔐 Sign-in attempt:', {
         email: user.email,
         provider: account?.provider,
-        allowedEmails: ALLOWED_ADMIN_EMAILS
+        allowedEmails: ALLOWED_ADMIN_EMAILS,
+        userObject: user,
+        accountObject: account
       })
       
       // Only allow sign-in for allowed admin emails
       if (!user.email || !ALLOWED_ADMIN_EMAILS.includes(user.email)) {
         console.log(`🚫 Unauthorized login attempt from: ${user.email}`)
-        return '/admin/login?error=AccessDenied'
+        console.log(`🚫 Allowed emails: ${JSON.stringify(ALLOWED_ADMIN_EMAILS)}`)
+        return false // Changed from redirect to false to prevent silent failures
       }
       
       console.log(`✅ Authorized admin login: ${user.email}`)
@@ -70,7 +73,7 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
     maxAge: 24 * 60 * 60, // 24 hours (increased from 4)
   },
-  debug: process.env.NODE_ENV === 'development',
+  debug: true, // Enable debug mode to see OAuth flow issues
   secret: process.env.NEXTAUTH_SECRET,
 }
 
