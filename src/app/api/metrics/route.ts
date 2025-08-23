@@ -15,9 +15,11 @@ interface CompanyData {
 export async function GET() {
   const prisma = new PrismaClient()
   try {
-    // Fetch live data from database
+    // Fetch live data from database with explicit connection
+    await prisma.$connect()
     
     const companies = await prisma.company.findMany({
+      where: { isActive: true },
       select: {
         id: true,
         ticker: true,
@@ -25,7 +27,8 @@ export async function GET() {
         ethHoldings: true,
         marketCap: true,
         isActive: true
-      }
+      },
+      orderBy: { ethHoldings: 'desc' }
     })
     
     await prisma.$disconnect()
@@ -86,12 +89,12 @@ export async function GET() {
     if (systemMetrics?.ethPrice) {
       ethPrice = systemMetrics.ethPrice
       ethPriceSource = 'database'
-      console.log(` ETH price from database: $${ethPrice}`)
+      console.log(`📊 ETH price from database: $${ethPrice}`)
     } else {
       // Only used if no DB record exists at all (first deployment)
       ethPrice = 3500
       ethPriceSource = 'fallback'
-      console.warn(' No ETH price found in database, using fallback')
+      console.warn('⚠️ No ETH price found in database, using fallback')
     }
     // Get ETH supply from database (stored by admin updates from Etherscan API)
     const ecosystemData = await prisma.ecosystemSummary.findFirst({
@@ -179,16 +182,33 @@ export async function GET() {
       console.log('Could not fetch live ETH supply in fallback mode, using static value')
     }
     
-    // Static fallback metrics for MVP (updated July 27, 2025 - matches current live data)
+    // Get current data from companies API to ensure consistency
+    let fallbackEthHoldings = 1131276.0
+    let fallbackMarketCap = '5442000000'
+    
+    try {
+      const companiesResponse = await fetch(`${process.env.NEXTAUTH_URL || 'https://ethereumlist.com'}/api/companies`)
+      if (companiesResponse.ok) {
+        const companiesData = await companiesResponse.json()
+        const companies = companiesData.companies || []
+        fallbackEthHoldings = companies.reduce((sum: number, company: any) => sum + (company.ethHoldings || 0), 0)
+        fallbackMarketCap = companies.reduce((sum: number, company: any) => sum + Number(company.marketCap || 0), 0).toString()
+        console.log(`📊 Using live companies data in fallback: ${fallbackEthHoldings} ETH from ${companies.length} companies`)
+      }
+    } catch (error) {
+      console.log('Could not fetch live companies data for fallback, using static values')
+    }
+    
+    // Static fallback metrics for MVP (updated with live data when possible)
     const fallbackMetrics = {
-      totalEthHoldings: 1131276.0, // Current sum from live companies API
-      totalEthValue: 1131276.0 * fallbackEthPrice, // ETH value at last known price
-      totalMarketCap: '5442000000', // Current sum from live companies API
+      totalEthHoldings: fallbackEthHoldings,
+      totalEthValue: fallbackEthHoldings * fallbackEthPrice,
+      totalMarketCap: fallbackMarketCap,
       ethPrice: fallbackEthPrice,
-      ethSupplyPercent: (1131276.0 / fallbackEthSupply) * 100,
+      ethSupplyPercent: (fallbackEthHoldings / fallbackEthSupply) * 100,
       totalEthSupply: fallbackEthSupply,
       ethSupplySource: fallbackEthSupplySource,
-      totalCompanies: 9, // Correct count of all 9 companies
+      totalCompanies: 9,
       lastUpdate: new Date(),
     }
     
