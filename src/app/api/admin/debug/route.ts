@@ -17,7 +17,12 @@ export async function GET() {
       nodeEnv: process.env.NODE_ENV,
       adminEmail: process.env.ADMIN_EMAIL ? 
         process.env.ADMIN_EMAIL.substring(0, 3) + '***@' + process.env.ADMIN_EMAIL.split('@')[1] : 
-        'not set'
+        'not set',
+      // Add more detailed checks
+      googleClientIdLength: process.env.GOOGLE_CLIENT_ID?.length || 0,
+      googleClientSecretLength: process.env.GOOGLE_CLIENT_SECRET?.length || 0,
+      nextAuthSecretLength: process.env.NEXTAUTH_SECRET?.length || 0,
+      googleClientIdPrefix: process.env.GOOGLE_CLIENT_ID?.substring(0, 10) + '...' || 'not set'
     }
 
     // Session analysis
@@ -66,6 +71,19 @@ export async function GET() {
     
     if (!session) {
       debugInfo.recommendations.push('No active session found - user needs to sign in')
+    }
+
+    // Add specific troubleshooting for OAuth flow
+    if (envCheck.googleClientIdLength < 50) {
+      debugInfo.recommendations.push('Google Client ID appears too short - check if complete')
+    }
+    
+    if (envCheck.googleClientSecretLength < 20) {
+      debugInfo.recommendations.push('Google Client Secret appears too short - check if complete')
+    }
+    
+    if (envCheck.nextAuthSecretLength < 32) {
+      debugInfo.recommendations.push('NEXTAUTH_SECRET should be at least 32 characters long')
     }
 
     return NextResponse.json(debugInfo, { status: 200 })
