@@ -11,20 +11,55 @@ export default function AdminPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'dashboard' | 'companies'>('dashboard')
+  const [bypassSession, setBypassSession] = useState<{ isAdmin: boolean; email?: string } | null>(null)
+  const [isCheckingBypass, setIsCheckingBypass] = useState(true)
+
+  // Check for bypass session
+  useEffect(() => {
+    const checkBypassSession = async () => {
+      try {
+        const response = await fetch('/api/admin/bypass-check')
+        if (response.ok) {
+          const data = await response.json()
+          setBypassSession(data)
+        }
+      } catch (error) {
+        console.error('Bypass session check failed:', error)
+      } finally {
+        setIsCheckingBypass(false)
+      }
+    }
+    
+    checkBypassSession()
+  }, [])
 
   useEffect(() => {
-    if (status === 'loading') return // Still loading
+    if (status === 'loading' || isCheckingBypass) return // Still loading
     
-    if (status === 'unauthenticated' || !session?.user?.isAdmin) {
+    // Check if user is authenticated via OAuth or bypass
+    const isOAuthAuthenticated = status === 'authenticated' && session?.user?.isAdmin
+    const isBypassAuthenticated = bypassSession?.isAdmin
+    
+    if (!isOAuthAuthenticated && !isBypassAuthenticated) {
       router.push('/admin/login')
     }
-  }, [session, status, router])
+  }, [session, status, router, bypassSession, isCheckingBypass])
 
   const handleLogout = async () => {
+    // Clear bypass session if it exists
+    if (bypassSession?.isAdmin) {
+      try {
+        await fetch('/api/admin/bypass-logout', { method: 'POST' })
+      } catch (error) {
+        console.error('Failed to clear bypass session:', error)
+      }
+    }
+    
+    // Sign out of OAuth session
     await signOut({ callbackUrl: '/admin/login' })
   }
 
-  if (status === 'loading') {
+  if (status === 'loading' || isCheckingBypass) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-lg">Loading...</div>
@@ -32,7 +67,11 @@ export default function AdminPage() {
     )
   }
 
-  if (status === 'unauthenticated' || !session?.user?.isAdmin) {
+  // Check if user is authenticated via OAuth or bypass
+  const isOAuthAuthenticated = status === 'authenticated' && session?.user?.isAdmin
+  const isBypassAuthenticated = bypassSession?.isAdmin
+  
+  if (!isOAuthAuthenticated && !isBypassAuthenticated) {
     return null // Will redirect to login via useEffect
   }
 
