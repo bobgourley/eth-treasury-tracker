@@ -15,7 +15,8 @@ export const authOptions: NextAuthOptions = {
         params: {
           prompt: "consent",
           access_type: "offline",
-          response_type: "code"
+          response_type: "code",
+          scope: "openid email profile"
         }
       }
     }),
@@ -72,6 +73,17 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
     maxAge: 24 * 60 * 60, // 24 hours (increased from 4)
+  },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    }
   },
   debug: true, // Enable debug mode to see OAuth flow issues
   secret: process.env.NEXTAUTH_SECRET,
