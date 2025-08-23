@@ -12,18 +12,31 @@ function AdminLoginContent() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    // Check for error parameters
-    const errorParam = searchParams.get('error')
-    if (errorParam === 'AccessDenied') {
-      setError('Access denied. Your email is not authorized for admin access.')
-    } else if (errorParam) {
-      setError(`Authentication error: ${errorParam}`)
+    // Check for OAuth debug info in localStorage
+    const oauthDebug = localStorage.getItem('oauth-debug')
+    if (oauthDebug) {
+      try {
+        const debugData = JSON.parse(oauthDebug)
+        console.log('🔍 OAuth Debug from localStorage:', debugData)
+        setDebugInfo(`OAuth Debug: ${JSON.stringify(debugData)}`)
+        // Clear after reading
+        localStorage.removeItem('oauth-debug')
+      } catch (e) {
+        console.log('Failed to parse oauth debug data')
+      }
     }
 
-    // Check if user is already logged in (OAuth or bypass)
+    // Check for error parameters
+    const errorParam = searchParams.get('error')
+    if (errorParam) {
+      setError(`Authentication error: ${errorParam}`)
+      setDebugInfo(`URL error parameter: ${errorParam}`)
+      console.log('❌ OAuth Error from URL:', errorParam)
+    }
+
+    // Check existing session
     const checkSession = async () => {
       try {
-        // Check OAuth session
         const session = await getSession()
         if (session?.user?.isAdmin) {
           setDebugInfo('OAuth session found, redirecting...')
@@ -58,41 +71,25 @@ function AdminLoginContent() {
       setDebugInfo('Starting Google sign-in...')
       console.log('🚀 Starting Google OAuth sign-in')
       
-      const result = await signIn('google', {
-        callbackUrl: '/admin',
-        redirect: true
-      })
+      // Store debug info in localStorage to persist across redirects
+      localStorage.setItem('oauth-debug', JSON.stringify({
+        timestamp: new Date().toISOString(),
+        step: 'starting-oauth',
+        url: window.location.href
+      }))
       
-      console.log('📋 Sign-in result:', result)
-      setDebugInfo(`Sign-in result: ${JSON.stringify(result)}`)
+      // Try direct redirect to Google OAuth
+      window.location.href = '/api/auth/signin/google?callbackUrl=' + encodeURIComponent('/admin')
       
-      if (result?.error) {
-        console.error('❌ Sign-in error:', result.error)
-        setError(`Sign-in failed: ${result.error}`)
-        setDebugInfo(`Error details: ${result.error}`)
-      } else if (result?.ok) {
-        console.log('✅ Sign-in successful, checking session...')
-        setDebugInfo('Sign-in successful, checking session...')
-        
-        // Wait a moment for session to be created
-        setTimeout(async () => {
-          const session = await getSession()
-          console.log('📋 Session after sign-in:', session)
-          setDebugInfo(`Session: ${JSON.stringify(session)}`)
-          
-          if (session?.user) {
-            console.log('✅ Session found, redirecting to admin')
-            router.push('/admin')
-          } else {
-            console.log('❌ No session found after sign-in')
-            setError('Session not created after sign-in')
-          }
-        }, 1000)
-      }
     } catch (err) {
       console.error('💥 Sign-in exception:', err)
       setError('Sign-in failed')
       setDebugInfo(`Exception: ${err}`)
+      localStorage.setItem('oauth-debug', JSON.stringify({
+        timestamp: new Date().toISOString(),
+        step: 'error',
+        error: err instanceof Error ? err.message : String(err)
+      }))
     } finally {
       setIsLoading(false)
     }
