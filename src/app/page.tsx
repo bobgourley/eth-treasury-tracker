@@ -7,7 +7,7 @@ import { DataList } from '../components/FuturisticCard'
 import GoogleNewsCard from '../components/GoogleNewsCard'
 import styles from '../styles/futuristic.module.css'
 import { fetchAllStaticData } from '@/lib/staticDataFetcher'
-import { FALLBACK_ETH_PRICE } from '@/lib/constants'
+import { FALLBACK_ETH_PRICE, FALLBACK_ETH_SUPPLY } from '@/lib/constants'
 import { getCryptoMarketData, getTotalEthSupply, getEthStakingData } from '../lib/api'
 import { PrismaClient } from '@prisma/client'
 
@@ -107,7 +107,7 @@ async function getHomePageData(): Promise<HomePageData> {
 
     // Fetch live crypto market data if system metrics are missing or stale
     let cryptoData = null
-    let ethSupply = 120000000 // fallback
+    let ethSupply = FALLBACK_ETH_SUPPLY // fallback
     let ethStaked = 32000000 // fallback
 
     try {
@@ -126,11 +126,11 @@ async function getHomePageData(): Promise<HomePageData> {
       companies: companiesResult,
       etfs: etfsResult,
       news: newsResult,
-      ethPrice: cryptoData?.ethPrice || systemMetrics?.ethPrice || FALLBACK_ETH_PRICE,
+      ethPrice: cryptoData?.ethPrice || systemMetrics?.ethPrice || 0,
       ethSupply: ethSupply,
-      bitcoinPrice: cryptoData?.bitcoinPrice || 95000,
+      bitcoinPrice: cryptoData?.bitcoinPrice || 0,
       bitcoinMarketCap: cryptoData?.bitcoinMarketCap || 1800000000000,
-      ethereumMarketCap: cryptoData?.ethMarketCap || 420000000000,
+      ethereumMarketCap: cryptoData?.ethMarketCap || 0,
       ethStaked: ethStaked
     }
   } catch (error) {
@@ -150,11 +150,11 @@ async function getHomePageData(): Promise<HomePageData> {
       companies: [],
       etfs: [],
       news: [],
-      ethPrice: fallbackMetrics?.ethPrice || FALLBACK_ETH_PRICE,
-      ethSupply: 120000000,
-      bitcoinPrice: 95000,
+      ethPrice: fallbackMetrics?.ethPrice || 0,
+      ethSupply: FALLBACK_ETH_SUPPLY,
+      bitcoinPrice: 0,
       bitcoinMarketCap: 1800000000000,
-      ethereumMarketCap: 420000000000,
+      ethereumMarketCap: 0,
       ethStaked: 32000000
     }
   }
