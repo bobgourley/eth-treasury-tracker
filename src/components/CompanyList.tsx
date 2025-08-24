@@ -63,45 +63,40 @@ export default function CompanyList() {
 
   return (
     <div className="space-y-6">
-      {/* Summary Stats */}
+      {/* Summary Stats - 6 Small Cards */}
       {metrics && (
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <div className="text-center">
-              <p className="text-2xl lg:text-3xl font-bold">{formatEthCompact(metrics.totalEthHoldings)}</p>
-              <p className="text-blue-100 text-sm">Total ETH Holdings</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl lg:text-3xl font-bold">
-                {metrics.totalEthValue ? formatNumber(metrics.totalEthValue) : 'N/A'}
-              </p>
-              <p className="text-blue-100 text-sm">Total ETH Value</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl lg:text-3xl font-bold">
-                {metrics.totalMarketCap ? formatNumber(metrics.totalMarketCap) : 'N/A'}
-              </p>
-              <p className="text-blue-100 text-sm">Total Market Cap</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl lg:text-3xl font-bold">
-                {metrics.ethPrice ? `$${metrics.ethPrice.toLocaleString()}` : 'N/A'}
-              </p>
-              <p className="text-blue-100 text-sm">ETH Price</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl lg:text-3xl font-bold">
-                {metrics.ethSupplyPercent ? `${metrics.ethSupplyPercent.toFixed(3)}%` : 'N/A'}
-              </p>
-              <p className="text-blue-100 text-sm">% of ETH Supply</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl lg:text-3xl font-bold">{metrics.totalCompanies}</p>
-              <p className="text-blue-100 text-sm">Companies Tracked</p>
-            </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+          <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-lg p-4 text-center">
+            <p className="text-2xl font-bold">{formatEthCompact(metrics.totalEthHoldings)}</p>
+            <p className="text-blue-100 text-sm">Total ETH Holdings</p>
           </div>
-          <div className="text-center mt-4 text-sm text-blue-100">
-            Last updated: {new Date(metrics.lastUpdate).toLocaleString()}
+          <div className="bg-gradient-to-br from-green-600 to-green-700 text-white rounded-lg p-4 text-center">
+            <p className="text-2xl font-bold">
+              {metrics.totalEthValue ? formatNumber(metrics.totalEthValue) : 'N/A'}
+            </p>
+            <p className="text-green-100 text-sm">Total ETH Value</p>
+          </div>
+          <div className="bg-gradient-to-br from-purple-600 to-purple-700 text-white rounded-lg p-4 text-center">
+            <p className="text-2xl font-bold">
+              {metrics.totalMarketCap ? formatNumber(metrics.totalMarketCap) : 'N/A'}
+            </p>
+            <p className="text-purple-100 text-sm">Total Market Cap</p>
+          </div>
+          <div className="bg-gradient-to-br from-orange-600 to-orange-700 text-white rounded-lg p-4 text-center">
+            <p className="text-2xl font-bold">
+              {metrics.ethPrice ? `$${metrics.ethPrice.toLocaleString()}` : 'N/A'}
+            </p>
+            <p className="text-orange-100 text-sm">ETH Price</p>
+          </div>
+          <div className="bg-gradient-to-br from-cyan-600 to-cyan-700 text-white rounded-lg p-4 text-center">
+            <p className="text-2xl font-bold">
+              {metrics.ethSupplyPercent ? `${metrics.ethSupplyPercent.toFixed(3)}%` : 'N/A'}
+            </p>
+            <p className="text-cyan-100 text-sm">% of ETH Supply</p>
+          </div>
+          <div className="bg-gradient-to-br from-indigo-600 to-indigo-700 text-white rounded-lg p-4 text-center">
+            <p className="text-2xl font-bold">{metrics.totalCompanies}</p>
+            <p className="text-indigo-100 text-sm">Companies Tracked</p>
           </div>
         </div>
       )}

@@ -476,6 +476,29 @@
   margin-top: 0.5rem;
 }
 
+/* Compact news styles for homepage */
+.compactNewsItem {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.compactNewsItem:last-child {
+  border-bottom: none;
+}
+
+.compactNewsLink {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  display: block;
+  transition: color 0.2s ease;
+}
+
+.compactNewsLink:hover {
+  color: var(--neon-cyan);
+}
+
 /* Enhanced Card Variants */
 .cardSmall {
   min-height: 120px;

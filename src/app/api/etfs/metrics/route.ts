@@ -40,41 +40,46 @@ export async function GET() {
       }).format(value)
     }
     
-    // Get current ETH price and supply
+    // Get current ETH price from database (consistent with other pages)
     let ethPrice = FALLBACK_ETH_PRICE // Fallback
     let ethSupply = FALLBACK_ETH_SUPPLY // Fallback ETH supply
     
     try {
-      const coinGeckoResponse = await fetch(
-        'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd',
-        { next: { revalidate: 300 } }
-      )
+      // Use database-first approach for consistency with other pages
+      const systemMetrics = await prisma.systemMetrics.findFirst({
+        orderBy: { lastUpdate: 'desc' }
+      })
       
-      if (coinGeckoResponse.ok) {
-        const coinGeckoData = await coinGeckoResponse.json()
-        if (coinGeckoData.ethereum?.usd) {
-          ethPrice = coinGeckoData.ethereum.usd
+      if (systemMetrics?.ethPrice) {
+        ethPrice = systemMetrics.ethPrice
+        console.log(`📊 ETF metrics using ETH price from database: $${ethPrice}`)
+      } else {
+        // Fallback to ecosystem summary table
+        const ecosystemSummary = await prisma.ecosystemSummary.findFirst({
+          orderBy: { lastUpdated: 'desc' }
+        })
+        if (ecosystemSummary?.ethPrice) {
+          ethPrice = ecosystemSummary.ethPrice
+          console.log(`📊 ETF metrics using ETH price from ecosystem: $${ethPrice}`)
         }
       }
     } catch {
-      console.log('⚠️ ETH price fetch failed, using fallback')
+      console.log('⚠️ ETH price fetch from database failed, using fallback')
     }
     
-    // Get live ETH supply from Etherscan
+    // Get ETH supply from database (consistent with other pages)
     try {
-      const etherscanResponse = await fetch(
-        `https://api.etherscan.io/api?module=stats&action=ethsupply&apikey=${process.env.ETHERSCAN_API_KEY}`,
-        { next: { revalidate: 86400 } } // Cache for 24 hours
-      )
+      const ecosystemData = await prisma.ecosystemSummary.findFirst({
+        orderBy: { lastUpdated: 'desc' },
+        select: { ethSupply: true }
+      })
       
-      if (etherscanResponse.ok) {
-        const etherscanData = await etherscanResponse.json()
-        if (etherscanData.status === '1' && etherscanData.result) {
-          ethSupply = parseFloat(etherscanData.result) / 1e18 // Convert from wei to ETH
-        }
+      if (ecosystemData?.ethSupply) {
+        ethSupply = ecosystemData.ethSupply
+        console.log(`📊 ETF metrics using ETH supply from database: ${ethSupply.toLocaleString()}`)
       }
     } catch {
-      console.log('⚠️ ETH supply fetch failed, using fallback')
+      console.log('⚠️ ETH supply fetch from database failed, using fallback')
     }
     
     const ethSupplyPercentage = (totalEthHeld / ethSupply) * 100

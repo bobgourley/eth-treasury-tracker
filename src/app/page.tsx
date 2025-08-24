@@ -79,7 +79,7 @@ async function getHomePageData(): Promise<HomePageData> {
     // Fetch news from Google News RSS API
     let newsResult = []
     try {
-      const newsResponse = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/news/google-rss?limit=6`, {
+      const newsResponse = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/news/google-rss?limit=5`, {
         next: { revalidate: 1800 } // Cache for 30 minutes
       })
       
@@ -93,7 +93,7 @@ async function getHomePageData(): Promise<HomePageData> {
       const dbNews = await prisma.newsArticle.findMany({
         where: { isActive: true },
         orderBy: { publishedAt: 'desc' },
-        take: 6
+        take: 5
       })
       newsResult = dbNews.map(article => ({
         title: article.title,

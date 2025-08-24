@@ -86,7 +86,7 @@ export async function GET() {
     // Convert BigInt to string for JSON serialization and add calculated values
     const serializedEtfs = etfs.map((etf) => ({
       ...etf,
-      aum: etf.aum?.toString(),
+      aum: etf.aum ? Number(etf.aum) : 0, // Keep as number for calculations
       totalValue: (etf.ethHoldings || 0) * ethPrice, // Recalculate with current ETH price
       lastUpdated: etf.lastUpdated.toISOString(),
       createdAt: etf.createdAt.toISOString(),

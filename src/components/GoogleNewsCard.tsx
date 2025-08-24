@@ -85,26 +85,41 @@ export default function GoogleNewsCard({
         {articles.length > 0 ? (
           articles.map((article, index) => (
             <div key={index} className={styles.newsItem}>
-              <h4>
-                <a 
-                  href={article.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className={styles.newsLink}
-                >
-                  {article.title}
-                </a>
-              </h4>
-              {!compact && article.description && (
-                <p className={styles.newsDescription}>
-                  {cleanDescription(article.description)}
-                </p>
-              )}
-              {!compact && (
-                <div className={styles.newsMetadata}>
-                  <span className={styles.newsSource}>{article.source.name}</span>
-                  <span className={styles.newsTime}>{formatTimeAgo(article.publishedAt)}</span>
+              {compact ? (
+                // Compact mode: title only with link
+                <div className={styles.compactNewsItem}>
+                  <a 
+                    href={article.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={styles.compactNewsLink}
+                  >
+                    {article.title}
+                  </a>
                 </div>
+              ) : (
+                // Full mode: title, description, metadata
+                <>
+                  <h4>
+                    <a 
+                      href={article.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={styles.newsLink}
+                    >
+                      {article.title}
+                    </a>
+                  </h4>
+                  {article.description && (
+                    <p className={styles.newsDescription}>
+                      {cleanDescription(article.description)}
+                    </p>
+                  )}
+                  <div className={styles.newsMetadata}>
+                    <span className={styles.newsSource}>{article.source.name}</span>
+                    <span className={styles.newsTime}>{formatTimeAgo(article.publishedAt)}</span>
+                  </div>
+                </>
               )}
             </div>
           ))
