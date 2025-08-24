@@ -86,7 +86,7 @@ export default function CardsPage() {
     fetchCardData()
   }, [])
 
-  const downloadCard = async (ref: React.RefObject<HTMLDivElement>, filename: string) => {
+  const downloadCard = async (ref: React.RefObject<HTMLDivElement | null>, filename: string) => {
     if (!ref.current) return
 
     try {
