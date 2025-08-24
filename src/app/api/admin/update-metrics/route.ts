@@ -32,7 +32,7 @@ export async function POST() {
     
     // Get ETH supply from database (updated by updateSystemMetrics function)
     const ecosystemData = await prisma.ecosystemSummary.findFirst({
-      orderBy: { lastUpdated: 'desc' },
+      orderBy: { id: 'desc' },
       select: { ethSupply: true }
     })
     const ethSupply = ecosystemData?.ethSupply || FALLBACK_ETH_SUPPLY // Fallback only if no database data
