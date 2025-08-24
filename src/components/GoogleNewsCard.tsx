@@ -49,6 +49,23 @@ export default function GoogleNewsCard({
     }
   }
 
+  const cleanDescription = (description: string) => {
+    if (!description) return ''
+    
+    // Remove HTML tags and decode HTML entities
+    const cleaned = description
+      .replace(/<[^>]*>/g, '') // Remove HTML tags
+      .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
+      .replace(/&amp;/g, '&') // Replace &amp; with &
+      .replace(/&lt;/g, '<') // Replace &lt; with <
+      .replace(/&gt;/g, '>') // Replace &gt; with >
+      .replace(/&quot;/g, '"') // Replace &quot; with "
+      .replace(/&#39;/g, "'") // Replace &#39; with '
+      .trim()
+    
+    return cleaned
+  }
+
   return (
     <FuturisticCard 
       title={title}
@@ -78,10 +95,12 @@ export default function GoogleNewsCard({
               </h4>
               {article.description && (
                 <p className={styles.newsDescription}>
-                  {article.description.length > 150 
-                    ? `${article.description.substring(0, 150)}...` 
-                    : article.description
-                  }
+                  {(() => {
+                    const cleaned = cleanDescription(article.description)
+                    return cleaned.length > 150 
+                      ? `${cleaned.substring(0, 150)}...` 
+                      : cleaned
+                  })()}
                 </p>
               )}
               <div className={styles.newsMetadata}>
