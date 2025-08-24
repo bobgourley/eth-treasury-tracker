@@ -58,7 +58,9 @@ export async function POST() {
       totalValue: number | null;
       aum: number | null;
       expenseRatio: number | null;
-      nav: number | null;
+      inceptionDate: Date | null;
+      description: string | null;
+      website: string | null;
       lastUpdated: Date;
       createdAt: Date;
       isActive: boolean;
@@ -109,7 +111,21 @@ export async function POST() {
           }
         })
         
-        updatedEtfs.push(etf)
+        updatedEtfs.push({
+          id: etf.id,
+          symbol: etf.symbol,
+          name: etf.name,
+          ethHoldings: etf.ethHoldings,
+          totalValue: etf.totalValue,
+          aum: etf.aum,
+          expenseRatio: etf.expenseRatio,
+          inceptionDate: (etf as any).inceptionDate || null,
+          description: (etf as any).description || null,
+          website: (etf as any).website || null,
+          lastUpdated: etf.lastUpdated,
+          createdAt: etf.createdAt,
+          isActive: etf.isActive
+        })
         console.log(`✅ ${symbol}: ${ethHoldings.toFixed(2)} ETH, $${totalValue.toLocaleString()}`)
         
       } catch (error: unknown) {
@@ -129,7 +145,6 @@ export async function POST() {
                 totalValue: 0,
                 aum: 0,
                 expenseRatio: 0.75,
-                nav: 100,
                 lastUpdated: new Date(),
                 isActive: true
               },
@@ -140,13 +155,26 @@ export async function POST() {
                 totalValue: 0,
                 aum: 0,
                 expenseRatio: 0.75,
-                nav: 100,
                 lastUpdated: new Date(),
                 createdAt: new Date(),
                 isActive: true
               }
             })
-            updatedEtfs.push(etf)
+            updatedEtfs.push({
+              id: etf.id,
+              symbol: etf.symbol,
+              name: etf.name,
+              ethHoldings: etf.ethHoldings,
+              totalValue: etf.totalValue,
+              aum: etf.aum,
+              expenseRatio: etf.expenseRatio,
+              inceptionDate: (etf as any).inceptionDate || null,
+              description: (etf as any).description || null,
+              website: (etf as any).website || null,
+              lastUpdated: etf.lastUpdated,
+              createdAt: etf.createdAt,
+              isActive: etf.isActive
+            })
           } catch (dbError) {
             console.error(`❌ Failed to create fallback record for ${symbol}:`, dbError)
           }
