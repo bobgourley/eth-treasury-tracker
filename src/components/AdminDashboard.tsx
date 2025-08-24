@@ -37,6 +37,8 @@ export default function AdminDashboard() {
   const [isUpdatingMarketCaps, setIsUpdatingMarketCaps] = useState(false)
   const [isMigrating, setIsMigrating] = useState(false)
   const [migrationStatus, setMigrationStatus] = useState<{success: boolean, message: string, error?: string} | null>(null)
+  const [isUpdatingEtfs, setIsUpdatingEtfs] = useState(false)
+  const [etfUpdateStatus, setEtfUpdateStatus] = useState<{success: boolean, message: string, error?: string} | null>(null)
   const [marketCapStatus, setMarketCapStatus] = useState<{
     success: boolean
     summary?: {
@@ -155,6 +157,32 @@ export default function AdminDashboard() {
     }
   }
 
+  const updateEtfData = async () => {
+    setIsUpdatingEtfs(true)
+    setEtfUpdateStatus(null)
+
+    try {
+      const response = await fetch('/api/etfs/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const result = await response.json()
+      setEtfUpdateStatus(result)
+    } catch (error) {
+      console.error('ETF update failed:', error)
+      setEtfUpdateStatus({
+        success: false,
+        message: 'Failed to update ETF data',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      })
+    } finally {
+      setIsUpdatingEtfs(false)
+    }
+  }
+
   const checkMarketCapStatus = async () => {
     try {
       const response = await fetch('/api/admin/update-market-caps', {
@@ -241,6 +269,44 @@ export default function AdminDashboard() {
               {migrationStatus.error && (
                 <p className="text-xs mt-2 font-mono bg-white bg-opacity-50 p-2 rounded">
                   {migrationStatus.error}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ETF Data Management */}
+        <div className="bg-blue-50 rounded-lg p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 ETF Data Management</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Populate the ETF tables with current Ethereum ETF data. Run this after the database migration to add ETF holdings data.
+            <br />
+            <span className="text-xs text-blue-600 font-medium">💡 This will fetch and store ETF data so the homepage shows correct totals.</span>
+          </p>
+          
+          <button
+            onClick={updateEtfData}
+            disabled={isUpdatingEtfs}
+            className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+              isUpdatingEtfs
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
+            }`}
+          >
+            {isUpdatingEtfs ? 'Updating ETF Data...' : 'Update ETF Data'}
+          </button>
+          
+          {etfUpdateStatus && (
+            <div className={`mt-4 p-4 rounded-lg ${
+              etfUpdateStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            }`}>
+              <p className="font-medium">
+                {etfUpdateStatus.success ? '✅ Success!' : '❌ Error'}
+              </p>
+              <p className="text-sm mt-1">{etfUpdateStatus.message}</p>
+              {etfUpdateStatus.error && (
+                <p className="text-xs mt-2 font-mono bg-white bg-opacity-50 p-2 rounded">
+                  {etfUpdateStatus.error}
                 </p>
               )}
             </div>
