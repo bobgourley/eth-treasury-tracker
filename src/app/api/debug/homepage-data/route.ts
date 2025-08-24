@@ -52,7 +52,7 @@ export async function GET() {
     const etfTotalEth = etfsResult.reduce((sum: number, etf) => sum + (etf.ethHoldings || 0), 0)
 
     // Convert BigInt values to numbers for JSON serialization
-    const serializeData = (data: any) => {
+    const serializeData = (data: unknown) => {
       return JSON.parse(JSON.stringify(data, (key, value) =>
         typeof value === 'bigint' ? Number(value) : value
       ))
