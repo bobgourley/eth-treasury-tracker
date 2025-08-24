@@ -45,8 +45,8 @@ export async function GET() {
       })
     ])
 
-    const companyTotalEth = companiesResult.reduce((sum: number, company: any) => sum + (company.ethHoldings || 0), 0)
-    const etfTotalEth = etfsResult.reduce((sum: number, etf: any) => sum + (etf.ethHoldings || 0), 0)
+    const companyTotalEth = companiesResult.reduce((sum: number, company) => sum + (company.ethHoldings || 0), 0)
+    const etfTotalEth = etfsResult.reduce((sum: number, etf) => sum + (etf.ethHoldings || 0), 0)
 
     return NextResponse.json({
       debug: {
