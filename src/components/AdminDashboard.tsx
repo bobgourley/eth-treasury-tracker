@@ -33,10 +33,10 @@ interface UpdateStatus {
 
 export default function AdminDashboard() {
   const [isUpdating, setIsUpdating] = useState(false)
-  const [updateStatus, setUpdateStatus] = useState<UpdateStatus | null>(null)
+  const [updateStatus, setUpdateStatus] = useState<string>('')
   const [isUpdatingMarketCaps, setIsUpdatingMarketCaps] = useState(false)
-  const [isUpdatingEtfs, setIsUpdatingEtfs] = useState(false)
-  const [etfUpdateStatus, setEtfUpdateStatus] = useState<{success: boolean, message: string, error?: string} | null>(null)
+  const [etfUpdateStatus, setEtfUpdateStatus] = useState<string>('')
+  const [newsUpdateStatus, setNewsUpdateStatus] = useState<string>('')
   const [marketCapStatus, setMarketCapStatus] = useState<{
     success: boolean
     summary?: {
