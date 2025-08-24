@@ -1,9 +1,36 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+import GoogleProvider from 'next-auth/providers/google'
+import type { NextAuthOptions } from 'next-auth'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
+
+// NextAuth configuration for server-side session validation
+const ALLOWED_ADMIN_EMAILS = process.env.ADMIN_EMAIL?.split(',') || []
+
+const authOptions: NextAuthOptions = {
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+  ],
+  callbacks: {
+    async session({ session, token }) {
+      if (session?.user?.email && ALLOWED_ADMIN_EMAILS.includes(session.user.email)) {
+        return session
+      }
+      return session
+    },
+    async jwt({ token, user }) {
+      return token
+    },
+  },
+  pages: {
+    signIn: '/admin',
+  },
+}
 
 export async function POST() {
   try {
