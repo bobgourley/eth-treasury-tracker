@@ -114,11 +114,15 @@ async function getHomePageData(): Promise<HomePageData> {
 export default async function Home() {
   const { companies, etfs, news, ethPrice, ethSupply, bitcoinPrice, bitcoinMarketCap, ethereumMarketCap } = await getHomePageData()
 
-  // Calculate totals and metrics
-  const totalEthTracked = companies.reduce((sum: number, company: Company) => sum + (company.ethHoldings || 0), 0) + 
-                          etfs.reduce((sum: number, etf: Etf) => sum + (etf.ethHoldings || 0), 0)
-  const totalValueUsd = totalEthTracked * ethPrice
-  const trackedPercentage = (totalEthTracked / ethSupply) * 100
+  // Calculate company totals
+  const companyTotalEth = companies.reduce((sum: number, company: Company) => sum + (company.ethHoldings || 0), 0)
+  const companyTotalValue = companyTotalEth * ethPrice
+  const companyPercentage = (companyTotalEth / ethSupply) * 100
+
+  // Calculate ETF totals
+  const etfTotalEth = etfs.reduce((sum: number, etf: Etf) => sum + (etf.ethHoldings || 0), 0)
+  const etfTotalValue = etfTotalEth * ethPrice
+  const etfPercentage = (etfTotalEth / ethSupply) * 100
 
   // Format data for display - show ALL companies and ETFs
   const allCompanies = companies.map((company: Company) => ({
@@ -132,11 +136,99 @@ export default async function Home() {
     value: `${((etf.ethHoldings || 0) / 1000).toFixed(0)}K ETH`
   }))
 
-  const recentNews = news.slice(0, 3)
-
   return (
     <FuturisticLayout title="Ethereum Ecosystem Overview" showLiveIndicator={true}>
-      {/* Companies and ETFs Grid - Moved to Top */}
+      {/* Top Wide Card - Market Overview */}
+      <div className={styles.cardGrid}>
+        <FuturisticCard title="Market Overview" icon="📊" size="wide">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '2rem' }}>
+            <MetricDisplay
+              value={`$${ethPrice.toFixed(2)}`}
+              label="ETH Price"
+              color="cyan"
+            />
+            <MetricDisplay
+              value={`$${bitcoinPrice.toLocaleString()}`}
+              label="BTC Price"
+              color="orange"
+            />
+            <MetricDisplay
+              value={`$${(ethereumMarketCap / 1000000000).toFixed(0)}B`}
+              label="ETH Market Cap"
+              color="blue"
+            />
+            <MetricDisplay
+              value={`$${(bitcoinMarketCap / 1000000000000).toFixed(2)}T`}
+              label="BTC Market Cap"
+              color="orange"
+            />
+            <MetricDisplay
+              value={(ethPrice / bitcoinPrice).toFixed(4)}
+              label="ETH-BTC Ratio"
+              color="green"
+            />
+          </div>
+        </FuturisticCard>
+      </div>
+
+      {/* Two Large Cards - Companies and ETFs */}
+      <div className={styles.cardGrid}>
+        <FuturisticCard 
+          title="ETH Strategy Companies" 
+          icon="🏢" 
+          size="large"
+          actions={
+            <Link href="/treasury-companies">
+              <FuturisticBadge variant="info">View All →</FuturisticBadge>
+            </Link>
+          }
+        >
+          <MetricDisplay 
+            value={`$${(companyTotalValue / 1000000000).toFixed(2)}B`} 
+            label="Total $" 
+            color="cyan"
+          />
+          <MetricDisplay 
+            value={`${(companyTotalEth / 1000000).toFixed(1)}M ETH`} 
+            label="Total ETH Held" 
+            color="green"
+          />
+          <MetricDisplay 
+            value={`${companyPercentage.toFixed(3)}%`} 
+            label="Percent ETH Held" 
+            color="blue"
+          />
+        </FuturisticCard>
+
+        <FuturisticCard 
+          title="ETH ETFs" 
+          icon="📈" 
+          size="large"
+          actions={
+            <Link href="/etfs">
+              <FuturisticBadge variant="info">View All →</FuturisticBadge>
+            </Link>
+          }
+        >
+          <MetricDisplay 
+            value={`$${(etfTotalValue / 1000000000).toFixed(2)}B`} 
+            label="Total $" 
+            color="cyan"
+          />
+          <MetricDisplay 
+            value={`${(etfTotalEth / 1000000).toFixed(1)}M ETH`} 
+            label="Total ETH Held" 
+            color="green"
+          />
+          <MetricDisplay 
+            value={`${etfPercentage.toFixed(3)}%`} 
+            label="Percent ETH Held" 
+            color="blue"
+          />
+        </FuturisticCard>
+      </div>
+
+      {/* Treasury Company and ETF Cards from Dashboard */}
       <div className={styles.cardGrid}>
         {/* Treasury Companies Summary */}
         <FuturisticCard 
@@ -149,20 +241,32 @@ export default async function Home() {
             </Link>
           }
         >
-          <MetricDisplay 
-            value={`${(companies.reduce((sum: number, c: Company) => sum + (c.ethHoldings || 0), 0) / 1000000).toFixed(1)}M ETH`} 
-            label="Total Holdings" 
-          />
-          <MetricDisplay 
-            value={`${companies.length}`} 
-            label="Companies" 
-          />
-          <DataList items={allCompanies} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+            <div>
+              <MetricDisplay
+                value={companies.length}
+                label="Active Companies"
+                color="cyan"
+              />
+              <MetricDisplay
+                value={`${(companyTotalEth / 1000000).toFixed(1)}M`}
+                label="Total ETH Holdings"
+                subtext={`$${(companyTotalValue / 1000000000).toFixed(2)}B value`}
+                color="green"
+              />
+            </div>
+            <div>
+              <h4 style={{ color: 'var(--text-secondary)', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                Top Holdings
+              </h4>
+              <DataList items={allCompanies} linkable={true} />
+            </div>
+          </div>
         </FuturisticCard>
 
-        {/* ETH ETF Summary */}
+        {/* Ethereum ETFs Summary */}
         <FuturisticCard 
-          title="ETH ETFs" 
+          title="Ethereum ETFs" 
           icon="📈" 
           size="large"
           actions={
@@ -171,113 +275,26 @@ export default async function Home() {
             </Link>
           }
         >
-          <MetricDisplay 
-            value={`${(etfs.reduce((sum: number, e: Etf) => sum + (e.ethHoldings || 0), 0) / 1000000).toFixed(1)}M ETH`} 
-            label="Total Holdings" 
-          />
-          <MetricDisplay 
-            value={`${etfs.length}`} 
-            label="ETFs" 
-          />
-          <DataList items={allEtfs} />
-        </FuturisticCard>
-      </div>
-
-      {/* Main Metrics Grid - Moved Below Lists */}
-      <div className={styles.cardGrid}>
-        {/* ETH Price Card */}
-        <FuturisticCard title="ETH Price" icon="💰">
-          <MetricDisplay
-            value={`$${ethPrice.toFixed(2)}`}
-            label="Current Price"
-            color="cyan"
-          />
-        </FuturisticCard>
-
-        {/* Total Supply Card */}
-        <FuturisticCard title="ETH Supply" icon="🔗">
-          <MetricDisplay
-            value={`${(ethSupply / 1000000).toFixed(1)}M`}
-            label="Total Supply"
-            color="blue"
-          />
-        </FuturisticCard>
-
-        {/* Tracked ETH Card */}
-        <FuturisticCard title="Tracked ETH" icon="📊">
-          <MetricDisplay
-            value={`${(totalEthTracked / 1000).toFixed(0)}K`}
-            label="Total Tracked"
-            subtext={`${trackedPercentage.toFixed(3)}% of supply`}
-            color="green"
-          />
-        </FuturisticCard>
-
-        {/* ETH and Treasury Reserves Card */}
-        <FuturisticCard title="ETH and Treasury Reserves" icon="💎">
-          <MetricDisplay
-            value={`$${(totalValueUsd / 1000000000).toFixed(2)}B`}
-            label="USD Value"
-            color="orange"
-          />
-        </FuturisticCard>
-
-        {/* Token Market Cap Card */}
-        <FuturisticCard title="Token Market Cap" icon="💰" size="large">
-          <MetricDisplay 
-            value={`$${(bitcoinMarketCap / 1000000000000).toFixed(2)}T`}
-            label="Bitcoin Market Cap" 
-            color="orange"
-          />
-          <MetricDisplay 
-            value={`$${(ethereumMarketCap / 1000000000).toFixed(0)}B`}
-            label="Ethereum Market Cap" 
-            color="blue"
-          />
-        </FuturisticCard>
-
-        {/* ETH-BTC Ratio */}
-        <FuturisticCard title="ETH-BTC" icon="⚖️" size="large">
-          <MetricDisplay 
-            value={(ethPrice / bitcoinPrice).toFixed(4)}
-            label="ETH/BTC Ratio" 
-            color="cyan"
-          />
-          <MetricDisplay 
-            value={`$${bitcoinPrice.toLocaleString()}`}
-            label="Bitcoin Price" 
-            color="orange"
-          />
-        </FuturisticCard>
-      </div>
-
-      {/* News and Updates */}
-      <div className={styles.cardGrid}>
-        <FuturisticCard 
-          title="Latest Ethereum News" 
-          icon="📰" 
-          size="wide"
-          actions={
-            <Link href="/news">
-              <FuturisticBadge variant="info">View All →</FuturisticBadge>
-            </Link>
-          }
-        >
-          <div className={styles.newsGrid}>
-            {recentNews.map((article: NewsArticle, index: number) => (
-              <div key={index} className={styles.newsItem}>
-                <h4>
-                  <a href={article.url} target="_blank" rel="noopener noreferrer">
-                    {article.title}
-                  </a>
-                </h4>
-                <p>{article.description}</p>
-                <div className={styles.newsMetadata}>
-                  <span>{typeof article.source === 'string' ? article.source : article.source.name}</span>
-                  <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
-                </div>
-              </div>
-            ))}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+            <div>
+              <MetricDisplay
+                value={etfs.length}
+                label="Active ETFs"
+                color="blue"
+              />
+              <MetricDisplay
+                value={`${(etfTotalEth / 1000000).toFixed(1)}M`}
+                label="Total ETH Holdings"
+                subtext={`$${(etfTotalValue / 1000000000).toFixed(1)}B value`}
+                color="orange"
+              />
+            </div>
+            <div>
+              <h4 style={{ color: 'var(--text-secondary)', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                Top ETF Holdings
+              </h4>
+              <DataList items={allEtfs} />
+            </div>
           </div>
         </FuturisticCard>
       </div>

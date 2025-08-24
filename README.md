@@ -774,6 +774,62 @@ The platform maintains strict data consistency through a database-first architec
 - [ ] **API Access**: Public API for developers and researchers
 - [ ] **Mobile App**: Native iOS/Android applications
 - [ ] **Email Alerts**: Notifications for significant holdings changes
+
+## 🎨 UI Design System & Layout
+
+### **Card Grid System**
+
+The website uses a flexible CSS Grid-based layout system for organizing content into modular cards:
+
+**Grid Layout:**
+- `cardGrid`: Auto-fit grid with minimum 300px columns, 1.5rem gap
+- Responsive breakpoints: 280px minimum on tablet, single column on mobile
+
+**Card Size Variants:**
+
+### Standard Cards
+- **Default card**: Single grid column (300px+ width)
+- **Small card** (`.cardSmall`): 120px minimum height
+- **Large card** (`.cardLarge`): Spans 2 grid columns
+- **Wide card** (`.cardWide`): Spans 3 grid columns  
+- **Full card** (`.cardFull`): Spans entire row (1 / -1)
+
+### Responsive Behavior
+- **Desktop (1024px+)**: 300px minimum columns, large/wide cards maintain spans
+- **Tablet (768-1024px)**: 280px minimum columns, large/wide cards collapse to single column
+- **Mobile (<768px)**: Single column layout, all cards full width
+
+**Layout Structure:**
+- **Sidebar**: 280px fixed width (240px on tablet, hidden on mobile)
+- **Main Content**: Flexible width with 280px left margin, 2rem padding
+
+**How to Describe Block Sizes:**
+
+You can reference cards using these terms:
+
+1. **"Standard card"** - Default single-column card
+2. **"Small card"** - Compact height variant
+3. **"Large card"** - Double-width card (2 columns)
+4. **"Wide card"** - Triple-width card (3 columns)
+5. **"Full-width card"** - Spans entire row
+6. **"Card grid"** - The container with auto-fit columns
+
+The system uses CSS Grid with `minmax(300px, 1fr)` for responsive behavior, so cards automatically adjust to screen size while maintaining minimum widths.
+
+### **CSS Classes Reference**
+
+```css
+.cardGrid          /* Main grid container */
+.card              /* Default single card */
+.cardSmall         /* Compact height card */
+.cardLarge         /* 2-column span card */
+.cardWide          /* 3-column span card */
+.cardFull          /* Full-width card */
+.cardHighlight     /* Highlighted border card */
+.cardWarning       /* Warning state card */
+.cardSuccess       /* Success state card */
+.cardInfo          /* Info state card */
+```
 - [ ] **Portfolio Tracking**: User accounts and portfolio management
 - [ ] **International Expansion**: Multi-language support and global companies
 
