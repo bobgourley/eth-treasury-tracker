@@ -120,10 +120,26 @@ export async function fetchEthereumNewsMultiTopic(limit: number = 15): Promise<G
             const cleanTitle = titleParts.length > 1 ? titleParts.slice(0, -1).join(' - ') : titleStr
             const source = titleParts.length > 1 ? titleParts[titleParts.length - 1] : 'Unknown'
             
+            // Clean up Google News redirect URLs
+            let cleanUrl = String(newsItem.link || '')
+            if (cleanUrl.includes('news.google.com')) {
+              // Extract the actual URL from Google News redirect
+              try {
+                const urlParams = new URLSearchParams(cleanUrl.split('?')[1])
+                const actualUrl = urlParams.get('url')
+                if (actualUrl) {
+                  cleanUrl = decodeURIComponent(actualUrl)
+                }
+              } catch (e) {
+                // If URL parsing fails, keep original URL
+                console.log('Could not parse Google News URL:', cleanUrl)
+              }
+            }
+
             return {
               title: cleanTitle || 'No title',
               description: String(newsItem.description || ''),
-              url: String(newsItem.link || ''),
+              url: cleanUrl,
               publishedAt: String(newsItem.pubDate || new Date().toISOString()),
               source: source,
               guid: String(newsItem.guid || newsItem.link || Math.random().toString())
