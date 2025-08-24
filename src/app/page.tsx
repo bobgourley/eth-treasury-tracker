@@ -1,6 +1,7 @@
 import React from 'react'
 import FuturisticLayout from '@/components/FuturisticLayout'
 import FuturisticCard, { MetricDisplay, DataList } from '@/components/FuturisticCard'
+import GoogleNewsCard from '@/components/GoogleNewsCard'
 import { FuturisticBadge } from '@/components/FuturisticUI'
 import Link from 'next/link'
 import styles from '@/styles/futuristic.module.css'
@@ -52,7 +53,7 @@ interface HomePageData {
 async function getHomePageData(): Promise<HomePageData> {
   try {
     // Fetch data from database
-    const [companiesResult, etfsResult, newsResult] = await Promise.all([
+    const [companiesResult, etfsResult] = await Promise.all([
       prisma.company.findMany({
         where: { ethHoldings: { gt: 0 } },
         orderBy: { ethHoldings: 'desc' }
@@ -60,12 +61,38 @@ async function getHomePageData(): Promise<HomePageData> {
       prisma.etf.findMany({
         where: { ethHoldings: { gt: 0 } },
         orderBy: { ethHoldings: 'desc' }
-      }),
-      prisma.newsArticle.findMany({
-        orderBy: { publishedAt: 'desc' },
-        take: 10
       })
     ])
+
+    // Fetch news from Google News RSS API
+    let newsResult = []
+    try {
+      const newsResponse = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/news/google-rss?limit=6`, {
+        next: { revalidate: 1800 } // Cache for 30 minutes
+      })
+      
+      if (newsResponse.ok) {
+        const newsData = await newsResponse.json()
+        newsResult = newsData.articles || []
+      }
+    } catch (error) {
+      console.error('Failed to fetch news from Google RSS:', error)
+      // Fallback to database news if API fails
+      const dbNews = await prisma.newsArticle.findMany({
+        where: { isActive: true },
+        orderBy: { publishedAt: 'desc' },
+        take: 6
+      })
+      newsResult = dbNews.map(article => ({
+        title: article.title,
+        description: article.description || '',
+        url: article.url,
+        publishedAt: article.publishedAt.toISOString(),
+        source: { name: article.sourceName },
+        company: article.company,
+        ticker: article.ticker
+      }))
+    }
 
     // Get latest system metrics
     const systemMetrics = await prisma.systemMetrics.findFirst({
@@ -75,12 +102,7 @@ async function getHomePageData(): Promise<HomePageData> {
     return {
       companies: companiesResult,
       etfs: etfsResult,
-      news: newsResult.map(article => ({
-        ...article,
-        source: { name: article.sourceName },
-        description: article.description || '',
-        publishedAt: article.publishedAt.toISOString()
-      })),
+      news: newsResult,
       ethPrice: systemMetrics?.ethPrice || 3500,
       ethSupply: 120000000, // Static for now
       bitcoinPrice: 95000, // Static for now
@@ -326,6 +348,11 @@ export default async function Home() {
             </div>
           </div>
         </FuturisticCard>
+      </div>
+
+      {/* News Section */}
+      <div className={styles.cardGrid}>
+        <GoogleNewsCard articles={news} />
       </div>
 
       {/* Footer */}
