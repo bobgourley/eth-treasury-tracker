@@ -32,6 +32,13 @@ export const metadata: Metadata = {
   authors: [{ name: "Ethereum Treasury Tracker" }],
   creator: "Ethereum Treasury Tracker",
   publisher: "Ethereum Treasury Tracker",
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '32x32' }
+    ],
+    apple: '/favicon.svg'
+  },
   openGraph: {
     title: "Ethereum Treasury Companies - Corporate ETH Holdings",
     description: "Track publicly traded companies holding Ethereum in their corporate treasuries with real-time data and financial analysis.",
