@@ -166,6 +166,9 @@ async function getHomePageData(): Promise<HomePageData> {
   }
 }
 
+// Force revalidation every 5 minutes
+export const revalidate = 300
+
 export default async function Home() {
   const { companies, etfs, news, ethPrice, ethSupply, bitcoinPrice, bitcoinMarketCap, ethereumMarketCap, ethStaked } = await getHomePageData()
 
