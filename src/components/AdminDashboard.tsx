@@ -121,6 +121,60 @@ export default function AdminDashboard() {
     }
   }
 
+  const handleForceNewsUpdate = async () => {
+    setIsUpdating(true)
+    setUpdateStatus('')
+
+    try {
+      const response = await fetch('/api/admin/force-news-update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        setUpdateStatus(`News update completed: ${result.message}`)
+      } else {
+        setUpdateStatus(`News update failed: ${result.error || 'Unknown error'}`)
+      }
+    } catch (error) {
+      console.error('News update failed:', error)
+      setUpdateStatus(`News update failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setIsUpdating(false)
+    }
+  }
+
+  const handleForcePriceUpdate = async () => {
+    setIsUpdating(true)
+    setUpdateStatus('')
+
+    try {
+      const response = await fetch('/api/admin/force-price-update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        setUpdateStatus(`Price update completed: ETH $${result.data.ethPrice}, BTC $${result.data.btcPrice}`)
+      } else {
+        setUpdateStatus(`Price update failed: ${result.error || 'Unknown error'}`)
+      }
+    } catch (error) {
+      console.error('Price update failed:', error)
+      setUpdateStatus(`Price update failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setIsUpdating(false)
+    }
+  }
+
 
   const updateEtfData = async () => {
     setIsUpdating(true)
@@ -211,6 +265,22 @@ export default function AdminDashboard() {
             <br />
             <span className="text-xs text-blue-600 font-medium">💡 This will fetch and store ETF data so the homepage shows correct totals.</span>
           </p>
+          
+          <button
+            onClick={handleForceNewsUpdate}
+            disabled={isUpdating}
+            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg transition-colors mr-3"
+          >
+            {isUpdating ? 'Updating...' : 'Force News Update'}
+          </button>
+          
+          <button
+            onClick={handleForcePriceUpdate}
+            disabled={isUpdating}
+            className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            {isUpdating ? 'Updating...' : 'Force Price Update'}
+          </button>
           
           <button
             onClick={updateEtfData}

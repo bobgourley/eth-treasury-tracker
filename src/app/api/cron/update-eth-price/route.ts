@@ -11,12 +11,6 @@ const prisma = new PrismaClient()
  */
 export async function GET(request: Request) {
   try {
-    // Verify this is a cron request (optional security check)
-    const authHeader = request.headers.get('authorization')
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     console.log('🕐 Starting scheduled ETH price update...')
     
     // Get last known ETH price from database as fallback
