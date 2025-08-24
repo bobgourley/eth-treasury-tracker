@@ -213,7 +213,11 @@ class RateLimiter {
     
     if (!check.allowed && check.waitTime) {
       console.warn(`⏳ Rate limited for ${apiName}: ${check.reason}. Waiting ${Math.ceil(check.waitTime / 1000)}s...`)
-      await new Promise(resolve => setTimeout(resolve, check.waitTime))
+      await new Promise<void>((resolve) => {
+        setTimeout(() => {
+          resolve()
+        }, check.waitTime)
+      })
     }
   }
 
@@ -263,11 +267,11 @@ export const rateLimiter = new RateLimiter()
 /**
  * Decorator function to wrap API calls with rate limiting
  */
-export function withRateLimit<T extends any[], R>(
+export function withRateLimit<T extends unknown[], R>(
   apiName: string,
   endpoint: string = 'default'
 ) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value
 
     descriptor.value = async function (...args: T): Promise<R> {
