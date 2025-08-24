@@ -61,11 +61,17 @@ async function getHomePageData(): Promise<HomePageData> {
     // Fetch data from database
     const [companiesResult, etfsResult] = await Promise.all([
       prisma.company.findMany({
-        where: { ethHoldings: { gt: 0 } },
+        where: { 
+          isActive: true,
+          ethHoldings: { not: null }
+        },
         orderBy: { ethHoldings: 'desc' }
       }),
       prisma.etf.findMany({
-        where: { ethHoldings: { gt: 0 } },
+        where: { 
+          isActive: true,
+          ethHoldings: { not: null }
+        },
         orderBy: { ethHoldings: 'desc' }
       })
     ])
