@@ -71,17 +71,9 @@ export default function AdminDashboard() {
       })
 
       const result = await response.json()
-      setUpdateStatus({
-        success: result.success,
-        message: result.message,
-        timestamp: result.timestamp || new Date().toISOString()
-      })
+      setUpdateStatus(result.message || 'Data update completed successfully')
     } catch (error) {
-      setUpdateStatus({
-        success: false,
-        message: 'Failed to trigger data update',
-        timestamp: new Date().toISOString()
-      })
+      setUpdateStatus('Failed to trigger data update')
     } finally {
       setIsUpdating(false)
     }
