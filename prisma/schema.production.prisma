@@ -1,0 +1,174 @@
+// Ethereum Treasury Tracker Database Schema - Production (PostgreSQL)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id                  Int      @id @default(autoincrement())
+  name                String
+  ticker              String? @unique
+  website             String?  @map("website")
+  ethHoldings         Float?   @map("eth_holdings")
+  ethAddress          String?  // Ethereum address for live tracking
+  ethAddresses        String?  @map("eth_addresses") // JSON array of addresses
+  marketCap           BigInt?  @map("market_cap")
+  sharesOutstanding   BigInt?  @map("shares_outstanding")
+  stockPrice          Float?   @map("stock_price")
+  ethPerShare         Float?   @map("eth_per_share")
+  mnavRatio           Float?   @map("mnav_ratio")
+  stakingYield        Float?   @map("staking_yield")
+  yieldSources        String?  @map("yield_sources")
+  capitalStructure    String?  @map("capital_structure")
+  fundingSources      String?  @map("funding_sources")
+  lastUpdated         DateTime @default(now()) @map("last_updated")
+  createdAt           DateTime @default(now()) @map("created_at")
+  isActive            Boolean  @default(true) @map("is_active")
+
+  @@map("companies")
+}
+
+model SystemMetrics {
+  id                 Int      @id @default(autoincrement())
+  totalEthHoldings   Float    @map("total_eth_holdings")
+  totalCompanies     Int      @map("total_companies")
+  ethPrice           Float?   @map("eth_price")
+  totalEthValue      Float?   @map("total_eth_value")
+  totalMarketCap     Float?   @map("total_market_cap")
+  ethSupplyPercent   Float?   @map("eth_supply_percent")
+  lastUpdate         DateTime @default(now()) @map("last_update")
+  lastStockUpdate    DateTime? @map("last_stock_update")
+
+  @@map("system_metrics")
+}
+
+model DailySnapshot {
+  id                 Int      @id @default(autoincrement())
+  date               DateTime @unique @map("snapshot_date") // Date of the snapshot (YYYY-MM-DD)
+  totalEthHoldings   Float    @map("total_eth_holdings")    // Sum of all companies' ETH holdings
+  totalEthValue      Float?   @map("total_eth_value")       // Total USD value of ETH holdings
+  totalMarketCap     Float?   @map("total_market_cap")      // Sum of all companies' market caps
+  ethPrice           Float?   @map("eth_price")             // ETH price at snapshot time
+  ethSupplyPercent   Float?   @map("eth_supply_percent")    // Percentage of total ETH supply held
+  totalCompanies     Int      @map("total_companies")       // Number of active companies
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@map("daily_snapshots")
+}
+
+model Etf {
+  id                  Int      @id @default(autoincrement())
+  name                String
+  ticker              String   @unique
+  ethHoldings         Float    @map("eth_holdings")
+  aum                 Float?   // Assets Under Management in USD
+  expenseRatio        Float?   @map("expense_ratio")
+  inceptionDate       DateTime? @map("inception_date")
+  description         String?
+  website             String?
+  lastUpdated         DateTime @default(now()) @map("last_updated")
+  createdAt           DateTime @default(now()) @map("created_at")
+  isActive            Boolean  @default(true) @map("is_active")
+
+  @@map("etfs")
+}
+
+model EtfMetrics {
+  id                 Int      @id @default(autoincrement())
+  totalEthHoldings   Float    @map("total_eth_holdings")
+  totalAum           Float?   @map("total_aum")
+  totalEtfs          Int      @map("total_etfs")
+  ethPrice           Float?   @map("eth_price")
+  totalEthValue      Float?   @map("total_eth_value")
+  ethSupplyPercent   Float?   @map("eth_supply_percent")
+  lastUpdate         DateTime @default(now()) @map("last_update")
+
+  @@map("etf_metrics")
+}
+
+model NewsArticle {
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String?
+  url          String   @unique
+  publishedAt  DateTime @map("published_at")
+  sourceName   String   @map("source_name")
+  company      String?  // Related company name
+  ticker       String?  // Related company ticker
+  createdAt    DateTime @default(now()) @map("created_at")
+  isActive     Boolean  @default(true) @map("is_active")
+
+  @@map("news_articles")
+}
+
+model EcosystemSummary {
+  id                    Int      @id @default(autoincrement())
+  totalEthHoldings      Float    @map("total_eth_holdings")
+  totalCompanies        Int      @map("total_companies")
+  totalEtfs             Int      @map("total_etfs")
+  totalMarketCap        Float?   @map("total_market_cap")
+  totalAum              Float?   @map("total_aum")
+  ethPrice              Float?   @map("eth_price")
+  ethSupplyPercent      Float?   @map("eth_supply_percent")
+  lastUpdate            DateTime @default(now()) @map("last_update")
+
+  @@map("ecosystem_summaries")
+}
+
+// NextAuth.js models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  isAdmin       Boolean   @default(false) @map("is_admin")
+  accounts      Account[]
+  sessions      Session[]
+
+  @@map("users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
