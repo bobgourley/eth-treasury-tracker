@@ -138,36 +138,54 @@ export default async function Home() {
 
   return (
     <FuturisticLayout title="Ethereum Ecosystem Overview" showLiveIndicator={true}>
-      {/* Top Wide Card - Market Overview */}
+      {/* Top 6 Small Cards - Market Overview */}
       <div className={styles.cardGrid}>
-        <FuturisticCard title="Market Overview" icon="📊" size="wide">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '2rem' }}>
-            <MetricDisplay
-              value={`$${ethPrice.toFixed(2)}`}
-              label="ETH Price"
-              color="cyan"
-            />
-            <MetricDisplay
-              value={`$${bitcoinPrice.toLocaleString()}`}
-              label="BTC Price"
-              color="orange"
-            />
-            <MetricDisplay
-              value={`$${(ethereumMarketCap / 1000000000).toFixed(0)}B`}
-              label="ETH Market Cap"
-              color="blue"
-            />
-            <MetricDisplay
-              value={`$${(bitcoinMarketCap / 1000000000000).toFixed(2)}T`}
-              label="BTC Market Cap"
-              color="orange"
-            />
-            <MetricDisplay
-              value={(ethPrice / bitcoinPrice).toFixed(4)}
-              label="ETH-BTC Ratio"
-              color="green"
-            />
-          </div>
+        <FuturisticCard title="ETH Price" icon="💰" size="small">
+          <MetricDisplay
+            value={`$${ethPrice.toFixed(2)}`}
+            label="Current Price"
+            color="cyan"
+          />
+        </FuturisticCard>
+
+        <FuturisticCard title="BTC Price" icon="₿" size="small">
+          <MetricDisplay
+            value={`$${bitcoinPrice.toLocaleString()}`}
+            label="Current Price"
+            color="orange"
+          />
+        </FuturisticCard>
+
+        <FuturisticCard title="ETH Market Cap" icon="📊" size="small">
+          <MetricDisplay
+            value={`$${(ethereumMarketCap / 1000000000).toFixed(0)}B`}
+            label="Market Cap"
+            color="blue"
+          />
+        </FuturisticCard>
+
+        <FuturisticCard title="BTC Market Cap" icon="📈" size="small">
+          <MetricDisplay
+            value={`$${(bitcoinMarketCap / 1000000000000).toFixed(2)}T`}
+            label="Market Cap"
+            color="orange"
+          />
+        </FuturisticCard>
+
+        <FuturisticCard title="ETH-BTC Ratio" icon="⚖️" size="small">
+          <MetricDisplay
+            value={(ethPrice / bitcoinPrice).toFixed(4)}
+            label="Price Ratio"
+            color="green"
+          />
+        </FuturisticCard>
+
+        <FuturisticCard title="Total ETH Supply" icon="🔗" size="small">
+          <MetricDisplay
+            value={`${(ethSupply / 1000000).toFixed(1)}M`}
+            label="Total Supply"
+            color="blue"
+          />
         </FuturisticCard>
       </div>
 
