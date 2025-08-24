@@ -108,14 +108,19 @@ model NewsArticle {
 
 model EcosystemSummary {
   id                    Int      @id @default(autoincrement())
-  totalEthHoldings      Float    @map("total_eth_holdings")
-  totalCompanies        Int      @map("total_companies")
-  totalEtfs             Int      @map("total_etfs")
-  totalMarketCap        Float?   @map("total_market_cap")
-  totalAum              Float?   @map("total_aum")
-  ethPrice              Float?   @map("eth_price")
-  ethSupplyPercent      Float?   @map("eth_supply_percent")
-  lastUpdate            DateTime @default(now()) @map("last_update")
+  ethPrice              Float    @map("eth_price")
+  ethSupply             Float    @map("eth_supply")
+  totalTrackedEth       Float    @map("total_tracked_eth")
+  totalTrackedPercentage Float   @map("total_tracked_percentage")
+  companyCount          Int      @map("company_count")
+  companyTotalEth       Float    @map("company_total_eth")
+  companyTotalValue     Float    @map("company_total_value")
+  companyPercentage     Float    @map("company_percentage")
+  etfCount              Int      @map("etf_count")
+  etfTotalEth           Float    @map("etf_total_eth")
+  etfTotalValue         Float    @map("etf_total_value")
+  etfPercentage         Float    @map("etf_percentage")
+  lastUpdated           DateTime @default(now()) @map("last_updated")
 
   @@map("ecosystem_summaries")
 }
