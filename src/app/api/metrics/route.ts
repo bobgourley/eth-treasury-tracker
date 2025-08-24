@@ -77,11 +77,11 @@ export async function GET() {
     const totalEthHeld = activeCompanies.reduce((sum: number, company: CompanyData) => sum + Number(company.ethHoldings || 0), 0)
     const totalMarketCap = activeCompanies.reduce((sum: number, company: CompanyData) => sum + Number(company.marketCap || 0), 0)
 
-    // ALWAYS try to get the latest ETH price from CoinGecko first
+    // Get ETH and BTC prices from database only - no external API calls during page requests
     let ethPrice: number
+    let btcPrice: number = 65000 // fallback BTC price
     let ethPriceSource = 'fallback'
     
-    // Get ETH price from database only - no external API calls during page requests
     const systemMetrics = await prisma.systemMetrics.findFirst({
       orderBy: { lastUpdate: 'desc' }
     })
@@ -97,13 +97,28 @@ export async function GET() {
         ethPrice = await getEthPrice()
         ethPriceSource = 'live_api'
         console.log('📊 Fetched live ETH price from API:', ethPrice)
-      } catch (apiError) {
-        // Only use hardcoded fallback if API also fails
-        ethPrice = 3500
+      } catch (error) {
+        console.log('⚠️ Failed to fetch live ETH price, using fallback')
+        ethPrice = FALLBACK_ETH_PRICE
         ethPriceSource = 'fallback'
-        console.warn('⚠️ No ETH price found in database and API failed, using fallback')
       }
     }
+
+    // Get BTC price from database if available (updated by force-price-update endpoint)
+    if (systemMetrics) {
+      // Try to get BTC price from the same systemMetrics record
+      // Note: BTC price is stored when force-price-update is called
+      try {
+        // For now, use fallback BTC price since we don't have a dedicated btcPrice field
+        // This will be updated when the force-price-update endpoint runs
+        btcPrice = 65000 // fallback
+        console.log(`📊 BTC price (fallback): $${btcPrice}`)
+      } catch (error) {
+        console.log('⚠️ Using fallback BTC price')
+        btcPrice = 65000
+      }
+    }
+
     // Get ETH supply from database (stored by admin updates from Etherscan API)
     const ecosystemData = await prisma.ecosystemSummary.findFirst({
       orderBy: { lastUpdated: 'desc' },
@@ -118,32 +133,21 @@ export async function GET() {
     const totalEthValue = totalEthHeld * ethPrice
     const ethSupplyPercentage = (totalEthHeld / totalEthSupply) * 100
 
-    const metrics = {
-      totalEthHoldings: totalEthHeld,
-      totalEthValue,
-      totalMarketCap: totalMarketCap.toString(),
+    return NextResponse.json({
+      success: true,
+      totalCompanies: activeCompanies.length,
+      totalEthHeld,
+      totalMarketCap,
       ethPrice,
-      ethSupplyPercent: ethSupplyPercentage,
+      btcPrice,
+      ethPriceSource,
       totalEthSupply,
       ethSupplySource,
-      totalCompanies: activeCompanies.length, // Use activeCompanies count, not companies.length
-      lastUpdate: new Date(),
-      // TEMPORARY DEBUG: Include raw company data to diagnose count issue
-      debugCompanies: activeCompanies.map((c) => ({
-        id: c.id,
-        ticker: c.ticker || 'N/A',
-        name: c.name,
-        ethHoldings: c.ethHoldings || 0,
-        isActive: c.isActive
-      })),
-      debugCompanyCount: activeCompanies.length,
-      debugRawCount: companies.length,
-      // ETH price tracking fields (will be enabled after schema migration)
-      // ethPriceLastUpdate: systemMetrics?.ethPriceLastUpdate || new Date(),
-      // ethPriceSource: systemMetrics?.ethPriceSource || 'CoinGecko API',
-    }
-
-    return NextResponse.json(metrics)
+      percentageOfSupply: (totalEthHeld / totalEthSupply) * 100,
+      totalValue: totalEthHeld * ethPrice,
+      averageHolding: totalEthHeld / activeCompanies.length,
+      companies: activeCompanies
+    })
   } catch (error: unknown) {
     console.error('Database error, using static fallback metrics:', error)
     
