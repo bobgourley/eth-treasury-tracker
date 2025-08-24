@@ -62,18 +62,19 @@ model DailySnapshot {
 }
 
 model Etf {
-  id                  Int      @id @default(autoincrement())
-  name                String
-  ticker              String   @unique
-  ethHoldings         Float    @map("eth_holdings")
-  aum                 Float?   // Assets Under Management in USD
-  expenseRatio        Float?   @map("expense_ratio")
-  inceptionDate       DateTime? @map("inception_date")
-  description         String?
-  website             String?
-  lastUpdated         DateTime @default(now()) @map("last_updated")
-  createdAt           DateTime @default(now()) @map("created_at")
-  isActive            Boolean  @default(true) @map("is_active")
+  id              Int      @id @default(autoincrement())
+  symbol          String   @unique
+  name            String?
+  ethHoldings     Float?   @map("eth_holdings")     // Number of ETH held by the ETF
+  totalValue      Float?   @map("total_value")      // ETH holdings * ETH price
+  aum             Float?   @map("assets_under_management") // Total AUM from API
+  expenseRatio    Float?   @map("expense_ratio")    // Annual expense ratio
+  inceptionDate   DateTime? @map("inception_date")
+  description     String?
+  website         String?
+  lastUpdated     DateTime @default(now()) @map("last_updated")
+  createdAt       DateTime @default(now()) @map("created_at")
+  isActive        Boolean  @default(true) @map("is_active")
 
   @@map("etfs")
 }
