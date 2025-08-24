@@ -66,7 +66,6 @@ export async function GET(request: NextRequest) {
             description: item.description,
             sourceName: item.source,
             publishedAt: new Date(item.publishedAt),
-            lastUpdated: new Date(),
             isActive: true
           },
           create: {
