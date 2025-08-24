@@ -93,7 +93,6 @@ export async function POST() {
             totalValue,
             aum,
             expenseRatio: etfInfo.expenseRatio,
-            nav,
             lastUpdated: new Date(),
             isActive: true
           },
@@ -104,7 +103,6 @@ export async function POST() {
             totalValue,
             aum,
             expenseRatio: etfInfo.expenseRatio,
-            nav,
             lastUpdated: new Date(),
             createdAt: new Date(),
             isActive: true
