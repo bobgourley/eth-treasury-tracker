@@ -88,13 +88,21 @@ async function getHomePageData(): Promise<HomePageData> {
           : 'https://ethereumlist.com'
       
       const response = await fetch(`${baseUrl}/api/news/google-rss?limit=5`, {
-        next: { revalidate: 1800 } // Revalidate every 30 minutes
+        next: { revalidate: 300 } // Revalidate every 5 minutes for fresh news
       })
+      
+      console.log(`📰 Homepage: API response status: ${response.status}`)
       
       if (response.ok) {
         const data = await response.json()
-        newsResult = data.articles || []
-        console.log(`📰 Homepage: Successfully fetched ${newsResult.length} news articles via API`)
+        if (data.success && data.articles && data.articles.length > 0) {
+          newsResult = data.articles
+          console.log(`📰 Homepage: Successfully fetched ${newsResult.length} real RSS articles`)
+          console.log(`📰 Homepage: First article URL: ${newsResult[0]?.url}`)
+        } else {
+          console.log('⚠️ Homepage: API returned no articles, using fallback news')
+          // Use fallback only if API returns no articles
+        }
       } else {
         console.log('⚠️ Homepage: API fetch failed, using fallback news')
         // Use same fallback URLs as news API for consistency
