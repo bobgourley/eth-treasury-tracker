@@ -102,7 +102,7 @@ async function getHomePageData(): Promise<HomePageData> {
           {
             title: "Ethereum ETFs See Record Inflows as Institutional Adoption Grows",
             description: "Major Ethereum ETFs report significant capital inflows as institutional investors increase their exposure to the second-largest cryptocurrency.",
-            url: "https://www.coindesk.com/markets/2024/08/24/ethereum-etfs-see-record-inflows/",
+            url: "https://www.coindesk.com/markets/ethereum/",
             publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
             source: { name: "CoinDesk" },
             company: null,
