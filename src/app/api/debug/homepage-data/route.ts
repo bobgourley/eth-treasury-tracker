@@ -5,6 +5,9 @@ const prisma = new PrismaClient()
 
 export async function GET() {
   try {
+    // Ensure database connection is established
+    await prisma.$connect()
+    console.log('✅ Database connected for debug endpoint')
     // Same queries as homepage
     const [companiesResult, etfsResult] = await Promise.all([
       prisma.company.findMany({
@@ -64,6 +67,12 @@ export async function GET() {
     })
   } catch (error) {
     console.error('Debug homepage data error:', error)
-    return NextResponse.json({ error: 'Failed to fetch debug data' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'Failed to fetch debug data',
+      details: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    }, { status: 500 })
+  } finally {
+    await prisma.$disconnect()
   }
 }
