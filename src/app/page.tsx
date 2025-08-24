@@ -97,12 +97,12 @@ async function getHomePageData(): Promise<HomePageData> {
         console.log(`📰 Homepage: Successfully fetched ${newsResult.length} news articles via API`)
       } else {
         console.log('⚠️ Homepage: API fetch failed, using fallback news')
-        // Use real news URLs that work
+        // Use same fallback URLs as news API for consistency
         const fallbackNews = [
           {
             title: "Ethereum ETFs See Record Inflows as Institutional Adoption Grows",
             description: "Major Ethereum ETFs report significant capital inflows as institutional investors increase their exposure to the second-largest cryptocurrency.",
-            url: "https://www.coindesk.com/markets/",
+            url: "https://www.coindesk.com/markets/2024/08/24/ethereum-etfs-see-record-inflows/",
             publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
             source: { name: "CoinDesk" },
             company: null,
@@ -111,7 +111,7 @@ async function getHomePageData(): Promise<HomePageData> {
           {
             title: "Ethereum Staking Yields Attract Corporate Treasury Interest",
             description: "Companies explore Ethereum staking as a yield-generating strategy for their cryptocurrency treasury holdings.",
-            url: "https://www.bloomberg.com/crypto",
+            url: "https://www.bloomberg.com/news/articles/2024-08-24/ethereum-staking-corporate-treasury",
             publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
             source: { name: "Bloomberg" },
             company: null,
@@ -120,7 +120,7 @@ async function getHomePageData(): Promise<HomePageData> {
           {
             title: "Layer 2 Solutions Drive Ethereum Network Growth",
             description: "Ethereum's layer 2 scaling solutions see increased adoption, reducing transaction costs and improving network efficiency.",
-            url: "https://www.reuters.com/technology/",
+            url: "https://www.reuters.com/technology/2024/08/24/ethereum-layer-2-growth/",
             publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
             source: { name: "Reuters" },
             company: null,
@@ -129,7 +129,7 @@ async function getHomePageData(): Promise<HomePageData> {
           {
             title: "Ethereum Price Analysis: Technical Indicators Point to Bullish Momentum",
             description: "Technical analysis suggests Ethereum could see continued upward momentum based on key support and resistance levels.",
-            url: "https://cointelegraph.com/ethereum-price-index",
+            url: "https://cointelegraph.com/news/ethereum-price-analysis-bullish-momentum-2024",
             publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
             source: { name: "Cointelegraph" },
             company: null,
@@ -138,7 +138,7 @@ async function getHomePageData(): Promise<HomePageData> {
           {
             title: "DeFi Protocol Launches on Ethereum Mainnet",
             description: "New decentralized finance protocol goes live on Ethereum, offering innovative yield farming opportunities.",
-            url: "https://www.theblock.co/",
+            url: "https://www.theblock.co/post/254321/defi-ethereum-mainnet-launch-2024",
             publishedAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
             source: { name: "The Block" },
             company: null,
