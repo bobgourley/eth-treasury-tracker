@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { updateSystemMetrics } from '@/lib/dataFetcher'
 import { prisma } from '@/lib/db'
 import { formatNumber, formatEth } from '@/lib/utils'
-import { ETH_SUPPLY } from '@/lib/constants'
+import { FALLBACK_ETH_SUPPLY } from '@/lib/constants'
 
 export async function POST() {
   try {
@@ -35,7 +35,7 @@ export async function POST() {
       orderBy: { lastUpdated: 'desc' },
       select: { ethSupply: true }
     })
-    const ethSupply = ecosystemData?.ethSupply || ETH_SUPPLY // Fallback only if no database data
+    const ethSupply = ecosystemData?.ethSupply || FALLBACK_ETH_SUPPLY // Fallback only if no database data
     const ethSupplyPercent = ((totalEthHoldings / ethSupply) * 100).toFixed(3) + '%'
     
     return NextResponse.json({
