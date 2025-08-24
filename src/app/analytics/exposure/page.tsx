@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import CompanyLink from '@/components/CompanyLink'
-import Navigation from '@/components/Navigation'
+import FuturisticLayout from '@/components/FuturisticLayout'
+import FuturisticCard from '@/components/FuturisticCard'
 import { formatNumber, formatEth, formatPercentage } from '@/lib/utils'
+import styles from '@/styles/futuristic.module.css'
 
 interface ExposureData {
   id: number
@@ -108,186 +110,188 @@ export default function MarketCapWeightedExposure() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <FuturisticLayout title="Market Cap Weighted ETH Exposure" showLiveIndicator={true}>
+        <FuturisticCard title="Loading..." icon="⏳">
+          <div className="text-center">
+            <p>Loading exposure analysis...</p>
           </div>
-        </div>
-      </div>
+        </FuturisticCard>
+      </FuturisticLayout>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-12">
-            <div className="text-red-600 text-lg font-semibold">Error: {error}</div>
+      <FuturisticLayout title="Market Cap Weighted ETH Exposure" showLiveIndicator={true}>
+        <FuturisticCard title="Error" icon="❌" variant="warning">
+          <div className="text-center">
+            <p>{error}</p>
             <button 
               onClick={() => window.location.reload()} 
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md cursor-pointer transition-colors"
             >
               Retry
             </button>
           </div>
-        </div>
-      </div>
+        </FuturisticCard>
+      </FuturisticLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation title="Market Cap Weighted ETH Exposure" />
+    <FuturisticLayout title="Market Cap Weighted ETH Exposure" showLiveIndicator={true}>
+      <div className={styles.pageHeader}>
+        <div className={styles.pageTitle}>
+          <span>📊</span>
+          <span>Market Cap Weighted ETH Exposure</span>
+        </div>
+        <p className={styles.pageDescription}>
+          Market cap weighted analysis of ETH exposure and concentration risk across treasury companies
+        </p>
+      </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className={styles.cardGrid}>
         {/* Summary Stats */}
         {data && (
-          <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-8 rounded-lg mb-8">
-          <h1 className="text-3xl font-bold mb-4">Market Cap Weighted ETH Exposure</h1>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            <div className="text-center">
-              <div className="text-2xl font-bold">{formatPercentage(data.averageEthExposure)}</div>
-              <div className="text-sm opacity-90">Average ETH Exposure</div>
+          <FuturisticCard title="Market Overview" icon="📈" size="large">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 text-center">
+              <div>
+                <div className="text-2xl font-bold text-blue-400">{formatPercentage(data.averageEthExposure)}</div>
+                <div className="text-gray-400 text-sm">Average ETH Exposure</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-purple-400">Baselines</div>
+                <div className="text-gray-400 text-sm">Market Analysis</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-green-400">{formatPercentage(data.topThreeConcentration)}</div>
+                <div className="text-gray-400 text-sm">Median ETCD</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-orange-400">{data.diversificationIndex.toFixed(1)}/10</div>
+                <div className="text-gray-400 text-sm">Diversification Index</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-cyan-400">${data.ethPrice.toLocaleString()}</div>
+                <div className="text-gray-400 text-sm">ETH Price</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">Baselines</div>
-              <div className="text-sm opacity-90">Market Analysis</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">{formatPercentage(data.topThreeConcentration)}</div>
-              <div className="text-sm opacity-90">Median ETCD</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">{data.diversificationIndex.toFixed(1)}/10</div>
-              <div className="text-sm opacity-90">Diversification Index</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold">${data.ethPrice.toLocaleString()}</div>
-              <div className="text-sm opacity-90">ETH Price</div>
-            </div>
-          </div>
-        </div>)}
+          </FuturisticCard>
+        )}
 
         {/* Market Analysis Cards */}
         {data && (
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Market Concentration</h3>
-              <div className="space-y-2">
+          <>
+            <FuturisticCard title="Market Concentration" icon="🎯">
+              <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Total Market Cap:</span>
-                  <span className="text-sm font-medium text-gray-900">{formatNumber(data.totalMarketCap)}</span>
+                  <span className="text-gray-400">Total Market Cap:</span>
+                  <span className="text-white font-medium">{formatNumber(data.totalMarketCap)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Total ETH Value:</span>
-                  <span className="text-sm font-medium text-gray-900">{formatNumber(data.totalEthValue)}</span>
+                  <span className="text-gray-400">Total ETH Value:</span>
+                  <span className="text-white font-medium">{formatNumber(data.totalEthValue)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">ETH/Market Ratio:</span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-gray-400">ETH/Market Ratio:</span>
+                  <span className="text-white font-medium">
                     {formatPercentage((data.totalEthValue / data.totalMarketCap) * 100)}
                   </span>
                 </div>
               </div>
-            </div>
+            </FuturisticCard>
 
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Baselines</h3>
-              <div className="space-y-2">
+            <FuturisticCard title="Baselines" icon="📏">
+              <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Median ECMC:</span>
-                  <span className="text-sm font-medium text-gray-900">{formatPercentage(data.averageEthExposure)}</span>
+                  <span className="text-gray-400">Median ECMC:</span>
+                  <span className="text-white font-medium">{formatPercentage(data.averageEthExposure)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Median ETCD:</span>
-                  <span className="text-sm font-medium text-gray-900">{formatPercentage(data.topThreeConcentration)}</span>
+                  <span className="text-gray-400">Median ETCD:</span>
+                  <span className="text-white font-medium">{formatPercentage(data.topThreeConcentration)}</span>
                 </div>
               </div>
-            </div>
+            </FuturisticCard>
 
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Diversification</h3>
-              <div className="space-y-2">
+            <FuturisticCard title="Diversification" icon="🌐">
+              <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Companies Tracked:</span>
-                  <span className="text-sm font-medium text-gray-900">{data.companies.length}</span>
+                  <span className="text-gray-400">Companies Tracked:</span>
+                  <span className="text-white font-medium">{data.companies.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Diversification Score:</span>
-                  <span className="text-sm font-medium text-gray-900">{data.diversificationIndex.toFixed(1)}/10</span>
+                  <span className="text-gray-400">Diversification Score:</span>
+                  <span className="text-white font-medium">{data.diversificationIndex.toFixed(1)}/10</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Current ETH Price:</span>
-                  <span className="text-sm font-medium text-gray-900">${data.ethPrice.toLocaleString()}</span>
+                  <span className="text-gray-400">Current ETH Price:</span>
+                  <span className="text-white font-medium">${data.ethPrice.toLocaleString()}</span>
                 </div>
               </div>
-            </div>
-          </div>
+            </FuturisticCard>
+          </>
         )}
 
         {/* Exposure Analysis Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Company Exposure Analysis</h2>
-            <p className="text-sm text-gray-600 mt-1">
-              Market cap weighted analysis of ETH exposure and concentration risk
-            </p>
-          </div>
-
+        <FuturisticCard title="Company Exposure Analysis" icon="🏢" size="large">
+          <p className="text-gray-400 text-sm mb-4">
+            Market cap weighted analysis of ETH exposure and concentration risk
+          </p>
+          
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
+              <thead>
+                <tr className="border-b border-gray-700">
                   <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50"
+                    className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:text-blue-400"
                     onClick={() => handleSort('etcdWeight')}
                   >
                     <div className="flex items-center space-x-1">
                       <span>ETCD</span>
                       {sortBy === 'etcdWeight' && (
-                        <span className="text-blue-500">
+                        <span className="text-blue-400">
                           {sortOrder === 'asc' ? '↑' : '↓'}
                         </span>
                       )}
                     </div>
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50"
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:text-blue-400"
                     onClick={() => handleSort('name')}
                   >
                     <div className="flex items-center space-x-1">
                       <span>Company</span>
                       {sortBy === 'name' && (
-                        <span className="text-blue-500">
+                        <span className="text-blue-400">
                           {sortOrder === 'asc' ? '↑' : '↓'}
                         </span>
                       )}
                     </div>
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
                     ETH Holdings
                   </th>
                   <th 
-                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50"
+                    className="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:text-blue-400"
                     onClick={() => handleSort('ethWeight')}
                   >
                     <div className="flex items-center justify-end space-x-1">
                       <span>ETH Weight</span>
                       {sortBy === 'ethWeight' && (
-                        <span className="text-blue-500">
+                        <span className="text-blue-400">
                           {sortOrder === 'asc' ? '↑' : '↓'}
                         </span>
                       )}
                     </div>
                   </th>
                   <th 
-                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-50"
+                    className="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:text-blue-400"
                     onClick={() => handleSort('ecmc')}
                   >
                     <div className="flex items-center justify-end space-x-1">
                       <span>ECMC</span>
                       {sortBy === 'ecmc' && (
-                        <span className="text-blue-500">
+                        <span className="text-blue-400">
                           {sortOrder === 'asc' ? '↑' : '↓'}
                         </span>
                       )}
@@ -295,41 +299,35 @@ export default function MarketCapWeightedExposure() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-700">
                 {sortedCompanies?.map((company) => {
                   return (
-                    <tr key={company.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {formatPercentage(company.etcdWeight)}
-                            </div>
+                    <tr key={company.id} className="hover:bg-gray-800/50">
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-blue-400">
+                          {formatPercentage(company.etcdWeight)}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div>
+                          <div className="text-sm font-medium text-white">
+                            <CompanyLink 
+                              ticker={company.ticker} 
+                              name={company.name}
+                            />
+                          </div>
+                          <div className="text-sm text-gray-400">
+                            {company.ticker}
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              <CompanyLink 
-                                ticker={company.ticker} 
-                                name={company.name}
-                              />
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {company.ticker}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-right text-sm text-gray-300">
                         {formatEth(company.ethHoldings)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-right text-sm text-gray-300">
                         {formatPercentage(company.ethExposureWeight)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-right text-sm text-gray-300">
                         {formatPercentage(company.ecmcPercentage)}
                       </td>
                     </tr>
@@ -338,43 +336,41 @@ export default function MarketCapWeightedExposure() {
               </tbody>
             </table>
           </div>
-        </div>
+        </FuturisticCard>
 
 
 
         {/* Explanatory Text */}
-        <div className="mt-12 bg-gray-50 rounded-lg p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Understanding the Metrics</h2>
-          
+        <FuturisticCard title="Understanding the Metrics" icon="📚" size="large">
           <div className="grid md:grid-cols-2 gap-8">
             <div>
-              <h3 className="text-lg font-semibold text-blue-600 mb-3">ECMC - ETH Component of Market Cap</h3>
-              <p className="text-gray-700 leading-relaxed">
-                ECMC measures what percentage of a company&apos;s market capitalization is represented by their ETH holdings. 
-                A higher ECMC indicates that ETH holdings make up a larger portion of the company&apos;s total value, 
-                showing how much the company&apos;s stock price is tied to ETH performance.
+              <h3 className="text-lg font-semibold text-blue-400 mb-3">ECMC - ETH Component of Market Cap</h3>
+              <p className="text-gray-300 leading-relaxed text-sm">
+                ECMC measures what percentage of a company's market capitalization is represented by their ETH holdings. 
+                A higher ECMC indicates that ETH holdings make up a larger portion of the company's total value, 
+                showing how much the company's stock price is tied to ETH performance.
               </p>
             </div>
             
             <div>
-              <h3 className="text-lg font-semibold text-purple-600 mb-3">ETCD - ETH Treasury Company Dominance</h3>
-              <p className="text-gray-700 leading-relaxed">
-                ETCD shows each company&apos;s relative size within the ETH treasury company ecosystem. 
+              <h3 className="text-lg font-semibold text-purple-400 mb-3">ETCD - ETH Treasury Company Dominance</h3>
+              <p className="text-gray-300 leading-relaxed text-sm">
+                ETCD shows each company's relative size within the ETH treasury company ecosystem. 
                 This metric helps identify which companies have the most influence in the space and 
                 how market dominance is distributed among ETH-holding public companies.
               </p>
             </div>
           </div>
           
-          <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-            <h4 className="font-semibold text-blue-800 mb-2">Baselines</h4>
-            <div className="grid md:grid-cols-2 gap-4 text-sm text-blue-700">
-              <div><strong>Median ECMC:</strong> The middle value of ETH components across all companies</div>
-              <div><strong>Median ETCD:</strong> The middle value of company dominance in the ETH treasury space</div>
+          <div className="mt-8 p-4 bg-blue-900/30 rounded-lg border border-blue-700/50">
+            <h4 className="font-semibold text-blue-400 mb-2">Baselines</h4>
+            <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-300">
+              <div><strong className="text-blue-400">Median ECMC:</strong> The middle value of ETH components across all companies</div>
+              <div><strong className="text-purple-400">Median ETCD:</strong> The middle value of company dominance in the ETH treasury space</div>
             </div>
           </div>
-        </div>
-      </main>
-    </div>
+        </FuturisticCard>
+      </div>
+    </FuturisticLayout>
   )
 }

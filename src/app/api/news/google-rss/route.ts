@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     if (newsItems.length === 0) {
       console.log('⚠️ No news from RSS, using fallback articles...')
       
-      // Return real working news URLs as fallback
+      // Return general Ethereum news URLs as fallback
       const fallbackNews = [
         {
           title: "Ethereum ETFs See Record Inflows as Institutional Adoption Grows",
@@ -27,11 +27,11 @@ export async function GET(request: NextRequest) {
           ticker: null
         },
         {
-          title: "Ethereum Staking Yields Attract Corporate Treasury Interest",
-          description: "Companies explore Ethereum staking as a yield-generating strategy for their cryptocurrency treasury holdings.",
-          url: "https://www.bloomberg.com/news/articles/2024-08-24/ethereum-staking-corporate-treasury",
+          title: "Ethereum Price Analysis: Technical Indicators Point to Bullish Momentum",
+          description: "Technical analysis suggests Ethereum could see continued upward momentum based on key support and resistance levels.",
+          url: "https://cointelegraph.com/news/ethereum-price-analysis-bullish-momentum-2024",
           publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-          source: { name: "Bloomberg" },
+          source: { name: "Cointelegraph" },
           company: null,
           ticker: null
         },
@@ -45,11 +45,11 @@ export async function GET(request: NextRequest) {
           ticker: null
         },
         {
-          title: "Ethereum Price Analysis: Technical Indicators Point to Bullish Momentum",
-          description: "Technical analysis suggests Ethereum could see continued upward momentum based on key support and resistance levels.",
-          url: "https://cointelegraph.com/news/ethereum-price-analysis-bullish-momentum-2024",
+          title: "Ethereum Staking Yields Attract Investor Interest",
+          description: "Ethereum staking continues to grow as investors seek yield-generating opportunities in the cryptocurrency market.",
+          url: "https://www.bloomberg.com/news/articles/2024/08/24/ethereum-staking-yields-investor-interest",
           publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
-          source: { name: "Cointelegraph" },
+          source: { name: "Bloomberg" },
           company: null,
           ticker: null
         },

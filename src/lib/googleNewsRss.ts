@@ -80,7 +80,8 @@ export async function fetchEthereumNewsMultiTopic(limit: number = 15): Promise<G
     'ethereum',
     'ethereum price',
     'ethereum ETF',
-    'ethereum staking'
+    'ethereum staking',
+    'ethereum news'
   ]
   
   try {

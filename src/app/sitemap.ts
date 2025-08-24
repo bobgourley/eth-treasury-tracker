@@ -32,6 +32,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.9,
       },
       {
+        url: `${baseUrl}/overview`,
+        lastModified: new Date(),
+        changeFrequency: 'daily', // Overview page updates daily with company data
+        priority: 0.9,
+      },
+      {
         url: `${baseUrl}/etfs`,
         lastModified: new Date(),
         changeFrequency: 'daily', // ETF data updates daily
@@ -112,6 +118,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${baseUrl}/treasury-companies`,
         lastModified: new Date(),
         changeFrequency: 'daily', // ETH Treasury page updates daily with new holdings data
+        priority: 0.9,
+      },
+      {
+        url: `${baseUrl}/overview`,
+        lastModified: new Date(),
+        changeFrequency: 'daily', // Overview page updates daily with company data
         priority: 0.9,
       },
       {

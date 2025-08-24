@@ -118,7 +118,7 @@ export default function AboutPage() {
           {/* Main Dashboard */}
           <div style={{ padding: '1.5rem', border: '1px solid var(--border-color)', borderRadius: '8px', backgroundColor: 'var(--card-bg)' }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-              <div style={{ marginRight: '1rem', fontSize: '1.5rem' }}>📊</div>
+              <div style={{ marginRight: '1rem', fontSize: '1.5rem' }}>🏠</div>
               <div>
                 <h4 style={{ color: 'var(--text-primary)', fontSize: '1.1rem', marginBottom: '0.25rem' }}>
                   <Link href="/" style={{ color: 'var(--neon-cyan)', textDecoration: 'none' }}>Main Dashboard</Link>
@@ -128,14 +128,48 @@ export default function AboutPage() {
             </div>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5' }}>
               Comprehensive overview of all tracked Ethereum treasury companies with total ETH holdings, 
-              current ETH price, market statistics, and sortable company data.
+              current ETH price, market statistics, sortable company data, and latest news updates.
+            </p>
+          </div>
+
+          {/* Company Overview */}
+          <div style={{ padding: '1.5rem', border: '1px solid var(--border-color)', borderRadius: '8px', backgroundColor: 'var(--card-bg)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+              <div style={{ marginRight: '1rem', fontSize: '1.5rem' }}>📋</div>
+              <div>
+                <h4 style={{ color: 'var(--text-primary)', fontSize: '1.1rem', marginBottom: '0.25rem' }}>
+                  <Link href="/overview" style={{ color: 'var(--neon-cyan)', textDecoration: 'none' }}>Company Overview</Link>
+                </h4>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Detailed company profiles and holdings</p>
+              </div>
+            </div>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5' }}>
+              Detailed view of all tracked companies with individual company pages, ETH holdings history, 
+              market cap data, and comprehensive financial metrics.
+            </p>
+          </div>
+
+          {/* ETFs Tracking */}
+          <div style={{ padding: '1.5rem', border: '1px solid var(--border-color)', borderRadius: '8px', backgroundColor: 'var(--card-bg)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+              <div style={{ marginRight: '1rem', fontSize: '1.5rem' }}>📈</div>
+              <div>
+                <h4 style={{ color: 'var(--text-primary)', fontSize: '1.1rem', marginBottom: '0.25rem' }}>
+                  <Link href="/etfs" style={{ color: 'var(--neon-cyan)', textDecoration: 'none' }}>Ethereum ETFs</Link>
+                </h4>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Track all major Ethereum ETF holdings</p>
+              </div>
+            </div>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5' }}>
+              Comprehensive tracking of Ethereum ETFs including ETHA, ETHE, FETH, ETH, ETHW, ETHV, EZET, CETH, and QETH 
+              with real-time holdings data, AUM calculations, and performance metrics.
             </p>
           </div>
 
           {/* Premium/Discount Analytics */}
           <div style={{ padding: '1.5rem', border: '1px solid var(--border-color)', borderRadius: '8px', backgroundColor: 'var(--card-bg)' }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-              <div style={{ marginRight: '1rem', fontSize: '1.5rem' }}>📈</div>
+              <div style={{ marginRight: '1rem', fontSize: '1.5rem' }}>📊</div>
               <div>
                 <h4 style={{ color: 'var(--text-primary)', fontSize: '1.1rem', marginBottom: '0.25rem' }}>
                   <Link href="/analytics/premium-discount" style={{ color: 'var(--neon-cyan)', textDecoration: 'none' }}>ETH Basis Analytics</Link>
@@ -149,10 +183,27 @@ export default function AboutPage() {
             </p>
           </div>
 
+          {/* Market Exposure Analytics */}
+          <div style={{ padding: '1.5rem', border: '1px solid var(--border-color)', borderRadius: '8px', backgroundColor: 'var(--card-bg)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+              <div style={{ marginRight: '1rem', fontSize: '1.5rem' }}>🎯</div>
+              <div>
+                <h4 style={{ color: 'var(--text-primary)', fontSize: '1.1rem', marginBottom: '0.25rem' }}>
+                  <Link href="/analytics/exposure" style={{ color: 'var(--neon-cyan)', textDecoration: 'none' }}>Market Exposure Analysis</Link>
+                </h4>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Market cap weighted ETH exposure and concentration risk</p>
+              </div>
+            </div>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5' }}>
+              Market cap weighted analysis of ETH exposure including ECMC (ETH Component of Market Cap) and 
+              ETCD (ETH Treasury Company Dominance) metrics with diversification scoring.
+            </p>
+          </div>
+
           {/* Charts Dashboard */}
           <div style={{ padding: '1.5rem', border: '1px solid var(--border-color)', borderRadius: '8px', backgroundColor: 'var(--card-bg)' }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-              <div style={{ marginRight: '1rem', fontSize: '1.5rem' }}>📊</div>
+              <div style={{ marginRight: '1rem', fontSize: '1.5rem' }}>📉</div>
               <div>
                 <h4 style={{ color: 'var(--text-primary)', fontSize: '1.1rem', marginBottom: '0.25rem' }}>
                   <Link href="/analytics/charts" style={{ color: 'var(--neon-cyan)', textDecoration: 'none' }}>Interactive Charts</Link>
@@ -179,7 +230,24 @@ export default function AboutPage() {
             </div>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5' }}>
               Curated news feed featuring the latest developments, announcements, and market updates 
-              related to companies holding Ethereum as treasury assets.
+              related to companies holding Ethereum as treasury assets from Google News RSS feeds.
+            </p>
+          </div>
+
+          {/* Shareable Cards */}
+          <div style={{ padding: '1.5rem', border: '1px solid var(--border-color)', borderRadius: '8px', backgroundColor: 'var(--card-bg)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+              <div style={{ marginRight: '1rem', fontSize: '1.5rem' }}>🎴</div>
+              <div>
+                <h4 style={{ color: 'var(--text-primary)', fontSize: '1.1rem', marginBottom: '0.25rem' }}>
+                  <Link href="/cards" style={{ color: 'var(--neon-cyan)', textDecoration: 'none' }}>Shareable Cards</Link>
+                </h4>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Generate PNG cards for social media sharing</p>
+              </div>
+            </div>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5' }}>
+              Generate ready-to-share PNG cards with key statistics including company summaries, ETF data, 
+              ETH/BTC comparisons, and treasury percentage metrics for social media and presentations.
             </p>
           </div>
         </div>

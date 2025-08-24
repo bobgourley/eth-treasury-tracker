@@ -164,35 +164,63 @@ export default function CardsPage() {
             </button>
           }
         >
-          <div ref={companySummaryRef} style={{ padding: '2rem', background: '#0F1419', borderRadius: '12px' }}>
-            <h2 style={{ color: '#00D9FF', fontSize: '1.5rem', marginBottom: '1rem', textAlign: 'center', letterSpacing: '0.5px', wordSpacing: '2px' }}>
+          <div ref={companySummaryRef} style={{ 
+            width: '1200px', 
+            height: '630px', 
+            padding: '60px', 
+            background: 'linear-gradient(135deg, #0F1419 0%, #1A1F2E 100%)', 
+            borderRadius: '12px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            position: 'relative'
+          }}>
+            <h2 style={{ 
+              color: '#00D9FF', 
+              fontSize: '3rem', 
+              marginBottom: '2rem', 
+              textAlign: 'center', 
+              letterSpacing: '1px', 
+              fontWeight: 'bold',
+              textShadow: '0 0 20px rgba(0, 217, 255, 0.3)'
+            }}>
               Treasury Strategy Companies
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '1.5rem', textAlign: 'center' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '3rem', textAlign: 'center', marginBottom: '2rem' }}>
               <div>
-                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#00D9FF' }}>{companies.length}</div>
-                <div style={{ color: '#8B949E', fontSize: '0.9rem', letterSpacing: '0.3px' }}>Active Companies</div>
+                <div style={{ fontSize: '4rem', fontWeight: 'bold', color: '#00D9FF', marginBottom: '0.5rem' }}>{companies.length}</div>
+                <div style={{ color: '#8B949E', fontSize: '1.2rem', letterSpacing: '0.3px' }}>Active Companies</div>
               </div>
               <div>
-                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#7C3AED' }}>
+                <div style={{ fontSize: '4rem', fontWeight: 'bold', color: '#7C3AED', marginBottom: '0.5rem' }}>
                   {(totalCompanyEth / 1000000).toFixed(1)}M
                 </div>
-                <div style={{ color: '#8B949E', fontSize: '0.9rem' }}>Total ETH Holdings</div>
+                <div style={{ color: '#8B949E', fontSize: '1.2rem' }}>Total ETH Holdings</div>
               </div>
               <div>
-                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#F97316' }}>
-                  ${(totalCompanyEth * ethPrice / 1000000000).toFixed(2)}B
+                <div style={{ fontSize: '4rem', fontWeight: 'bold', color: '#F97316', marginBottom: '0.5rem' }}>
+                  ${(totalCompanyEth * ethPrice / 1000000000).toFixed(1)}B
                 </div>
-                <div style={{ color: '#8B949E', fontSize: '0.9rem' }}>USD Value</div>
+                <div style={{ color: '#8B949E', fontSize: '1.2rem' }}>USD Value</div>
               </div>
               <div>
-                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#10B981' }}>
+                <div style={{ fontSize: '4rem', fontWeight: 'bold', color: '#10B981', marginBottom: '0.5rem' }}>
                   {((totalCompanyEth / totalEthSupply) * 100).toFixed(3)}%
                 </div>
-                <div style={{ color: '#8B949E', fontSize: '0.9rem' }}>of ETH Supply</div>
+                <div style={{ color: '#8B949E', fontSize: '1.2rem' }}>of ETH Supply</div>
               </div>
             </div>
-            <div style={{ marginTop: '1rem', textAlign: 'center', color: '#8B949E', fontSize: '0.8rem' }}>
+            <div style={{ 
+              position: 'absolute',
+              bottom: '30px',
+              left: '60px',
+              right: '60px',
+              textAlign: 'center', 
+              color: '#8B949E', 
+              fontSize: '1rem',
+              borderTop: '1px solid #21262D',
+              paddingTop: '20px'
+            }}>
               EthereumList.com • {new Date().toLocaleDateString()}
             </div>
           </div>
@@ -211,35 +239,63 @@ export default function CardsPage() {
             </button>
           }
         >
-          <div ref={etfSummaryRef} style={{ padding: '2rem', background: '#0F1419', borderRadius: '12px' }}>
-            <h2 style={{ color: '#00D9FF', fontSize: '1.5rem', marginBottom: '1rem', textAlign: 'center', letterSpacing: '0.5px', wordSpacing: '2px' }}>
+          <div ref={etfSummaryRef} style={{ 
+            width: '1200px', 
+            height: '630px', 
+            padding: '60px', 
+            background: 'linear-gradient(135deg, #0F1419 0%, #1A1F2E 100%)', 
+            borderRadius: '12px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            position: 'relative'
+          }}>
+            <h2 style={{ 
+              color: '#00D9FF', 
+              fontSize: '3rem', 
+              marginBottom: '2rem', 
+              textAlign: 'center', 
+              letterSpacing: '1px', 
+              fontWeight: 'bold',
+              textShadow: '0 0 20px rgba(0, 217, 255, 0.3)'
+            }}>
               Ethereum ETFs
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '1.5rem', textAlign: 'center' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '3rem', textAlign: 'center', marginBottom: '2rem' }}>
               <div>
-                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#00D9FF' }}>{etfs.length}</div>
-                <div style={{ color: '#8B949E', fontSize: '0.9rem', letterSpacing: '0.3px' }}>Active ETFs</div>
+                <div style={{ fontSize: '4rem', fontWeight: 'bold', color: '#00D9FF', marginBottom: '0.5rem' }}>{etfs.length}</div>
+                <div style={{ color: '#8B949E', fontSize: '1.2rem', letterSpacing: '0.3px' }}>Active ETFs</div>
               </div>
               <div>
-                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#7C3AED' }}>
+                <div style={{ fontSize: '4rem', fontWeight: 'bold', color: '#7C3AED', marginBottom: '0.5rem' }}>
                   {(totalEtfEth / 1000000).toFixed(1)}M
                 </div>
-                <div style={{ color: '#8B949E', fontSize: '0.9rem' }}>Total ETH Holdings</div>
+                <div style={{ color: '#8B949E', fontSize: '1.2rem' }}>Total ETH Holdings</div>
               </div>
               <div>
-                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#F97316' }}>
+                <div style={{ fontSize: '4rem', fontWeight: 'bold', color: '#F97316', marginBottom: '0.5rem' }}>
                   ${(totalEtfEth * ethPrice / 1000000000).toFixed(1)}B
                 </div>
-                <div style={{ color: '#8B949E', fontSize: '0.9rem' }}>USD Value</div>
+                <div style={{ color: '#8B949E', fontSize: '1.2rem' }}>USD Value</div>
               </div>
               <div>
-                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#10B981' }}>
+                <div style={{ fontSize: '4rem', fontWeight: 'bold', color: '#10B981', marginBottom: '0.5rem' }}>
                   {((totalEtfEth / totalEthSupply) * 100).toFixed(3)}%
                 </div>
-                <div style={{ color: '#8B949E', fontSize: '0.9rem' }}>of ETH Supply</div>
+                <div style={{ color: '#8B949E', fontSize: '1.2rem' }}>of ETH Supply</div>
               </div>
             </div>
-            <div style={{ marginTop: '1rem', textAlign: 'center', color: '#8B949E', fontSize: '0.8rem' }}>
+            <div style={{ 
+              position: 'absolute',
+              bottom: '30px',
+              left: '60px',
+              right: '60px',
+              textAlign: 'center', 
+              color: '#8B949E', 
+              fontSize: '1rem',
+              borderTop: '1px solid #21262D',
+              paddingTop: '20px'
+            }}>
               EthereumList.com • {new Date().toLocaleDateString()}
             </div>
           </div>
@@ -475,64 +531,82 @@ export default function CardsPage() {
             </button>
           }
         >
-          <div ref={ethBtcComparisonRef} style={{ padding: '2rem', background: '#0F1419', borderRadius: '12px' }}>
-            <h2 style={{ color: '#00D9FF', fontSize: '1.5rem', marginBottom: '1.5rem', textAlign: 'center', letterSpacing: '0.5px', wordSpacing: '2px' }}>
+          <div ref={ethBtcComparisonRef} style={{ 
+            width: '1200px', 
+            height: '630px', 
+            padding: '60px', 
+            background: 'linear-gradient(135deg, #0F1419 0%, #1A1F2E 100%)', 
+            borderRadius: '12px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            position: 'relative'
+          }}>
+            <h2 style={{ 
+              color: '#00D9FF', 
+              fontSize: '2.5rem', 
+              marginBottom: '2rem', 
+              textAlign: 'center', 
+              letterSpacing: '1px', 
+              fontWeight: 'bold',
+              textShadow: '0 0 20px rgba(0, 217, 255, 0.3)'
+            }}>
               ETH vs BTC Market Comparison
             </h2>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', marginBottom: '2rem' }}>
               {/* ETH Section */}
-              <div style={{ textAlign: 'center', padding: '1.5rem', background: '#161B22', borderRadius: '8px', border: '1px solid #7C3AED' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+              <div style={{ textAlign: 'center', padding: '2rem', background: '#161B22', borderRadius: '12px', border: '2px solid #7C3AED' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
                   <div style={{ 
-                    width: '40px', 
-                    height: '40px', 
+                    width: '60px', 
+                    height: '60px', 
                     background: 'linear-gradient(135deg, #627EEA, #8A92B2)', 
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginRight: '0.5rem'
+                    marginRight: '1rem'
                   }}>
-                    <span style={{ color: 'white', fontWeight: 'bold', fontSize: '1.2rem' }}>Ξ</span>
+                    <span style={{ color: 'white', fontWeight: 'bold', fontSize: '2rem' }}>Ξ</span>
                   </div>
-                  <h3 style={{ color: '#7C3AED', fontSize: '1.3rem', fontWeight: 'bold', margin: 0 }}>ETHEREUM</h3>
+                  <h3 style={{ color: '#7C3AED', fontSize: '2rem', fontWeight: 'bold', margin: 0 }}>ETHEREUM</h3>
                 </div>
-                <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#7C3AED', marginBottom: '0.5rem' }}>
+                <div style={{ fontSize: '3.5rem', fontWeight: 'bold', color: '#7C3AED', marginBottom: '1rem' }}>
                   ${ethPrice.toLocaleString()}
                 </div>
-                <div style={{ color: '#8B949E', fontSize: '0.9rem', marginBottom: '1rem' }}>Market Price</div>
-                <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#10B981' }}>
+                <div style={{ color: '#8B949E', fontSize: '1.2rem', marginBottom: '1.5rem' }}>Market Price</div>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#10B981' }}>
                   ${(totalTrackedEth * ethPrice / 1000000000).toFixed(2)}B
                 </div>
-                <div style={{ color: '#8B949E', fontSize: '0.8rem' }}>Treasury Value</div>
+                <div style={{ color: '#8B949E', fontSize: '1rem' }}>Treasury Value</div>
               </div>
 
               {/* BTC Section */}
-              <div style={{ textAlign: 'center', padding: '1.5rem', background: '#161B22', borderRadius: '8px', border: '1px solid #F97316' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+              <div style={{ textAlign: 'center', padding: '2rem', background: '#161B22', borderRadius: '12px', border: '2px solid #F97316' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
                   <div style={{ 
-                    width: '40px', 
-                    height: '40px', 
+                    width: '60px', 
+                    height: '60px', 
                     background: 'linear-gradient(135deg, #F7931A, #FFB84D)', 
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginRight: '0.5rem'
+                    marginRight: '1rem'
                   }}>
-                    <span style={{ color: 'white', fontWeight: 'bold', fontSize: '1.2rem' }}>₿</span>
+                    <span style={{ color: 'white', fontWeight: 'bold', fontSize: '2rem' }}>₿</span>
                   </div>
-                  <h3 style={{ color: '#F97316', fontSize: '1.3rem', fontWeight: 'bold', margin: 0 }}>BITCOIN</h3>
+                  <h3 style={{ color: '#F97316', fontSize: '2rem', fontWeight: 'bold', margin: 0 }}>BITCOIN</h3>
                 </div>
-                <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#F97316', marginBottom: '0.5rem' }}>
+                <div style={{ fontSize: '3.5rem', fontWeight: 'bold', color: '#F97316', marginBottom: '1rem' }}>
                   ${btcPrice.toLocaleString()}
                 </div>
-                <div style={{ color: '#8B949E', fontSize: '0.9rem', marginBottom: '1rem' }}>Market Price</div>
-                <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#8B949E' }}>
+                <div style={{ color: '#8B949E', fontSize: '1.2rem', marginBottom: '1.5rem' }}>Market Price</div>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#8B949E' }}>
                   N/A
                 </div>
-                <div style={{ color: '#8B949E', fontSize: '0.8rem' }}>Treasury Value</div>
+                <div style={{ color: '#8B949E', fontSize: '1rem' }}>Treasury Value</div>
               </div>
             </div>
 
@@ -573,105 +647,82 @@ export default function CardsPage() {
             </button>
           }
         >
-          <div ref={ethTreasuryPercentRef} style={{ padding: '2rem', background: '#0F1419', borderRadius: '12px' }}>
-            <h2 style={{ color: '#00D9FF', fontSize: '1.5rem', marginBottom: '1.5rem', textAlign: 'center', letterSpacing: '0.5px', wordSpacing: '2px' }}>
+          <div ref={ethTreasuryPercentRef} style={{ 
+            width: '1200px', 
+            height: '630px', 
+            padding: '60px', 
+            background: 'linear-gradient(135deg, #0F1419 0%, #1A1F2E 100%)', 
+            borderRadius: '12px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            position: 'relative'
+          }}>
+            <h2 style={{ 
+              color: '#00D9FF', 
+              fontSize: '2.5rem', 
+              marginBottom: '2rem', 
+              textAlign: 'center', 
+              letterSpacing: '1px', 
+              fontWeight: 'bold',
+              textShadow: '0 0 20px rgba(0, 217, 255, 0.3)'
+            }}>
               Corporate ETH Treasury Holdings
             </h2>
             
             {/* Main Stat */}
             <div style={{ 
               textAlign: 'center', 
-              padding: '2rem', 
+              padding: '3rem', 
               background: '#161B22', 
-              borderRadius: '12px',
-              border: '2px solid #7C3AED',
-              marginBottom: '1.5rem'
+              borderRadius: '16px',
+              border: '3px solid #7C3AED',
+              marginBottom: '2rem'
             }}>
-              <div style={{ fontSize: '4rem', fontWeight: 'bold', color: '#7C3AED', marginBottom: '0.5rem' }}>
+              <div style={{ fontSize: '6rem', fontWeight: 'bold', color: '#7C3AED', marginBottom: '1rem' }}>
                 {((totalCompanyEth / totalEthSupply) * 100).toFixed(3)}%
               </div>
-              <div style={{ color: '#E6EDF3', fontSize: '1.2rem', marginBottom: '1rem' }}>
+              <div style={{ color: '#E6EDF3', fontSize: '1.8rem', marginBottom: '1rem' }}>
                 of Total ETH Supply
               </div>
-              <div style={{ color: '#8B949E', fontSize: '0.9rem' }}>
+              <div style={{ color: '#8B949E', fontSize: '1.2rem' }}>
                 Held by {companies.length} Treasury Strategy Companies
               </div>
             </div>
 
             {/* Supporting Stats */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
-              <div style={{ textAlign: 'center', padding: '1rem', background: '#161B22', borderRadius: '8px' }}>
-                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#00D9FF' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+              <div style={{ textAlign: 'center', padding: '1.5rem', background: '#161B22', borderRadius: '12px' }}>
+                <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#00D9FF', marginBottom: '0.5rem' }}>
                   {(totalCompanyEth / 1000000).toFixed(1)}M
                 </div>
-                <div style={{ color: '#8B949E', fontSize: '0.8rem' }}>Total ETH</div>
+                <div style={{ color: '#8B949E', fontSize: '1.1rem' }}>Total ETH</div>
               </div>
-              <div style={{ textAlign: 'center', padding: '1rem', background: '#161B22', borderRadius: '8px' }}>
-                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#10B981' }}>
+              <div style={{ textAlign: 'center', padding: '1.5rem', background: '#161B22', borderRadius: '12px' }}>
+                <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#10B981', marginBottom: '0.5rem' }}>
                   ${(totalCompanyEth * ethPrice / 1000000000).toFixed(2)}B
                 </div>
-                <div style={{ color: '#8B949E', fontSize: '0.8rem' }}>USD Value</div>
+                <div style={{ color: '#8B949E', fontSize: '1.1rem' }}>USD Value</div>
               </div>
-              <div style={{ textAlign: 'center', padding: '1rem', background: '#161B22', borderRadius: '8px' }}>
-                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#F97316' }}>
+              <div style={{ textAlign: 'center', padding: '1.5rem', background: '#161B22', borderRadius: '12px' }}>
+                <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#F97316', marginBottom: '0.5rem' }}>
                   {companies.length}
                 </div>
-                <div style={{ color: '#8B949E', fontSize: '0.8rem' }}>Companies</div>
+                <div style={{ color: '#8B949E', fontSize: '1.1rem' }}>Companies</div>
               </div>
             </div>
 
-            {/* Top Companies */}
-            <div style={{ marginBottom: '1rem' }}>
-              <h3 style={{ color: '#E6EDF3', fontSize: '1rem', marginBottom: '1rem', textAlign: 'center' }}>
-                Top ETH Holdings
-              </h3>
-              {companies
-                .sort((a, b) => (b.ethHoldings || 0) - (a.ethHoldings || 0))
-                .slice(0, 3)
-                .map((company, index) => (
-                <div key={company.id} style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center',
-                  padding: '0.5rem 1rem',
-                  background: '#161B22',
-                  borderRadius: '6px',
-                  marginBottom: '0.5rem'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <div style={{ 
-                      width: '24px', 
-                      height: '24px', 
-                      background: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : '#CD7F32',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginRight: '0.5rem',
-                      fontSize: '0.8rem',
-                      fontWeight: 'bold',
-                      color: '#000'
-                    }}>
-                      {index + 1}
-                    </div>
-                    <div>
-                      <div style={{ color: '#E6EDF3', fontWeight: 'bold', fontSize: '0.9rem' }}>{company.name}</div>
-                      <div style={{ color: '#8B949E', fontSize: '0.7rem' }}>{company.ticker}</div>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ color: '#7C3AED', fontWeight: 'bold', fontSize: '0.9rem' }}>
-                      {((company.ethHoldings || 0) / 1000).toFixed(0)}K ETH
-                    </div>
-                    <div style={{ color: '#8B949E', fontSize: '0.7rem' }}>
-                      {(((company.ethHoldings || 0) / totalEthSupply) * 100).toFixed(3)}%
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div style={{ marginTop: '1rem', textAlign: 'center', color: '#8B949E', fontSize: '0.8rem' }}>
+            <div style={{ 
+              position: 'absolute',
+              bottom: '30px',
+              left: '60px',
+              right: '60px',
+              textAlign: 'center', 
+              color: '#8B949E', 
+              fontSize: '1rem',
+              borderTop: '1px solid #21262D',
+              paddingTop: '20px'
+            }}>
               EthereumList.com • {new Date().toLocaleDateString()}
             </div>
           </div>
