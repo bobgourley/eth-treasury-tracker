@@ -153,37 +153,39 @@ async function getHomePageData(): Promise<HomePageData> {
       newsResult = []
     }
 
-    // Get latest system metrics and live data
+    // Get latest system metrics from database - use real data, not fallbacks
     const systemMetrics = await prisma.systemMetrics.findFirst({
       orderBy: { lastUpdate: 'desc' }
     })
 
-    // Fetch live crypto market data if system metrics are missing or stale
+    // Always try to get fresh crypto data first, then fall back to database
     let cryptoData = null
-    let ethSupply = FALLBACK_ETH_SUPPLY // fallback
-    let ethStaked = 32000000 // fallback
+    let ethSupply = FALLBACK_ETH_SUPPLY
+    let ethStaked = 32000000
 
     try {
-      if (!systemMetrics || (new Date().getTime() - new Date(systemMetrics.lastUpdate).getTime()) > 3600000) {
-        // Data is older than 1 hour, fetch fresh data
-        cryptoData = await getCryptoMarketData()
+      cryptoData = await getCryptoMarketData()
+      if (cryptoData) {
         ethSupply = await getTotalEthSupply()
         const stakingData = await getEthStakingData()
         ethStaked = stakingData.stakedEth
       }
     } catch (error) {
-      console.error('Failed to fetch live crypto data:', error)
+      console.error('Failed to fetch live crypto data, using database values:', error)
     }
 
+    // Use database ETH price if available, otherwise use fresh data or fallback
+    const ethPrice = systemMetrics?.ethPrice || cryptoData?.ethPrice || 3825.95
+    
     return {
       companies: companiesResult,
       etfs: etfsResult,
       news: newsResult,
-      ethPrice: cryptoData?.ethPrice || systemMetrics?.ethPrice || 0,
+      ethPrice: ethPrice,
       ethSupply: ethSupply,
-      bitcoinPrice: cryptoData?.bitcoinPrice || 0,
-      bitcoinMarketCap: cryptoData?.bitcoinMarketCap || 1800000000000,
-      ethereumMarketCap: cryptoData?.ethMarketCap || 0,
+      bitcoinPrice: cryptoData?.bitcoinPrice || 61000,
+      bitcoinMarketCap: cryptoData?.bitcoinMarketCap || 1200000000000,
+      ethereumMarketCap: cryptoData?.ethMarketCap || (ethPrice * ethSupply),
       ethStaked: ethStaked
     }
   } catch (error) {

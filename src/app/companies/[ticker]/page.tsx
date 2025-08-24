@@ -274,7 +274,7 @@ export default function CompanyProfilePage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Current ETH Price</span>
-                  <span className="font-semibold text-gray-900">${company.ethPrice.toLocaleString()}</span>
+                  <span className="font-semibold text-gray-900">${Math.round(company.ethPrice).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">ETH Holdings</span>
