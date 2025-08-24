@@ -154,7 +154,6 @@ export async function POST(_request: NextRequest) {
             description: item.description,
             sourceName: item.source,
             publishedAt: new Date(item.publishedAt),
-            lastUpdated: new Date(),
             isActive: true
           },
           create: {
