@@ -79,17 +79,21 @@ async function getHomePageData(): Promise<HomePageData> {
     // Fetch news directly from database for homepage (more reliable than internal API call)
     let newsResult: NewsArticle[] = []
     try {
+      console.log('🔍 Homepage: Starting news fetch...')
+      
       // First try to get recent cached news from database
       const dbNews = await prisma.newsArticle.findMany({
         where: { 
           isActive: true,
           publishedAt: {
-            gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Last 24 hours
+            gte: new Date(Date.now() - 48 * 60 * 60 * 1000) // Extended to 48 hours for production
           }
         },
         orderBy: { publishedAt: 'desc' },
         take: 5
       })
+      
+      console.log(`📊 Homepage: Found ${dbNews.length} cached news articles`)
       
       if (dbNews.length > 0) {
         newsResult = dbNews.map(article => ({
@@ -103,34 +107,41 @@ async function getHomePageData(): Promise<HomePageData> {
         }))
         console.log(`📰 Homepage: Using ${newsResult.length} cached news articles`)
       } else {
-        // If no recent news in database, try to fetch from Google News RSS
+        // If no recent news in database, always try to fetch fresh news
+        console.log('🔄 Homepage: No cached news found, fetching fresh news...')
         try {
           const { fetchEthereumNewsMultiTopic } = await import('@/lib/googleNewsRss')
           const freshNews = await fetchEthereumNewsMultiTopic(5)
           
+          console.log(`📡 Homepage: Fetched ${freshNews.length} fresh news articles from RSS`)
+          
           if (freshNews.length > 0) {
             // Save to database and use for homepage
             for (const item of freshNews) {
-              await prisma.newsArticle.upsert({
-                where: { url: item.url },
-                update: {
-                  title: item.title,
-                  description: item.description,
-                  sourceName: item.source,
-                  publishedAt: new Date(item.publishedAt),
-                  isActive: true
-                },
-                create: {
-                  title: item.title,
-                  description: item.description,
-                  url: item.url,
-                  publishedAt: new Date(item.publishedAt),
-                  sourceName: item.source,
-                  company: null,
-                  ticker: null,
-                  isActive: true
-                }
-              })
+              try {
+                await prisma.newsArticle.upsert({
+                  where: { url: item.url },
+                  update: {
+                    title: item.title,
+                    description: item.description,
+                    sourceName: item.source,
+                    publishedAt: new Date(item.publishedAt),
+                    isActive: true
+                  },
+                  create: {
+                    title: item.title,
+                    description: item.description,
+                    url: item.url,
+                    publishedAt: new Date(item.publishedAt),
+                    sourceName: item.source,
+                    company: null,
+                    ticker: null,
+                    isActive: true
+                  }
+                })
+              } catch (dbError) {
+                console.error('Failed to save news article to database:', dbError)
+              }
             }
             
             newsResult = freshNews.map(item => ({
@@ -142,16 +153,20 @@ async function getHomePageData(): Promise<HomePageData> {
               company: null,
               ticker: null
             }))
-            console.log(`📰 Homepage: Fetched ${newsResult.length} fresh news articles`)
+            console.log(`✅ Homepage: Successfully processed ${newsResult.length} fresh news articles`)
+          } else {
+            console.log('⚠️ Homepage: No fresh news articles returned from RSS')
           }
         } catch (newsError) {
-          console.error('Failed to fetch fresh news for homepage:', newsError)
+          console.error('❌ Homepage: Failed to fetch fresh news:', newsError)
         }
       }
     } catch (error) {
-      console.error('Failed to fetch news for homepage:', error)
+      console.error('❌ Homepage: Critical error in news fetching:', error)
       newsResult = []
     }
+    
+    console.log(`🎯 Homepage: Final news count: ${newsResult.length}`)
 
     // Get latest system metrics from database - use real data, not fallbacks
     const systemMetrics = await prisma.systemMetrics.findFirst({
