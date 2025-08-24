@@ -44,24 +44,22 @@ export async function fetchEthereumNews(limit: number = 10): Promise<GoogleNewsI
       throw new Error('Invalid RSS format: no items found')
     }
     
-    const items = Array.isArray(result.rss.channel.item) 
-      ? result.rss.channel.item 
-      : [result.rss.channel.item]
-    
-    // Transform RSS items to our format
-    const newsItems: GoogleNewsItem[] = items.slice(0, limit).map((item: any) => {
-      // Extract source from title (Google News format: "Title - Source")
-      const titleParts = item.title?.split(' - ') || []
-      const cleanTitle = titleParts.length > 1 ? titleParts.slice(0, -1).join(' - ') : item.title
+    const items = Array.isArray(result.rss.channel.item) ? result.rss.channel.item : [result.rss.channel.item].filter(Boolean)
+  
+    const newsItems = items.slice(0, limit).map((item: unknown) => {
+      const newsItem = item as Record<string, string>
+      const titleStr = String(newsItem.title || '')
+      const titleParts = titleStr.split(' - ')
+      const cleanTitle = titleParts.length > 1 ? titleParts.slice(0, -1).join(' - ') : titleStr
       const source = titleParts.length > 1 ? titleParts[titleParts.length - 1] : 'Unknown'
       
       return {
         title: cleanTitle || 'No title',
-        description: item.description || '',
-        url: item.link || '',
-        publishedAt: item.pubDate || new Date().toISOString(),
+        description: String(newsItem.description || ''),
+        url: String(newsItem.link || ''),
+        publishedAt: String(newsItem.pubDate || new Date().toISOString()),
         source: source,
-        guid: item.guid || item.link || Math.random().toString()
+        guid: String(newsItem.guid || newsItem.link || Math.random().toString())
       }
     })
     
@@ -113,18 +111,20 @@ export async function fetchEthereumNewsMultiTopic(limit: number = 15): Promise<G
             : [result.rss.channel.item]
           
           // Take first 3-4 items from each topic
-          const topicNews = items.slice(0, 4).map((item: any) => {
-            const titleParts = item.title?.split(' - ') || []
-            const cleanTitle = titleParts.length > 1 ? titleParts.slice(0, -1).join(' - ') : item.title
+          const topicNews = items.slice(0, 4).map((item: unknown) => {
+            const newsItem = item as Record<string, string>
+            const titleStr = String(newsItem.title || '')
+            const titleParts = titleStr.split(' - ')
+            const cleanTitle = titleParts.length > 1 ? titleParts.slice(0, -1).join(' - ') : titleStr
             const source = titleParts.length > 1 ? titleParts[titleParts.length - 1] : 'Unknown'
             
             return {
               title: cleanTitle || 'No title',
-              description: item.description || '',
-              url: item.link || '',
-              publishedAt: item.pubDate || new Date().toISOString(),
+              description: String(newsItem.description || ''),
+              url: String(newsItem.link || ''),
+              publishedAt: String(newsItem.pubDate || new Date().toISOString()),
               source: source,
-              guid: item.guid || item.link || Math.random().toString()
+              guid: String(newsItem.guid || newsItem.link || Math.random().toString())
             }
           })
           

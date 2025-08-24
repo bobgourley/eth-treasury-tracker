@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Optional: Add a POST method to manually refresh news
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     console.log('🔄 Manual refresh of Ethereum news requested...')
     
