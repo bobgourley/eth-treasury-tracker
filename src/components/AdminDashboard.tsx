@@ -35,6 +35,8 @@ export default function AdminDashboard() {
   const [isUpdating, setIsUpdating] = useState(false)
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus | null>(null)
   const [isUpdatingMarketCaps, setIsUpdatingMarketCaps] = useState(false)
+  const [isMigrating, setIsMigrating] = useState(false)
+  const [migrationStatus, setMigrationStatus] = useState<{success: boolean, message: string, error?: string} | null>(null)
   const [marketCapStatus, setMarketCapStatus] = useState<{
     success: boolean
     summary?: {
@@ -127,6 +129,32 @@ export default function AdminDashboard() {
     }
   }
 
+  const runDatabaseMigration = async () => {
+    setIsMigrating(true)
+    setMigrationStatus(null)
+
+    try {
+      const response = await fetch('/api/admin/migrate-database', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const result = await response.json()
+      setMigrationStatus(result)
+    } catch (error) {
+      console.error('Database migration failed:', error)
+      setMigrationStatus({
+        success: false,
+        message: 'Failed to run database migration',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      })
+    } finally {
+      setIsMigrating(false)
+    }
+  }
+
   const checkMarketCapStatus = async () => {
     try {
       const response = await fetch('/api/admin/update-market-caps', {
@@ -179,6 +207,44 @@ export default function AdminDashboard() {
           </button>
 
 
+        </div>
+
+        {/* Database Migration */}
+        <div className="bg-red-50 rounded-lg p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">🔧 Database Migration</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Create missing ETF tables in production database. This fixes the homepage ETF blocks showing zeros.
+            <br />
+            <span className="text-xs text-red-600 font-medium">⚠️ Run this once to create the missing etfs and etf_metrics tables.</span>
+          </p>
+          
+          <button
+            onClick={runDatabaseMigration}
+            disabled={isMigrating}
+            className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+              isMigrating
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-red-600 hover:bg-red-700 text-white'
+            }`}
+          >
+            {isMigrating ? 'Running Migration...' : 'Run Database Migration'}
+          </button>
+          
+          {migrationStatus && (
+            <div className={`mt-4 p-4 rounded-lg ${
+              migrationStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            }`}>
+              <p className="font-medium">
+                {migrationStatus.success ? '✅ Success!' : '❌ Error'}
+              </p>
+              <p className="text-sm mt-1">{migrationStatus.message}</p>
+              {migrationStatus.error && (
+                <p className="text-xs mt-2 font-mono bg-white bg-opacity-50 p-2 rounded">
+                  {migrationStatus.error}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Market Cap Management */}
