@@ -346,7 +346,7 @@ export default function MarketCapWeightedExposure() {
             <div>
               <h3 className="text-lg font-semibold text-blue-400 mb-3">ECMC - ETH Component of Market Cap</h3>
               <p className="text-gray-300 leading-relaxed text-sm">
-                ECMC measures what percentage of a company's market capitalization is represented by their ETH holdings. 
+                ECMC measures what percentage of a company&apos;s market capitalization is represented by their ETH holdings. 
                 A higher ECMC indicates that ETH holdings make up a larger portion of the company&apos;s total value, 
                 showing how much the company&apos;s stock price is tied to ETH performance.
               </p>
