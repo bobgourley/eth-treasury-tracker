@@ -245,23 +245,17 @@ export default function CardsPage() {
             </button>
           }
         >
-          <div className="flex justify-center">
-            <div 
-              ref={etfSummaryRef} 
-              style={{ 
-                width: '1200px', 
-                height: '630px', 
-                padding: '60px', 
-                background: 'linear-gradient(135deg, #0F1419 0%, #1A1F2E 100%)', 
-                borderRadius: '12px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                position: 'relative',
-                transform: 'scale(0.4)',
-                transformOrigin: 'top center'
-              }}
-            >
+          <div ref={etfSummaryRef} style={{ 
+            width: '1200px', 
+            height: '630px', 
+            padding: '60px', 
+            background: 'linear-gradient(135deg, #0F1419 0%, #1A1F2E 100%)', 
+            borderRadius: '12px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            position: 'relative'
+          }}>
             <h2 style={{ 
               color: '#00D9FF', 
               fontSize: '3rem', 
@@ -543,23 +537,17 @@ export default function CardsPage() {
             </button>
           }
         >
-          <div className="flex justify-center">
-            <div 
-              ref={ethBtcComparisonRef} 
-              style={{ 
-                width: '1200px', 
-                height: '630px', 
-                padding: '60px', 
-                background: 'linear-gradient(135deg, #0F1419 0%, #1A1F2E 100%)', 
-                borderRadius: '12px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                position: 'relative',
-                transform: 'scale(0.4)',
-                transformOrigin: 'top center'
-              }}
-            >
+          <div ref={ethBtcComparisonRef} style={{ 
+            width: '1200px', 
+            height: '630px', 
+            padding: '60px', 
+            background: 'linear-gradient(135deg, #0F1419 0%, #1A1F2E 100%)', 
+            borderRadius: '12px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            position: 'relative'
+          }}>
             <h2 style={{ 
               color: '#00D9FF', 
               fontSize: '2.5rem', 
@@ -665,23 +653,17 @@ export default function CardsPage() {
             </button>
           }
         >
-          <div className="flex justify-center">
-            <div 
-              ref={ethTreasuryPercentRef} 
-              style={{ 
-                width: '1200px', 
-                height: '630px', 
-                padding: '60px', 
-                background: 'linear-gradient(135deg, #0F1419 0%, #1A1F2E 100%)', 
-                borderRadius: '12px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                position: 'relative',
-                transform: 'scale(0.4)',
-                transformOrigin: 'top center'
-              }}
-            >
+          <div ref={ethTreasuryPercentRef} style={{ 
+            width: '1200px', 
+            height: '630px', 
+            padding: '60px', 
+            background: 'linear-gradient(135deg, #0F1419 0%, #1A1F2E 100%)', 
+            borderRadius: '12px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            position: 'relative'
+          }}>
             <h2 style={{ 
               color: '#00D9FF', 
               fontSize: '2.5rem', 
@@ -861,7 +843,7 @@ export default function CardsPage() {
       </div>
 
       {/* Footer */}
-      <div className="space-y-8">
+      <div className={styles.footer}>
         <p>Generate and download PNG cards for social media sharing • All data sourced from live APIs</p>
       </div>
     </FuturisticLayout>
