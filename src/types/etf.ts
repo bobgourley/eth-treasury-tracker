@@ -58,6 +58,7 @@ export interface EtfSummary {
   totalValue: number
   avgExpenseRatio: number
   ethPrice: number
+  ethSupply?: number
   lastUpdate: Date
   etfCount: number
 }

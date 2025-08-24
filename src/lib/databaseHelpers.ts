@@ -1,3 +1,5 @@
+import { PrismaClient } from '@prisma/client'
+import { FALLBACK_ETH_PRICE, FALLBACK_ETH_SUPPLY } from './constants'
 import { prisma } from '@/lib/db'
 
 /**
@@ -18,10 +20,10 @@ export async function getEthPriceFromDatabase(): Promise<number> {
     // If no database record exists, return a reasonable fallback
     // This should only happen on first deployment before any data is populated
     console.warn('⚠️ No ETH price found in database, using fallback')
-    return 3500
+    return FALLBACK_ETH_PRICE
   } catch (error) {
     console.error('❌ Error reading ETH price from database:', error)
-    return 3500
+    return FALLBACK_ETH_PRICE
   }
 }
 
@@ -37,13 +39,13 @@ export async function getEthSupplyFromDatabase(): Promise<{ supply: number; sour
     // For now, return static value since ETH supply isn't stored in SystemMetrics yet
     // TODO: Add ethSupply field to SystemMetrics table if needed
     return {
-      supply: 122373866.2178, // Current approximate ETH supply
+      supply: FALLBACK_ETH_SUPPLY, // Current approximate ETH supply
       source: 'database_static'
     }
   } catch (error) {
     console.error('❌ Error reading ETH supply from database:', error)
     return {
-      supply: 120500000,
+      supply: FALLBACK_ETH_SUPPLY,
       source: 'fallback'
     }
   }

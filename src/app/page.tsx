@@ -1,11 +1,17 @@
 import React from 'react'
-import FuturisticLayout from '@/components/FuturisticLayout'
-import FuturisticCard, { MetricDisplay, DataList } from '@/components/FuturisticCard'
-import GoogleNewsCard from '@/components/GoogleNewsCard'
-import { FuturisticBadge } from '@/components/FuturisticUI'
 import Link from 'next/link'
-import styles from '@/styles/futuristic.module.css'
-import { prisma } from '@/lib/db'
+import FuturisticLayout from '../components/FuturisticLayout'
+import FuturisticCard, { MetricDisplay } from '../components/FuturisticCard'
+import { FuturisticBadge } from '../components/FuturisticUI'
+import { DataList } from '../components/FuturisticCard'
+import GoogleNewsCard from '../components/GoogleNewsCard'
+import styles from '../styles/futuristic.module.css'
+import { fetchAllStaticData } from '@/lib/staticDataFetcher'
+import { FALLBACK_ETH_PRICE } from '@/lib/constants'
+import { getCryptoMarketData, getTotalEthSupply, getEthStakingData } from '../lib/api'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 // TypeScript interfaces
 interface Company {
@@ -94,31 +100,57 @@ async function getHomePageData(): Promise<HomePageData> {
       }))
     }
 
-    // Get latest system metrics
+    // Get latest system metrics and live data
     const systemMetrics = await prisma.systemMetrics.findFirst({
       orderBy: { lastUpdate: 'desc' }
     })
+
+    // Fetch live crypto market data if system metrics are missing or stale
+    let cryptoData = null
+    let ethSupply = 120000000 // fallback
+    let ethStaked = 32000000 // fallback
+
+    try {
+      if (!systemMetrics || (new Date().getTime() - new Date(systemMetrics.lastUpdate).getTime()) > 3600000) {
+        // Data is older than 1 hour, fetch fresh data
+        cryptoData = await getCryptoMarketData()
+        ethSupply = await getTotalEthSupply()
+        const stakingData = await getEthStakingData()
+        ethStaked = stakingData.stakedEth
+      }
+    } catch (error) {
+      console.error('Failed to fetch live crypto data:', error)
+    }
 
     return {
       companies: companiesResult,
       etfs: etfsResult,
       news: newsResult,
-      ethPrice: systemMetrics?.ethPrice || 3500,
-      ethSupply: 120000000, // Static for now
-      bitcoinPrice: 95000, // Static for now
-      bitcoinMarketCap: 1800000000000, // Static for now
-      ethereumMarketCap: 420000000000, // Static for now
-      ethStaked: 32000000 // Static for now - ~32M ETH staked
+      ethPrice: cryptoData?.ethPrice || systemMetrics?.ethPrice || FALLBACK_ETH_PRICE,
+      ethSupply: ethSupply,
+      bitcoinPrice: cryptoData?.bitcoinPrice || 95000,
+      bitcoinMarketCap: cryptoData?.bitcoinMarketCap || 1800000000000,
+      ethereumMarketCap: cryptoData?.ethMarketCap || 420000000000,
+      ethStaked: ethStaked
     }
   } catch (error) {
     console.error('Error fetching homepage data:', error)
     
-    // Return fallback data
+    // Return fallback data - try to get last known values from database
+    let fallbackMetrics = null
+    try {
+      fallbackMetrics = await prisma.systemMetrics.findFirst({
+        orderBy: { lastUpdate: 'desc' }
+      })
+    } catch (dbError) {
+      console.error('Failed to get fallback metrics from database:', dbError)
+    }
+
     return {
       companies: [],
       etfs: [],
       news: [],
-      ethPrice: 3500,
+      ethPrice: fallbackMetrics?.ethPrice || FALLBACK_ETH_PRICE,
       ethSupply: 120000000,
       bitcoinPrice: 95000,
       bitcoinMarketCap: 1800000000000,
@@ -352,7 +384,7 @@ export default async function Home() {
 
       {/* News Section */}
       <div className={styles.cardGrid}>
-        <GoogleNewsCard articles={news} />
+        <GoogleNewsCard articles={news} compact={true} />
       </div>
 
       {/* Footer */}

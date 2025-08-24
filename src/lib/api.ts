@@ -120,6 +120,68 @@ export async function getEthPrice(): Promise<number> {
 }
 
 /**
+ * Get current Bitcoin price in USD using CoinGecko API
+ */
+export async function getBitcoinPrice(): Promise<number> {
+  const url = `${COINGECKO_BASE_URL}/simple/price?ids=bitcoin&vs_currencies=usd`
+  
+  const headers: HeadersInit = {}
+  if (COINGECKO_API_KEY) {
+    headers['x-cg-demo-api-key'] = COINGECKO_API_KEY
+  }
+  
+  try {
+    const response = await fetchWithRetry(url, { headers })
+    const data = await response.json()
+    
+    if (!data.bitcoin?.usd) {
+      throw new Error('Invalid response from CoinGecko API')
+    }
+    
+    return data.bitcoin.usd
+  } catch (error) {
+    console.error('Failed to fetch Bitcoin price:', error)
+    throw error
+  }
+}
+
+/**
+ * Get market data for both ETH and BTC in a single call
+ */
+export async function getCryptoMarketData(): Promise<{
+  ethPrice: number
+  ethMarketCap: number
+  bitcoinPrice: number
+  bitcoinMarketCap: number
+}> {
+  const url = `${COINGECKO_BASE_URL}/simple/price?ids=ethereum,bitcoin&vs_currencies=usd&include_market_cap=true`
+  
+  const headers: HeadersInit = {}
+  if (COINGECKO_API_KEY) {
+    headers['x-cg-demo-api-key'] = COINGECKO_API_KEY
+  }
+  
+  try {
+    const response = await fetchWithRetry(url, { headers })
+    const data = await response.json()
+    
+    if (!data.ethereum?.usd || !data.bitcoin?.usd) {
+      throw new Error('Invalid response from CoinGecko API')
+    }
+    
+    return {
+      ethPrice: data.ethereum.usd,
+      ethMarketCap: data.ethereum.usd_market_cap,
+      bitcoinPrice: data.bitcoin.usd,
+      bitcoinMarketCap: data.bitcoin.usd_market_cap
+    }
+  } catch (error) {
+    console.error('Failed to fetch crypto market data:', error)
+    throw error
+  }
+}
+
+/**
  * Get ETH staking data from CoinGecko API
  */
 export async function getEthStakingData(): Promise<{ stakedEth: number; stakingApr: number }> {

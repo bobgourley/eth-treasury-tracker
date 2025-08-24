@@ -3,13 +3,10 @@
  * This ensures consistency across all components and APIs
  */
 
-// Current Ethereum supply (updated periodically)
-// This should be the single source of truth for ETH supply calculations
-export const ETH_SUPPLY = 120709652 // Current ETH supply as of latest update
-
-// Fallback values for API failures
-export const FALLBACK_ETH_PRICE = 3500 // USD
-export const FALLBACK_ETH_SUPPLY = ETH_SUPPLY
+// Fallback values for API failures - ONLY used when database and live APIs are unavailable
+export const FALLBACK_ETH_PRICE = 3500 // USD - Last resort fallback
+export const FALLBACK_ETH_SUPPLY = 120709652 // ETH - Last resort fallback
+export const FALLBACK_BTC_PRICE = 95000 // USD - Last resort fallback
 
 // API rate limits and caching
 export const CACHE_DURATION = {

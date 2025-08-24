@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { PrismaClient } from '@prisma/client'
+import { FALLBACK_ETH_PRICE, FALLBACK_ETH_SUPPLY } from '@/lib/constants'
 import FuturisticSidebar from '../../components/FuturisticSidebar'
 import FuturisticCard, { MetricDisplay, DataList } from '../../components/FuturisticCard'
 import styles from '../../styles/futuristic.module.css'
@@ -69,8 +71,8 @@ export default function OverviewPage() {
   const [totalCompanyCount, setTotalCompanyCount] = useState<number>(0)
   const [etfs, setEtfs] = useState<Etf[]>([])
   const [news, setNews] = useState<NewsArticle[]>([])
-  const [ethPrice, setEthPrice] = useState<number>(3500)
-  const [ethSupply, setEthSupply] = useState<number>(120709652)
+  const [ethPrice, setEthPrice] = useState<number>(FALLBACK_ETH_PRICE)
+  const [ethSupply, setEthSupply] = useState<number>(FALLBACK_ETH_SUPPLY)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -105,8 +107,8 @@ export default function OverviewPage() {
         
         if (metricsResponse.ok) {
           const metricsData = await metricsResponse.json()
-          setEthPrice(metricsData.ethPrice || 3500)
-          setEthSupply(metricsData.totalEthSupply || metricsData.ethSupply || 120709652)
+          setEthPrice(metricsData.ethPrice || FALLBACK_ETH_PRICE)
+          setEthSupply(metricsData.totalEthSupply || metricsData.ethSupply || FALLBACK_ETH_SUPPLY)
         }
         
         setError(null)

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { getEthPriceFromDatabase } from '@/lib/databaseHelpers'
-import { ETH_SUPPLY } from '@/lib/constants'
+import { FALLBACK_ETH_SUPPLY, FALLBACK_ETH_PRICE } from '@/lib/constants'
 
 interface CompanyData {
   id: number;
@@ -91,10 +91,18 @@ export async function GET() {
       ethPriceSource = 'database'
       console.log(`📊 ETH price from database: $${ethPrice}`)
     } else {
-      // Only used if no DB record exists at all (first deployment)
-      ethPrice = 3500
-      ethPriceSource = 'fallback'
-      console.warn('⚠️ No ETH price found in database, using fallback')
+      // Try to fetch live price if no DB record exists
+      try {
+        const { getEthPrice } = await import('@/lib/api')
+        ethPrice = await getEthPrice()
+        ethPriceSource = 'live_api'
+        console.log('📊 Fetched live ETH price from API:', ethPrice)
+      } catch (apiError) {
+        // Only use hardcoded fallback if API also fails
+        ethPrice = 3500
+        ethPriceSource = 'fallback'
+        console.warn('⚠️ No ETH price found in database and API failed, using fallback')
+      }
     }
     // Get ETH supply from database (stored by admin updates from Etherscan API)
     const ecosystemData = await prisma.ecosystemSummary.findFirst({
@@ -102,7 +110,7 @@ export async function GET() {
       select: { ethSupply: true, lastUpdated: true }
     })
     
-    const totalEthSupply = ecosystemData?.ethSupply || ETH_SUPPLY // Fallback only if no database data
+    const totalEthSupply = ecosystemData?.ethSupply || FALLBACK_ETH_SUPPLY // Fallback only if no database data
     const ethSupplySource = ecosystemData ? 'database_live' : 'fallback_constant'
     console.log(` ETH supply from ${ethSupplySource}: ${totalEthSupply.toLocaleString()} ETH`)
 
@@ -140,7 +148,7 @@ export async function GET() {
     console.error('Database error, using static fallback metrics:', error)
     
     // Try to get last known ETH price from database even in fallback mode
-    let fallbackEthPrice = 3500.0 // Only if absolutely no data exists
+    let fallbackEthPrice = FALLBACK_ETH_PRICE // Only if absolutely no data exists
     try {
       const fallbackPrisma = new PrismaClient()
       const lastKnownMetrics = await fallbackPrisma.systemMetrics.findFirst({

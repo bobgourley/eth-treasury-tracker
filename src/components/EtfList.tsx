@@ -129,7 +129,7 @@ export default function EtfList() {
             
             <div className="text-center">
               <div className="text-3xl font-bold">
-                {`${((metrics.totalEthHeld / 120500000) * 100).toFixed(3)}%`}
+                {metrics.ethSupply ? `${((metrics.totalEthHeld / metrics.ethSupply) * 100).toFixed(3)}%` : 'Loading...'}
               </div>
               <div className="text-sm opacity-90">% of ETH Supply</div>
             </div>

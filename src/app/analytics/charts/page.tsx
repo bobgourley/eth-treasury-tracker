@@ -1,6 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
+import { FALLBACK_ETH_PRICE } from '@/lib/constants'
 import Link from 'next/link'
 import CompanyLink from '@/components/CompanyLink'
 import FuturisticLayout from '@/components/FuturisticLayout'
@@ -60,7 +62,7 @@ export default function ChartsPage() {
         // Calculate totals using live ETH price
         const totalEthHoldings = companies.reduce((sum: number, company: CompanyData) => 
           sum + (company.ethHoldings || 0), 0)
-        const ethPrice = metricsData.ethPrice || companiesData.ethPrice || 3500 // Use ETH price from either API
+        const ethPrice = metricsData.ethPrice || companiesData.ethPrice || FALLBACK_ETH_PRICE // Use ETH price from either API
         const totalEthValue = totalEthHoldings * ethPrice
 
         setData({

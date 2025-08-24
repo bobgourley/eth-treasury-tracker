@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { fetchEthSupply } from './dataFetcher'
+import { FALLBACK_ETH_PRICE, FALLBACK_ETH_SUPPLY } from './constants'
 
 // Server-side data fetching for static generation
 // These functions are used during build time and ISR regeneration
@@ -28,7 +29,7 @@ function getFallbackStaticEtfData() {
     const aum = etfInfo.estimatedAum * variation
     // ETH price should be fetched from database, not hardcoded
     // This is a fallback for static generation only
-    const ethPrice = 3500
+    const ethPrice = FALLBACK_ETH_PRICE
     const totalValue = ethHoldings * ethPrice
     
     return {
@@ -51,7 +52,7 @@ function getFallbackStaticEtfData() {
   return {
     etfs: fallbackEtfs as StaticETFData[],
     count: fallbackEtfs.length,
-    ethPrice: 3484.13,
+    ethPrice: FALLBACK_ETH_PRICE,
     message: 'Using fallback ETF data for static generation'
   }
 }
@@ -206,8 +207,8 @@ export async function fetchStaticEcosystemData() {
 
     // CRITICAL: Always use database ETH price for consistency with dashboard
     // Only use fallback if database is completely unavailable
-    const ethPrice = systemMetrics?.ethPrice || 3500
-    const ethSupply = liveEthSupply || 120709652 // Live ETH supply from Etherscan, fallback to current estimate
+    const ethPrice = systemMetrics?.ethPrice || FALLBACK_ETH_PRICE
+    const ethSupply = liveEthSupply || FALLBACK_ETH_SUPPLY // Live ETH supply from Etherscan, fallback to current estimate
     
     if (!systemMetrics?.ethPrice) {
       console.log('⚠️ WARNING: Using fallback ETH price instead of database value!')
@@ -283,7 +284,7 @@ export async function fetchStaticCompaniesData() {
       orderBy: { lastUpdate: 'desc' },
       select: { ethPrice: true }
     })
-    const ethPrice = systemMetrics?.ethPrice || 3500
+    const ethPrice = systemMetrics?.ethPrice || FALLBACK_ETH_PRICE
 
     const serializedCompanies = companies.map((company) => ({
       ...company,
@@ -338,7 +339,7 @@ export async function fetchStaticETFsData() {
       orderBy: { lastUpdate: 'desc' },
       select: { ethPrice: true }
     })
-    const ethPrice = systemMetrics?.ethPrice || 3500
+    const ethPrice = systemMetrics?.ethPrice || FALLBACK_ETH_PRICE
 
     const serializedEtfs = etfs.map((etf) => ({
       id: etf.id,

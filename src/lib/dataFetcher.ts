@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { FALLBACK_ETH_SUPPLY } from './constants'
 
 interface CoinGeckoResponse {
   ethereum: {
@@ -132,7 +133,7 @@ export async function updateSystemMetrics(): Promise<void> {
         orderBy: { lastUpdated: 'desc' },
         select: { ethSupply: true }
       })
-      updatedEthSupply = lastEcosystemData?.ethSupply || 120709652 // Only fallback if no database data exists
+      updatedEthSupply = lastEcosystemData?.ethSupply || FALLBACK_ETH_SUPPLY // Only fallback if no database data exists
       console.log(`📊 Using ETH supply from database: ${updatedEthSupply.toLocaleString()} ETH`)
     }
     

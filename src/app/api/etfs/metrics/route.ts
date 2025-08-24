@@ -1,4 +1,8 @@
 import { NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
+import { FALLBACK_ETH_SUPPLY, FALLBACK_ETH_PRICE } from '@/lib/constants'
+
+const prisma = new PrismaClient()
 
 export async function GET() {
   try {
@@ -37,8 +41,8 @@ export async function GET() {
     }
     
     // Get current ETH price and supply
-    let ethPrice = 3825.95 // Fallback
-    let ethSupply = 120500000 // Fallback ETH supply
+    let ethPrice = FALLBACK_ETH_PRICE // Fallback
+    let ethSupply = FALLBACK_ETH_SUPPLY // Fallback ETH supply
     
     try {
       const coinGeckoResponse = await fetch(
@@ -103,13 +107,32 @@ export async function GET() {
   } catch (metricsError) {
     console.error('❌ ETF metrics error:', metricsError)
     
+    // Get fallback data from database if possible
+    let fallbackEthPrice = 3825.95
+    let fallbackEthSupply = 120000000
+    try {
+      const systemMetrics = await prisma.systemMetrics.findFirst({
+        orderBy: { lastUpdate: 'desc' },
+        select: { ethPrice: true }
+      })
+      fallbackEthPrice = systemMetrics?.ethPrice || 3825.95
+      
+      // Try to get ETH supply from API
+      const { getTotalEthSupply } = await import('@/lib/api')
+      fallbackEthSupply = await getTotalEthSupply()
+    } catch (error) {
+      console.error('Failed to get fallback data:', error)
+    }
+
+    const fallbackEthHeld = 2500000
     // Fallback metrics
     return NextResponse.json({
-      totalEthHeld: 2500000,
-      totalValue: 9500000000,
-      totalAum: 10000000000,
+      totalEthHeld: fallbackEthHeld,
+      totalValue: fallbackEthHeld * fallbackEthPrice,
+      totalAum: fallbackEthHeld * fallbackEthPrice * 1.05, // Slight premium
       activeEtfs: 9,
-      ethPrice: 3825.95,
+      ethPrice: fallbackEthPrice,
+      ethSupply: fallbackEthSupply,
       lastUpdated: new Date(),
       formattedTotalValue: '$9.5B',
       formattedTotalAum: '$10.0B',

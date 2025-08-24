@@ -21,12 +21,14 @@ interface GoogleNewsCardProps {
   articles: NewsArticle[]
   title?: string
   showViewAll?: boolean
+  compact?: boolean
 }
 
 export default function GoogleNewsCard({ 
   articles, 
   title = "Latest Ethereum News",
-  showViewAll = true 
+  showViewAll = true,
+  compact = false
 }: GoogleNewsCardProps) {
   const formatTimeAgo = (dateString: string) => {
     try {
@@ -93,20 +95,17 @@ export default function GoogleNewsCard({
                   {article.title}
                 </a>
               </h4>
-              {article.description && (
+              {!compact && article.description && (
                 <p className={styles.newsDescription}>
-                  {(() => {
-                    const cleaned = cleanDescription(article.description)
-                    return cleaned.length > 150 
-                      ? `${cleaned.substring(0, 150)}...` 
-                      : cleaned
-                  })()}
+                  {cleanDescription(article.description)}
                 </p>
               )}
-              <div className={styles.newsMetadata}>
-                <span className={styles.newsSource}>{article.source.name}</span>
-                <span className={styles.newsTime}>{formatTimeAgo(article.publishedAt)}</span>
-              </div>
+              {!compact && (
+                <div className={styles.newsMetadata}>
+                  <span className={styles.newsSource}>{article.source.name}</span>
+                  <span className={styles.newsTime}>{formatTimeAgo(article.publishedAt)}</span>
+                </div>
+              )}
             </div>
           ))
         ) : (

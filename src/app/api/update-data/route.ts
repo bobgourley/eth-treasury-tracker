@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
+import { FALLBACK_ETH_SUPPLY } from '@/lib/constants'
 
 const prisma = new PrismaClient()
 
@@ -112,7 +113,7 @@ export async function POST(request: Request) {
         ethPrice: ethPrice,
         totalEthValue: totalEthValue,
         totalMarketCap: totalMarketCap,
-        ethSupplyPercent: (totalEthHeld / 120500000) * 100,
+        ethSupplyPercent: (totalEthHeld / FALLBACK_ETH_SUPPLY) * 100,
         lastUpdate: new Date()
         // ETH price tracking fields (will be enabled after schema migration)
         // ethPriceLastUpdate: ethPriceLastUpdate,
@@ -124,7 +125,7 @@ export async function POST(request: Request) {
         ethPrice: ethPrice,
         totalEthValue: totalEthValue,
         totalMarketCap: totalMarketCap,
-        ethSupplyPercent: (totalEthHeld / 120500000) * 100,
+        ethSupplyPercent: (totalEthHeld / FALLBACK_ETH_SUPPLY) * 100,
         lastUpdate: new Date()
         // ETH price tracking fields (will be enabled after schema migration)
         // ethPriceLastUpdate: ethPriceLastUpdate,
@@ -146,7 +147,7 @@ export async function POST(request: Request) {
         totalEthHoldings: totalEthHeld,
         totalEthValue: totalEthValue,
         totalMarketCap: totalMarketCap,
-        ethSupplyPercent: `${((totalEthHeld / 120500000) * 100).toFixed(4)}%`
+        ethSupplyPercent: `${((totalEthHeld / FALLBACK_ETH_SUPPLY) * 100).toFixed(4)}%`
       },
       companies: updatedCompanies.map(company => ({
         name: company.name,
