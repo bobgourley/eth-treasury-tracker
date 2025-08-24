@@ -4,22 +4,23 @@ import FuturisticCard, { MetricDisplay, DataList } from '@/components/Futuristic
 import { FuturisticBadge } from '@/components/FuturisticUI'
 import Link from 'next/link'
 import styles from '@/styles/futuristic.module.css'
+import { prisma } from '@/lib/db'
 
 // TypeScript interfaces
 interface Company {
   id: number
   name: string
-  ticker: string
-  ethHoldings: number
+  ticker: string | null
+  ethHoldings: number | null
   isActive: boolean
 }
 
 interface Etf {
   id: number
   symbol: string
-  name: string
-  ethHoldings: number
-  aum: number
+  name: string | null
+  ethHoldings: number | null
+  aum: number | null
   isActive: boolean
 }
 
@@ -31,9 +32,9 @@ interface NewsArticle {
   publishedAt: string
   source: {
     name: string
-  } | string
-  company?: string
-  ticker?: string
+  }
+  company?: string | null
+  ticker?: string | null
 }
 
 interface HomePageData {
@@ -45,74 +46,68 @@ interface HomePageData {
   bitcoinPrice: number
   bitcoinMarketCap: number
   ethereumMarketCap: number
+  ethStaked: number
 }
 
 async function getHomePageData(): Promise<HomePageData> {
   try {
-    // Fetch data from API endpoints on the server
-    const [companiesResponse, etfsResponse, newsResponse, metricsResponse] = await Promise.all([
-      fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/companies`, { cache: 'no-store' }),
-      fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/etfs`, { cache: 'no-store' }),
-      fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/news`, { cache: 'no-store' }),
-      fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/metrics`, { cache: 'no-store' })
-    ])
-    
-    const [companiesData, etfsData, newsData, metricsData] = await Promise.all([
-      companiesResponse.ok ? companiesResponse.json() : { companies: [] },
-      etfsResponse.ok ? etfsResponse.json() : { etfs: [] },
-      newsResponse.ok ? newsResponse.json() : { articles: [] },
-      metricsResponse.ok ? metricsResponse.json() : { ethPrice: 3500, totalEthSupply: 120709652 }
+    // Fetch data from database
+    const [companiesResult, etfsResult, newsResult] = await Promise.all([
+      prisma.company.findMany({
+        where: { ethHoldings: { gt: 0 } },
+        orderBy: { ethHoldings: 'desc' }
+      }),
+      prisma.etf.findMany({
+        where: { ethHoldings: { gt: 0 } },
+        orderBy: { ethHoldings: 'desc' }
+      }),
+      prisma.newsArticle.findMany({
+        orderBy: { publishedAt: 'desc' },
+        take: 10
+      })
     ])
 
-    // Fetch Bitcoin and crypto market data from CoinGecko
-    let bitcoinPrice = 95000
-    let bitcoinMarketCap = 1800000000000 // $1.8T
-    let ethereumMarketCap = 420000000000 // $420B
-    
-    try {
-      const cryptoResponse = await fetch(
-        'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_market_cap=true',
-        { cache: 'no-store' }
-      )
-      
-      if (cryptoResponse.ok) {
-        const cryptoData = await cryptoResponse.json()
-        bitcoinPrice = cryptoData.bitcoin?.usd || bitcoinPrice
-        bitcoinMarketCap = cryptoData.bitcoin?.usd_market_cap || bitcoinMarketCap
-        ethereumMarketCap = cryptoData.ethereum?.usd_market_cap || ethereumMarketCap
-      }
-    } catch (cryptoError) {
-      console.error('Error fetching crypto market data:', cryptoError)
-    }
+    // Get latest system metrics
+    const systemMetrics = await prisma.systemMetrics.findFirst({
+      orderBy: { lastUpdate: 'desc' }
+    })
 
     return {
-      companies: companiesData.companies || [],
-      etfs: etfsData.etfs || [],
-      news: newsData.articles?.slice(0, 3) || [],
-      ethPrice: metricsData.ethPrice || 3500,
-      ethSupply: metricsData.totalEthSupply || metricsData.ethSupply || 120709652,
-      bitcoinPrice,
-      bitcoinMarketCap,
-      ethereumMarketCap
+      companies: companiesResult,
+      etfs: etfsResult,
+      news: newsResult.map(article => ({
+        ...article,
+        source: { name: article.sourceName },
+        description: article.description || '',
+        publishedAt: article.publishedAt.toISOString()
+      })),
+      ethPrice: systemMetrics?.ethPrice || 3500,
+      ethSupply: 120000000, // Static for now
+      bitcoinPrice: 95000, // Static for now
+      bitcoinMarketCap: 1800000000000, // Static for now
+      ethereumMarketCap: 420000000000, // Static for now
+      ethStaked: 32000000 // Static for now - ~32M ETH staked
     }
   } catch (error) {
     console.error('Error fetching homepage data:', error)
+    
     // Return fallback data
     return {
       companies: [],
       etfs: [],
       news: [],
       ethPrice: 3500,
-      ethSupply: 120709652,
+      ethSupply: 120000000,
       bitcoinPrice: 95000,
       bitcoinMarketCap: 1800000000000,
-      ethereumMarketCap: 420000000000
+      ethereumMarketCap: 420000000000,
+      ethStaked: 32000000
     }
   }
 }
 
 export default async function Home() {
-  const { companies, etfs, news, ethPrice, ethSupply, bitcoinPrice, bitcoinMarketCap, ethereumMarketCap } = await getHomePageData()
+  const { companies, etfs, news, ethPrice, ethSupply, bitcoinPrice, bitcoinMarketCap, ethereumMarketCap, ethStaked } = await getHomePageData()
 
   // Calculate company totals
   const companyTotalEth = companies.reduce((sum: number, company: Company) => sum + (company.ethHoldings || 0), 0)
@@ -185,6 +180,22 @@ export default async function Home() {
             value={`${(ethSupply / 1000000).toFixed(1)}M`}
             label="Total Supply"
             color="blue"
+          />
+        </FuturisticCard>
+
+        <FuturisticCard title="ETH Staked ($)" icon="🔒" size="small">
+          <MetricDisplay
+            value={`$${((ethStaked * ethPrice) / 1000000000).toFixed(1)}B`}
+            label="Staked Value"
+            color="blue"
+          />
+        </FuturisticCard>
+
+        <FuturisticCard title="ETH Staked" icon="🔒" size="small">
+          <MetricDisplay
+            value={`${(ethStaked / 1000000).toFixed(1)}M`}
+            label="Staked ETH"
+            color="green"
           />
         </FuturisticCard>
       </div>

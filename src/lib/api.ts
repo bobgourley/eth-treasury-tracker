@@ -120,6 +120,39 @@ export async function getEthPrice(): Promise<number> {
 }
 
 /**
+ * Get ETH staking data from CoinGecko API
+ */
+export async function getEthStakingData(): Promise<{ stakedEth: number; stakingApr: number }> {
+  const url = `${COINGECKO_BASE_URL}/coins/ethereum`
+  
+  const headers: HeadersInit = {}
+  if (COINGECKO_API_KEY) {
+    headers['x-cg-demo-api-key'] = COINGECKO_API_KEY
+  }
+  
+  try {
+    const response = await fetchWithRetry(url, { headers })
+    const data = await response.json()
+    
+    // Get staked ETH from market data or use estimated value
+    const stakedEth = data.market_data?.total_value_locked || 32000000 // ~32M ETH estimated
+    const stakingApr = data.market_data?.staking_rewards_apr || 3.2 // ~3.2% estimated
+    
+    return {
+      stakedEth,
+      stakingApr
+    }
+  } catch (error) {
+    console.error('Failed to fetch ETH staking data:', error)
+    // Return fallback values
+    return {
+      stakedEth: 32000000, // 32M ETH
+      stakingApr: 3.2 // 3.2%
+    }
+  }
+}
+
+/**
  * Get market data for a stock symbol from Alpha Vantage API
  * Returns stock price and market cap, with proper error handling for rate limits
  */
