@@ -314,12 +314,35 @@ export async function fetchStaticETFsData() {
     console.log('✅ Database connected for ETF static data')
     
     // Try to fetch ETFs data (table may not exist in production yet)
-    let etfs: Array<{ id: number; symbol: string; name: string | null; ethHoldings: number | null; aum: number | null; totalValue: number | null; expenseRatio: number | null; nav: number | null; isActive: boolean; lastUpdated: Date; createdAt: Date }> = []
+    let etfs: Array<{
+      id: number;
+      symbol: string;
+      name: string | null;
+      ethHoldings: number | null;
+      aum: number | null;
+      totalValue: number | null;
+      expenseRatio: number | null;
+      isActive: boolean;
+      lastUpdated: Date;
+      createdAt: Date;
+    }> = []
     try {
       console.log('🔍 Fetching ETF data for static ETF page...')
       etfs = await prisma.etf.findMany({
         where: { isActive: true },
-        orderBy: { aum: 'desc' }
+        orderBy: { aum: 'desc' },
+        select: {
+          id: true,
+          symbol: true,
+          name: true,
+          ethHoldings: true,
+          aum: true,
+          totalValue: true,
+          expenseRatio: true,
+          isActive: true,
+          lastUpdated: true,
+          createdAt: true
+        }
       })
       console.log(`✅ Found ${etfs.length} ETFs in database for static ETF data`)
     } catch (error: unknown) {
@@ -349,7 +372,7 @@ export async function fetchStaticETFsData() {
       aum: etf.aum?.toString() || '0',
       totalValue: (etf.ethHoldings || 0) * ethPrice,
       expenseRatio: etf.expenseRatio,
-      nav: etf.nav,
+      nav: null,
       lastUpdated: etf.lastUpdated.toISOString(),
       createdAt: etf.createdAt.toISOString(),
       isActive: etf.isActive
