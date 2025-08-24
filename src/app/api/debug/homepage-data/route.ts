@@ -51,19 +51,26 @@ export async function GET() {
     const companyTotalEth = companiesResult.reduce((sum: number, company) => sum + (company.ethHoldings || 0), 0)
     const etfTotalEth = etfsResult.reduce((sum: number, etf) => sum + (etf.ethHoldings || 0), 0)
 
+    // Convert BigInt values to numbers for JSON serialization
+    const serializeData = (data: any) => {
+      return JSON.parse(JSON.stringify(data, (key, value) =>
+        typeof value === 'bigint' ? Number(value) : value
+      ))
+    }
+
     return NextResponse.json({
-      debug: {
-        filteredCompanies: companiesResult.length,
-        filteredEtfs: etfsResult.length,
-        companyTotalEth,
-        etfTotalEth,
+      summary: {
+        filteredCompaniesCount: companiesResult.length,
+        filteredEtfsCount: etfsResult.length,
+        filteredCompaniesTotalEth: companiesResult.reduce((sum, c) => sum + (Number(c.ethHoldings) || 0), 0),
+        filteredEtfsTotalEth: etfsResult.reduce((sum, e) => sum + (Number(e.ethHoldings) || 0), 0),
         allCompaniesCount: allCompanies.length,
         allEtfsCount: allEtfs.length
       },
-      filteredCompanies: companiesResult,
-      filteredEtfs: etfsResult,
-      allCompanies: allCompanies,
-      allEtfs: allEtfs
+      filteredCompanies: serializeData(companiesResult),
+      filteredEtfs: serializeData(etfsResult),
+      allCompanies: serializeData(allCompanies),
+      allEtfs: serializeData(allEtfs)
     })
   } catch (error) {
     console.error('Debug homepage data error:', error)
