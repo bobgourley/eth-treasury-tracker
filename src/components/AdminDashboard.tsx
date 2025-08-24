@@ -35,8 +35,6 @@ export default function AdminDashboard() {
   const [isUpdating, setIsUpdating] = useState(false)
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus | null>(null)
   const [isUpdatingMarketCaps, setIsUpdatingMarketCaps] = useState(false)
-  const [isMigrating, setIsMigrating] = useState(false)
-  const [migrationStatus, setMigrationStatus] = useState<{success: boolean, message: string, error?: string} | null>(null)
   const [isUpdatingEtfs, setIsUpdatingEtfs] = useState(false)
   const [etfUpdateStatus, setEtfUpdateStatus] = useState<{success: boolean, message: string, error?: string} | null>(null)
   const [marketCapStatus, setMarketCapStatus] = useState<{
@@ -131,31 +129,6 @@ export default function AdminDashboard() {
     }
   }
 
-  const runDatabaseMigration = async () => {
-    setIsMigrating(true)
-    setMigrationStatus(null)
-
-    try {
-      const response = await fetch('/api/admin/migrate-database', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-
-      const result = await response.json()
-      setMigrationStatus(result)
-    } catch (error) {
-      console.error('Database migration failed:', error)
-      setMigrationStatus({
-        success: false,
-        message: 'Failed to run database migration',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      })
-    } finally {
-      setIsMigrating(false)
-    }
-  }
 
   const updateEtfData = async () => {
     setIsUpdatingEtfs(true)
@@ -169,8 +142,16 @@ export default function AdminDashboard() {
         }
       })
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
       const result = await response.json()
-      setEtfUpdateStatus(result)
+      setEtfUpdateStatus({
+        success: true,
+        message: result.message || 'ETF data updated successfully',
+        ...result
+      })
     } catch (error) {
       console.error('ETF update failed:', error)
       setEtfUpdateStatus({
@@ -237,43 +218,6 @@ export default function AdminDashboard() {
 
         </div>
 
-        {/* Database Migration */}
-        <div className="bg-red-50 rounded-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">🔧 Database Migration</h3>
-          <p className="text-sm text-gray-600 mb-4">
-            Create missing ETF tables in production database. This fixes the homepage ETF blocks showing zeros.
-            <br />
-            <span className="text-xs text-red-600 font-medium">⚠️ Run this once to create the missing etfs and etf_metrics tables.</span>
-          </p>
-          
-          <button
-            onClick={runDatabaseMigration}
-            disabled={isMigrating}
-            className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
-              isMigrating
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-red-600 hover:bg-red-700 text-white'
-            }`}
-          >
-            {isMigrating ? 'Running Migration...' : 'Run Database Migration'}
-          </button>
-          
-          {migrationStatus && (
-            <div className={`mt-4 p-4 rounded-lg ${
-              migrationStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-            }`}>
-              <p className="font-medium">
-                {migrationStatus.success ? '✅ Success!' : '❌ Error'}
-              </p>
-              <p className="text-sm mt-1">{migrationStatus.message}</p>
-              {migrationStatus.error && (
-                <p className="text-xs mt-2 font-mono bg-white bg-opacity-50 p-2 rounded">
-                  {migrationStatus.error}
-                </p>
-              )}
-            </div>
-          )}
-        </div>
 
         {/* ETF Data Management */}
         <div className="bg-blue-50 rounded-lg p-6 mb-6">
@@ -345,27 +289,41 @@ export default function AdminDashboard() {
           </div>
           
           {marketCapStatus && (
-            <div className="mt-4">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
-                <div className="bg-white p-3 rounded border">
-                  <p className="font-medium text-gray-600">Total Companies</p>
-                  <p className="text-xl font-bold text-blue-600">{marketCapStatus.summary?.totalCompanies || 0}</p>
+            <div className={`mt-4 rounded-lg p-4 ${
+              marketCapStatus.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+            }`}>
+              <h3 className={`text-lg font-semibold mb-3 ${
+                marketCapStatus.success ? 'text-green-800' : 'text-red-800'
+              }`}>
+                Market Cap Update Results
+              </h3>
+              
+              <p className={`mb-4 ${marketCapStatus.success ? 'text-green-700' : 'text-red-700'}`}>
+                {marketCapStatus.message}
+              </p>
+
+              {marketCapStatus.summary && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+                  <div className="bg-white p-3 rounded border">
+                    <p className="font-medium text-gray-600">Total Companies</p>
+                    <p className="text-xl font-bold text-blue-600">{marketCapStatus.summary?.totalCompanies || 0}</p>
+                  </div>
+                  <div className="bg-white p-3 rounded border">
+                    <p className="font-medium text-gray-600">With Market Cap</p>
+                    <p className="text-xl font-bold text-green-600">{marketCapStatus.summary?.companiesWithData || 0}</p>
+                  </div>
+                  <div className="bg-white p-3 rounded border">
+                    <p className="font-medium text-gray-600">Need Update</p>
+                    <p className="text-xl font-bold text-orange-600">{marketCapStatus.summary?.companiesNeedingUpdate || 0}</p>
+                  </div>
+                  <div className="bg-white p-3 rounded border">
+                    <p className="font-medium text-gray-600">Total Market Cap</p>
+                    <p className="text-xl font-bold text-purple-600">
+                      ${marketCapStatus.summary?.totalMarketCap ? (marketCapStatus.summary.totalMarketCap / 1000000000).toFixed(2) + 'B' : '0'}
+                    </p>
+                  </div>
                 </div>
-                <div className="bg-white p-3 rounded border">
-                  <p className="font-medium text-gray-600">With Market Cap</p>
-                  <p className="text-xl font-bold text-green-600">{marketCapStatus.summary?.companiesWithData || 0}</p>
-                </div>
-                <div className="bg-white p-3 rounded border">
-                  <p className="font-medium text-gray-600">Need Update</p>
-                  <p className="text-xl font-bold text-orange-600">{marketCapStatus.summary?.companiesNeedingUpdate || 0}</p>
-                </div>
-                <div className="bg-white p-3 rounded border">
-                  <p className="font-medium text-gray-600">Total Market Cap</p>
-                  <p className="text-xl font-bold text-purple-600">
-                    ${marketCapStatus.summary?.totalMarketCap ? (marketCapStatus.summary.totalMarketCap / 1000000000).toFixed(2) + 'B' : '0'}
-                  </p>
-                </div>
-              </div>
+              )}
               
               {marketCapStatus.companies && (
                 <div className="bg-white rounded border max-h-64 overflow-y-auto">

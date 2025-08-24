@@ -1,5 +1,6 @@
 // API service utilities for external data sources
 import { Company } from '@/types/company'
+import { callWithRateLimit } from './rateLimiter'
 
 // Etherscan API configuration
 const ETHERSCAN_BASE_URL = 'https://api.etherscan.io/api'
@@ -226,17 +227,16 @@ export async function getStockPrice(symbol: string): Promise<{ price: number; ma
     return null
   }
 
-  try {
+  return callWithRateLimit('alpha_vantage', `stock-${symbol}`, async () => {
+    console.log(`Fetching stock data for ${symbol} from Alpha Vantage...`)
+    
     // First, get the stock quote for current price
     const quoteUrl = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`
-    
-    console.log(`Fetching stock data for ${symbol} from Alpha Vantage...`)
     
     const quoteResponse = await fetch(quoteUrl, {
       headers: {
         'Accept': 'application/json',
       },
-      // Add timeout to prevent hanging
       signal: AbortSignal.timeout(10000)
     })
 
@@ -252,9 +252,7 @@ export async function getStockPrice(symbol: string): Promise<{ price: number; ma
     }
     
     if (quoteData['Note']) {
-      // Rate limit hit
-      console.warn(`Alpha Vantage rate limit for ${symbol}: ${quoteData['Note']}`)
-      return null
+      throw new Error(`Alpha Vantage rate limit: ${quoteData['Note']}`)
     }
 
     const globalQuote = quoteData['Global Quote']
@@ -264,47 +262,44 @@ export async function getStockPrice(symbol: string): Promise<{ price: number; ma
 
     const price = parseFloat(globalQuote['05. price'] || '0')
     
-    // Get company overview for market cap
-    const overviewUrl = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`
-    
-    const overviewResponse = await fetch(overviewUrl, {
-      headers: {
-        'Accept': 'application/json',
-      },
-      signal: AbortSignal.timeout(10000)
+    // Get company overview for market cap (second API call with rate limiting)
+    return callWithRateLimit('alpha_vantage', `overview-${symbol}`, async () => {
+      const overviewUrl = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`
+      
+      const overviewResponse = await fetch(overviewUrl, {
+        headers: {
+          'Accept': 'application/json',
+        },
+        signal: AbortSignal.timeout(10000)
+      })
+
+      if (!overviewResponse.ok) {
+        throw new Error(`Alpha Vantage Overview API returned ${overviewResponse.status}`)
+      }
+
+      const overviewData = await overviewResponse.json()
+      
+      if (overviewData['Error Message']) {
+        throw new Error(`Alpha Vantage Overview Error: ${overviewData['Error Message']}`)
+      }
+      
+      if (overviewData['Note']) {
+        throw new Error(`Alpha Vantage overview rate limit: ${overviewData['Note']}`)
+      }
+
+      const marketCap = parseFloat(overviewData['MarketCapitalization'] || '0')
+      
+      if (price > 0) {
+        console.log(`✅ Alpha Vantage data for ${symbol}: Price=$${price}, MarketCap=$${marketCap.toLocaleString()}`)
+        return { price, marketCap }
+      } else {
+        throw new Error('Invalid price data received')
+      }
     })
-
-    if (!overviewResponse.ok) {
-      throw new Error(`Alpha Vantage Overview API returned ${overviewResponse.status}`)
-    }
-
-    const overviewData = await overviewResponse.json()
-    
-    // Check for API rate limit or error
-    if (overviewData['Error Message']) {
-      throw new Error(`Alpha Vantage Overview Error: ${overviewData['Error Message']}`)
-    }
-    
-    if (overviewData['Note']) {
-      // Rate limit hit
-      console.warn(`Alpha Vantage overview rate limit for ${symbol}: ${overviewData['Note']}`)
-      // Return price data even if we can't get market cap
-      return { price, marketCap: 0 }
-    }
-
-    const marketCap = parseFloat(overviewData['MarketCapitalization'] || '0')
-    
-    if (price > 0) {
-      console.log(`✅ Alpha Vantage data for ${symbol}: Price=$${price}, MarketCap=$${marketCap.toLocaleString()}`)
-      return { price, marketCap }
-    } else {
-      throw new Error('Invalid price data received')
-    }
-    
-  } catch (error) {
+  }).catch(error => {
     console.error(`❌ Failed to fetch stock data for ${symbol}:`, error)
     return null
-  }
+  })
 }
 
 /**

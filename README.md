@@ -103,7 +103,10 @@ The platform integrates with multiple external APIs to provide real-time, accura
 - **ETH Supply**: Real-time total Ethereum supply (converted from wei to ETH)
 - **Blockchain Verification**: Validate ETH holdings and transactions
 - **Network Statistics**: Current network metrics and supply data
-- **Rate Limits**: 5 calls/second (free tier), 100 calls/second (paid)
+- **Rate Limits**: 
+  - **Free Tier**: 5 calls/second, 100,000 calls/day
+  - **Paid Tier**: 100 calls/second, unlimited daily calls
+- **Current Usage**: 1-2 calls per update cycle (every 30 minutes)
 - **Caching**: 24-hour cache for ETH supply (updates slowly)
 - **API Key Required**: `ETHERSCAN_API_KEY`
 
@@ -115,7 +118,10 @@ The platform integrates with multiple external APIs to provide real-time, accura
 - **BTC Price**: Bitcoin price for ETH/BTC ratio calculations
 - **Market Data**: Market caps, trading volumes, price changes
 - **Historical Data**: Price trends and historical analysis
-- **Rate Limits**: 50 calls/minute (free tier), 500 calls/minute (paid)
+- **Rate Limits**: 
+  - **Free Tier**: 50 calls/minute (3,000 calls/hour)
+  - **Paid Tier**: 500 calls/minute (30,000 calls/hour)
+- **Current Usage**: 2-3 calls per update cycle (every 5-30 minutes)
 - **API Key**: Optional (`COINGECKO_API_KEY` - improves rate limits)
 
 ### 📈 **Alpha Vantage API** (Stock Market Data)
@@ -126,7 +132,10 @@ The platform integrates with multiple external APIs to provide real-time, accura
 - **Market Caps**: Company market capitalizations
 - **Financial Metrics**: P/E ratios, trading volumes, price changes
 - **Company Fundamentals**: Shares outstanding, financial ratios
-- **Rate Limits**: 25 requests per day (free tier)
+- **Rate Limits**: 
+  - **Free Tier**: 25 requests per day, 5 requests per minute
+  - **Paid Tier**: 75+ requests per minute, unlimited daily calls
+- **Current Usage**: 9-18 calls per update cycle (1-2 per company)
 - **API Key Required**: `ALPHA_VANTAGE_API_KEY`
 - **Smart Usage**: Prioritized updates for most important companies
 
@@ -138,7 +147,10 @@ The platform integrates with multiple external APIs to provide real-time, accura
 - **Ethereum News**: General Ethereum and cryptocurrency news
 - **Market Analysis**: Financial news and market insights
 - **Content Filtering**: Relevant news filtering by company and keywords
-- **Rate Limits**: 1,000 requests/day (free tier)
+- **Rate Limits**: 
+  - **Free Tier**: 1,000 requests per day
+  - **Paid Tier**: 50,000+ requests per day
+- **Current Usage**: 5-10 calls per update cycle (every 30 minutes)
 - **API Key Required**: `NEWS_API_KEY`
 
 ### 🏛️ **SEC EDGAR API** (Government Filings)
@@ -149,7 +161,10 @@ The platform integrates with multiple external APIs to provide real-time, accura
 - **Financial Reports**: Quarterly and annual reports
 - **Corporate Events**: Material events and disclosures
 - **Direct Links**: Links to official SEC documents
-- **Rate Limits**: No official limits (government API)
+- **Rate Limits**: 
+  - **Free Tier**: 10 requests per second (no daily limit)
+  - **User-Agent Required**: Must include proper User-Agent header
+- **Current Usage**: 9-18 calls per update cycle (1-2 per company)
 - **Caching**: 1-hour cache for filing data
 
 ### 📊 **Financial Modeling Prep API** (ETF Data)
@@ -159,7 +174,31 @@ The platform integrates with multiple external APIs to provide real-time, accura
 - **ETF Holdings**: Ethereum ETF holdings and compositions
 - **ETF Metrics**: Assets under management, expense ratios
 - **Performance Data**: ETF performance and tracking metrics
+- **Rate Limits**: 
+  - **Free Tier**: 250 requests per day
+  - **Paid Tier**: 10,000+ requests per day
+- **Current Usage**: 9-18 calls per update cycle (1-2 per ETF)
 - **API Key Required**: `FMP_API_KEY`
+
+---
+
+## ⚡ **API Rate Limits Summary**
+
+| API Service | Free Tier Limits | Current Usage | Risk Level | Mitigation |
+|-------------|------------------|---------------|------------|------------|
+| **Etherscan** | 5/sec, 100K/day | 1-2 calls per 30min | ✅ Low | 24h caching |
+| **CoinGecko** | 50/min, 3K/hour | 2-3 calls per 5-30min | ✅ Low | Database-first |
+| **Alpha Vantage** | 25/day, 5/min | 9-18 calls per cycle | ⚠️ **High** | Smart prioritization |
+| **NewsAPI** | 1,000/day | 5-10 calls per 30min | ✅ Low | RSS fallback |
+| **SEC EDGAR** | 10/sec, unlimited | 9-18 calls per cycle | ✅ Low | 1h caching |
+| **Financial Modeling Prep** | 250/day | 9-18 calls per cycle | ⚠️ **Medium** | ETF prioritization |
+
+### 🚨 **Critical Rate Limit Considerations**
+- **Alpha Vantage**: Most restrictive at 25 requests/day - requires careful usage
+- **Financial Modeling Prep**: 250/day limit could be reached with frequent updates
+- **Database-first architecture** minimizes API calls by caching all data locally
+- **Smart update cycles** prioritize most important data sources
+- **Fallback mechanisms** ensure service continues even when APIs are rate-limited
 
 ## 🏗️ System Architecture
 

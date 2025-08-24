@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { FALLBACK_ETH_SUPPLY } from './constants'
+import { callWithRateLimit } from './rateLimiter'
 
 interface CoinGeckoResponse {
   ethereum: {
@@ -19,7 +20,7 @@ interface EtherscanSupplyResponse {
  * Fetches real ETH price from CoinGecko API
  */
 export async function fetchEthPrice(): Promise<number | null> {
-  try {
+  return callWithRateLimit('coingecko', 'eth-price', async () => {
     console.log('🔄 Fetching ETH price from CoinGecko...')
     
     const response = await fetch(
@@ -33,8 +34,7 @@ export async function fetchEthPrice(): Promise<number | null> {
     )
     
     if (!response.ok) {
-      console.error('❌ CoinGecko API error:', response.status, response.statusText)
-      return null
+      throw new Error(`CoinGecko API error: ${response.status} ${response.statusText}`)
     }
     
     const data: CoinGeckoResponse = await response.json()
@@ -44,28 +44,26 @@ export async function fetchEthPrice(): Promise<number | null> {
       console.log(`✅ ETH price fetched: $${ethPrice.toFixed(2)}`)
       return ethPrice
     } else {
-      console.error('❌ Invalid ETH price data from CoinGecko:', data)
-      return null
+      throw new Error('Invalid ETH price data from CoinGecko')
     }
-    
-  } catch (error) {
+  }).catch(error => {
     console.error('❌ Error fetching ETH price from CoinGecko:', error)
     return null
-  }
+  })
 }
 
 /**
  * Fetches real ETH supply from Etherscan API
  */
 export async function fetchEthSupply(): Promise<number | null> {
-  try {
+  const etherscanApiKey = process.env.ETHERSCAN_API_KEY
+  if (!etherscanApiKey) {
+    console.log('⚠️ No Etherscan API key found, skipping ETH supply fetch')
+    return null
+  }
+
+  return callWithRateLimit('etherscan', 'eth-supply', async () => {
     console.log('🔄 Fetching ETH supply from Etherscan...')
-    
-    const etherscanApiKey = process.env.ETHERSCAN_API_KEY
-    if (!etherscanApiKey) {
-      console.log('⚠️ No Etherscan API key found, skipping ETH supply fetch')
-      return null
-    }
     
     const response = await fetch(
       `https://api.etherscan.io/api?module=stats&action=ethsupply&apikey=${etherscanApiKey}`,
@@ -78,8 +76,7 @@ export async function fetchEthSupply(): Promise<number | null> {
     )
     
     if (!response.ok) {
-      console.error('❌ Etherscan API error:', response.status, response.statusText)
-      return null
+      throw new Error(`Etherscan API error: ${response.status} ${response.statusText}`)
     }
     
     const data: EtherscanSupplyResponse = await response.json()
@@ -90,14 +87,12 @@ export async function fetchEthSupply(): Promise<number | null> {
       console.log(`✅ ETH supply fetched: ${ethSupply.toLocaleString()} ETH`)
       return ethSupply
     } else {
-      console.error('❌ Invalid ETH supply data from Etherscan:', data)
-      return null
+      throw new Error('Invalid ETH supply data from Etherscan')
     }
-    
-  } catch (error) {
+  }).catch(error => {
     console.error('❌ Error fetching ETH supply from Etherscan:', error)
     return null
-  }
+  })
 }
 
 /**

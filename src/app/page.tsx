@@ -76,34 +76,81 @@ async function getHomePageData(): Promise<HomePageData> {
       })
     ])
 
-    // Fetch news from Google News RSS API
-    let newsResult = []
+    // Fetch news directly from database for homepage (more reliable than internal API call)
+    let newsResult: NewsArticle[] = []
     try {
-      const newsResponse = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/news/google-rss?limit=5`, {
-        next: { revalidate: 1800 } // Cache for 30 minutes
-      })
-      
-      if (newsResponse.ok) {
-        const newsData = await newsResponse.json()
-        newsResult = newsData.articles || []
-      }
-    } catch (error) {
-      console.error('Failed to fetch news from Google RSS:', error)
-      // Fallback to database news if API fails
+      // First try to get recent cached news from database
       const dbNews = await prisma.newsArticle.findMany({
-        where: { isActive: true },
+        where: { 
+          isActive: true,
+          publishedAt: {
+            gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Last 24 hours
+          }
+        },
         orderBy: { publishedAt: 'desc' },
         take: 5
       })
-      newsResult = dbNews.map(article => ({
-        title: article.title,
-        description: article.description || '',
-        url: article.url,
-        publishedAt: article.publishedAt.toISOString(),
-        source: { name: article.sourceName },
-        company: article.company,
-        ticker: article.ticker
-      }))
+      
+      if (dbNews.length > 0) {
+        newsResult = dbNews.map(article => ({
+          title: article.title,
+          description: article.description || '',
+          url: article.url,
+          publishedAt: article.publishedAt.toISOString(),
+          source: { name: article.sourceName },
+          company: article.company,
+          ticker: article.ticker
+        }))
+        console.log(`📰 Homepage: Using ${newsResult.length} cached news articles`)
+      } else {
+        // If no recent news in database, try to fetch from Google News RSS
+        try {
+          const { fetchEthereumNewsMultiTopic } = await import('@/lib/googleNewsRss')
+          const freshNews = await fetchEthereumNewsMultiTopic(5)
+          
+          if (freshNews.length > 0) {
+            // Save to database and use for homepage
+            for (const item of freshNews) {
+              await prisma.newsArticle.upsert({
+                where: { url: item.url },
+                update: {
+                  title: item.title,
+                  description: item.description,
+                  sourceName: item.source,
+                  publishedAt: new Date(item.publishedAt),
+                  isActive: true
+                },
+                create: {
+                  title: item.title,
+                  description: item.description,
+                  url: item.url,
+                  publishedAt: new Date(item.publishedAt),
+                  sourceName: item.source,
+                  company: null,
+                  ticker: null,
+                  isActive: true
+                }
+              })
+            }
+            
+            newsResult = freshNews.map(item => ({
+              title: item.title,
+              description: item.description,
+              url: item.url,
+              publishedAt: item.publishedAt,
+              source: { name: item.source },
+              company: null,
+              ticker: null
+            }))
+            console.log(`📰 Homepage: Fetched ${newsResult.length} fresh news articles`)
+          }
+        } catch (newsError) {
+          console.error('Failed to fetch fresh news for homepage:', newsError)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch news for homepage:', error)
+      newsResult = []
     }
 
     // Get latest system metrics and live data
