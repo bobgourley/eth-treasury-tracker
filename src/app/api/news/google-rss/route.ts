@@ -46,9 +46,41 @@ export async function GET(request: NextRequest) {
     const newsItems: GoogleNewsItem[] = await fetchEthereumNewsMultiTopic(limit)
     
     if (newsItems.length === 0) {
+      console.log('⚠️ No news from RSS, checking database for recent articles...')
+      // If RSS fails, try to get recent articles from database
+      const dbNews = await prisma.newsArticle.findMany({
+        where: { 
+          isActive: true,
+          createdAt: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // Last 7 days
+          }
+        },
+        orderBy: { publishedAt: 'desc' },
+        take: limit
+      })
+      
+      if (dbNews.length > 0) {
+        console.log(`📰 Returning ${dbNews.length} cached articles from database`)
+        return NextResponse.json({
+          success: true,
+          count: dbNews.length,
+          articles: dbNews.map(article => ({
+            title: article.title,
+            description: article.description || '',
+            url: article.url,
+            publishedAt: article.publishedAt.toISOString(),
+            source: { name: article.sourceName },
+            company: article.company,
+            ticker: article.ticker
+          })),
+          cached: true,
+          message: 'RSS failed, using database cache'
+        })
+      }
+      
       return NextResponse.json({
         success: false,
-        error: 'No news articles found',
+        error: 'No news articles found from RSS or database',
         count: 0,
         articles: []
       })

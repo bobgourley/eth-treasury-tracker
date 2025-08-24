@@ -92,7 +92,8 @@ export async function fetchEthereumNewsMultiTopic(limit: number = 15): Promise<G
       
       const response = await fetch(rssUrl, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; EthereumTracker/1.0; +https://ethereumlist.com)'
+          'User-Agent': 'Mozilla/5.0 (compatible; EthereumTracker/1.0; +https://ethereumlist.com)',
+          'Accept': 'application/rss+xml, application/xml, text/xml'
         }
       })
       
