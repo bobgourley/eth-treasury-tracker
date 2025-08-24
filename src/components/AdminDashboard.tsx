@@ -60,7 +60,7 @@ export default function AdminDashboard() {
 
   const triggerDataUpdate = async () => {
     setIsUpdating(true)
-    setUpdateStatus(null)
+    setUpdateStatus('')
 
     try {
       const response = await fetch('/api/admin/update-metrics', {
@@ -131,8 +131,8 @@ export default function AdminDashboard() {
 
 
   const updateEtfData = async () => {
-    setIsUpdatingEtfs(true)
-    setEtfUpdateStatus(null)
+    setIsUpdating(true)
+    setEtfUpdateStatus('')
 
     try {
       const response = await fetch('/api/etfs/update', {
@@ -147,20 +147,12 @@ export default function AdminDashboard() {
       }
 
       const result = await response.json()
-      setEtfUpdateStatus({
-        success: true,
-        message: result.message || 'ETF data updated successfully',
-        ...result
-      })
+      setEtfUpdateStatus('ETF data updated successfully')
     } catch (error) {
-      console.error('ETF update failed:', error)
-      setEtfUpdateStatus({
-        success: false,
-        message: 'Failed to update ETF data',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      })
+      console.error('ETF update error:', error)
+      setEtfUpdateStatus('Failed to update ETF data')
     } finally {
-      setIsUpdatingEtfs(false)
+      setIsUpdating(false)
     }
   }
 
@@ -230,29 +222,17 @@ export default function AdminDashboard() {
           
           <button
             onClick={updateEtfData}
-            disabled={isUpdatingEtfs}
-            className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
-              isUpdatingEtfs
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
-            }`}
+            disabled={isUpdating}
+            className={isUpdating ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}
           >
-            {isUpdatingEtfs ? 'Updating ETF Data...' : 'Update ETF Data'}
+            {isUpdating ? 'Updating...' : 'Update ETF Data'}
           </button>
           
           {etfUpdateStatus && (
-            <div className={`mt-4 p-4 rounded-lg ${
-              etfUpdateStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-            }`}>
+            <div className="mt-4 p-4 rounded-lg bg-red-100 text-red-800">
               <p className="font-medium">
-                {etfUpdateStatus.success ? '✅ Success!' : '❌ Error'}
+                ❌ {etfUpdateStatus}
               </p>
-              <p className="text-sm mt-1">{etfUpdateStatus.message}</p>
-              {etfUpdateStatus.error && (
-                <p className="text-xs mt-2 font-mono bg-white bg-opacity-50 p-2 rounded">
-                  {etfUpdateStatus.error}
-                </p>
-              )}
             </div>
           )}
         </div>
@@ -455,14 +435,13 @@ export default function AdminDashboard() {
             )}
 
             <p className="text-xs text-gray-500 mt-3">
-              Updated: {new Date(updateStatus.timestamp).toLocaleString()}
+              Updated: {new Date().toLocaleString()}
             </p>
           </div>
         )}
 
         {/* Last Check Status */}
         {/* System Status - Temporarily disabled for MVP deployment */}
-
 
       </div>
     </div>
