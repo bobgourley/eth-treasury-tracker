@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
 import { FALLBACK_ETH_PRICE } from '@/lib/constants'
 import Link from 'next/link'
 import CompanyLink from '@/components/CompanyLink'
