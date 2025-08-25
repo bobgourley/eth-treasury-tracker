@@ -45,7 +45,14 @@ export async function GET(request: Request) {
       where: { isActive: true }
     })
 
-    // Calculate metrics
+    // Calculate metrics - handle null ethPrice
+    if (!ethPrice) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'ETH price not available' 
+      }, { status: 503 })
+    }
+    
     const totalEthHeld = companies.reduce((sum, company) => 
       sum + (company.ethHoldings || 0), 0
     )
