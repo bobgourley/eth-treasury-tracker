@@ -37,7 +37,11 @@ export async function GET(
 
     // ETH price already fetched from systemMetrics above
 
-    // Calculate derived metrics
+    // Calculate derived metrics - handle null ethPrice
+    if (!ethPrice) {
+      return NextResponse.json({ error: 'ETH price not available' }, { status: 503 })
+    }
+    
     const ethValue = (company.ethHoldings || 0) * ethPrice
     const marketCapNumeric = company.marketCap ? parseFloat(company.marketCap.toString()) : 0
     const ecmcPercentage = marketCapNumeric > 0 ? (ethValue / marketCapNumeric) * 100 : 0
