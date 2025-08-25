@@ -79,7 +79,12 @@ export async function GET() {
         console.log(`📊 ETF metrics using ETH supply from database: ${ethSupply.toLocaleString()}`)
       }
     } catch {
-      console.log('⚠️ ETH supply fetch from database failed, using fallback')
+      console.log('⚠️ ETH supply fetch from database failed')
+    }
+    
+    // Handle null ethSupply
+    if (!ethSupply) {
+      return NextResponse.json({ error: 'ETH supply not available' }, { status: 503 })
     }
     
     const ethSupplyPercentage = (totalEthHeld / ethSupply) * 100
