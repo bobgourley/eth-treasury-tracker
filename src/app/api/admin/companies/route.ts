@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 
 const ALLOWED_ADMIN_EMAILS = process.env.ADMIN_EMAIL?.split(',') || []
@@ -9,7 +10,7 @@ const ALLOWED_ADMIN_EMAILS = process.env.ADMIN_EMAIL?.split(',') || []
  */
 async function checkAuth(request: NextRequest): Promise<boolean> {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     
     console.log('🔍 checkAuth - Session:', session)
     console.log('🔍 checkAuth - ALLOWED_ADMIN_EMAILS:', ALLOWED_ADMIN_EMAILS)
