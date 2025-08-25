@@ -220,8 +220,8 @@ async function getHomePageData(): Promise<HomePageData> {
       news: newsResult,
       ethPrice: ethPrice,
       ethSupply: ethSupply,
-      bitcoinPrice: cryptoData?.bitcoinPrice,
-      bitcoinMarketCap: cryptoData?.bitcoinMarketCap,
+      bitcoinPrice: cryptoData?.bitcoinPrice || null,
+      bitcoinMarketCap: cryptoData?.bitcoinMarketCap || null,
       ethereumMarketCap: cryptoData?.ethMarketCap || (ethPrice * ethSupply),
       ethStaked: ethStaked
     }
