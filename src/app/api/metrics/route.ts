@@ -213,9 +213,14 @@ export async function GET() {
     // Fetch Bitcoin price from database or live API - no fallbacks
     let bitcoinPrice = null
     
+    // Get systemMetrics again for Bitcoin price check
+    const systemMetricsForBtc = await prisma.systemMetrics.findFirst({
+      orderBy: { lastUpdate: 'desc' }
+    })
+    
     // First try to get from database
-    if (systemMetrics?.bitcoinPrice) {
-      bitcoinPrice = systemMetrics.bitcoinPrice
+    if (systemMetricsForBtc?.bitcoinPrice) {
+      bitcoinPrice = systemMetricsForBtc.bitcoinPrice
       console.log(`✅ Bitcoin price from database: $${bitcoinPrice.toLocaleString()}`)
     } else {
       // If not in database, fetch live and store
