@@ -46,9 +46,15 @@ export async function GET() {
             const rawLink = linkMatch ? linkMatch[1] : 'No link found'
             const title = titleMatch ? titleMatch[1] : 'No title found'
             
-            // Try to process the link
+            // Try to process the link using the same logic as the RSS fetcher
             let processedLink = rawLink
-            if (rawLink.includes('news.google.com')) {
+            if (rawLink.includes('news.google.com/rss/articles/')) {
+              // Convert RSS article URL to web URL format
+              const articleId = rawLink.split('/articles/')[1]?.split('?')[0]
+              if (articleId) {
+                processedLink = `https://news.google.com/articles/${articleId}?hl=en-US&gl=US&ceid=US%3Aen`
+              }
+            } else if (rawLink.includes('news.google.com') && rawLink.includes('url=')) {
               try {
                 const urlParams = new URLSearchParams(rawLink.split('?')[1])
                 const actualUrl = urlParams.get('url')

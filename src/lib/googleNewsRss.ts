@@ -120,10 +120,18 @@ export async function fetchEthereumNewsMultiTopic(limit: number = 15): Promise<G
             const cleanTitle = titleParts.length > 1 ? titleParts.slice(0, -1).join(' - ') : titleStr
             const source = titleParts.length > 1 ? titleParts[titleParts.length - 1] : 'Unknown'
             
-            // Clean up Google News redirect URLs
+            // Handle Google News URLs by converting RSS article URLs to clickable web URLs
             let cleanUrl = String(newsItem.link || '')
-            if (cleanUrl.includes('news.google.com')) {
-              // Extract the actual URL from Google News redirect
+            if (cleanUrl.includes('news.google.com/rss/articles/')) {
+              // Convert RSS article URL to web URL format
+              // From: https://news.google.com/rss/articles/CBMi...?oc=5
+              // To: https://news.google.com/articles/CBMi...?hl=en-US&gl=US&ceid=US%3Aen
+              const articleId = cleanUrl.split('/articles/')[1]?.split('?')[0]
+              if (articleId) {
+                cleanUrl = `https://news.google.com/articles/${articleId}?hl=en-US&gl=US&ceid=US%3Aen`
+              }
+            } else if (cleanUrl.includes('news.google.com') && cleanUrl.includes('url=')) {
+              // Handle old-style Google News redirect URLs with url parameter
               try {
                 const urlParams = new URLSearchParams(cleanUrl.split('?')[1])
                 const actualUrl = urlParams.get('url')
