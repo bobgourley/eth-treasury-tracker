@@ -33,7 +33,7 @@ export async function GET() {
         
         // Parse XML manually to see raw data
         const items = []
-        const itemMatches = xmlText.match(/<item>(.*?)<\/item>/gs)
+        const itemMatches = xmlText.match(/<item>(.*?)<\/item>/g)
         
         if (itemMatches) {
           for (let i = 0; i < Math.min(3, itemMatches.length); i++) {
