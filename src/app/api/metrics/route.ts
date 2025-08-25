@@ -210,50 +210,20 @@ export async function GET() {
       console.log('Could not fetch live companies data for fallback, using static values')
     }
     
-    // Fetch Bitcoin price from database or live API - no fallbacks
+    // Bitcoin price handling - fetch live since not stored in database
     let bitcoinPrice = null
     
-    // Get systemMetrics again for Bitcoin price check
-    const systemMetricsForBtc = await prisma.systemMetrics.findFirst({
-      orderBy: { lastUpdate: 'desc' }
-    })
-    
-    // First try to get from database
-    if (systemMetricsForBtc?.bitcoinPrice) {
-      bitcoinPrice = systemMetricsForBtc.bitcoinPrice
-      console.log(`✅ Bitcoin price from database: $${bitcoinPrice.toLocaleString()}`)
-    } else {
-      // If not in database, fetch live and store
-      try {
-        const cryptoResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
-        if (cryptoResponse.ok) {
-          const cryptoData = await cryptoResponse.json()
-          if (cryptoData.bitcoin?.usd) {
-            bitcoinPrice = cryptoData.bitcoin.usd
-            console.log(`✅ Live Bitcoin price fetched: $${bitcoinPrice.toLocaleString()}`)
-            
-            // Store in database for future use
-            await prisma.systemMetrics.upsert({
-              where: { id: systemMetrics?.id || 0 },
-              update: { bitcoinPrice },
-              create: { 
-                totalEthHoldings: 0,
-                totalEthValue: 0,
-                totalMarketCap: '0',
-                ethPrice: ethPrice,
-                bitcoinPrice: bitcoinPrice,
-                ethSupplyPercent: 0,
-                totalEthSupply: 0,
-                ethSupplySource: 'unknown',
-                totalCompanies: 0
-              }
-            })
-          }
+    try {
+      const cryptoResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
+      if (cryptoResponse.ok) {
+        const cryptoData = await cryptoResponse.json()
+        if (cryptoData.bitcoin?.usd) {
+          bitcoinPrice = cryptoData.bitcoin.usd
+          console.log(`✅ Live Bitcoin price fetched: $${bitcoinPrice.toLocaleString()}`)
         }
-      } catch (error) {
-        console.error('Failed to fetch Bitcoin price from API:', error)
-        throw new Error('No Bitcoin price available from database or API')
       }
+    } catch (error) {
+      console.log('⚠️ Failed to fetch live Bitcoin price')
     }
 
     // Static fallback metrics for MVP (updated with live data when possible)
