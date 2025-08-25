@@ -210,6 +210,10 @@ async function getHomePageData(): Promise<HomePageData> {
     // Always use database ETH price - database is single source of truth
     const ethPrice = systemMetrics?.ethPrice
     
+    if (!ethPrice) {
+      throw new Error('ETH price unavailable from database')
+    }
+    
     return {
       companies: companiesResult,
       etfs: etfsResult,
