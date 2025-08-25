@@ -55,7 +55,7 @@ export default function CardsPage() {
         ])
         
         if (!companiesResponse.ok || !etfsResponse.ok || !metricsResponse.ok) {
-          throw new Error('Failed to fetch data')
+          throw new Error(`Failed to fetch data: ${companiesResponse.status}, ${etfsResponse.status}, ${metricsResponse.status}`)
         }
 
         const [companiesData, etfsData, metricsData] = await Promise.all([
@@ -64,12 +64,14 @@ export default function CardsPage() {
           metricsResponse.json()
         ])
 
+        console.log('Cards page - Metrics data:', metricsData)
+
         setCardData({
           companies: companiesData.companies || [],
           etfs: etfsData.etfs || [],
-          ethPrice: metricsData.ethPrice,
-          btcPrice: metricsData.bitcoinPrice,
-          totalEthSupply: metricsData.ethSupply
+          ethPrice: metricsData.ethPrice || 0,
+          btcPrice: metricsData.bitcoinPrice || metricsData.btcPrice || 0,
+          totalEthSupply: metricsData.totalEthSupply || 120500000
         })
       } catch (err) {
         console.error('Error fetching card data:', err)
