@@ -161,7 +161,10 @@ export default function CardsPage() {
             justifyContent: 'center', 
             alignItems: 'center',
             overflow: 'hidden',
-            marginBottom: '1rem'
+            marginBottom: '1rem',
+            width: '500px',
+            height: '280px',
+            margin: '0 auto 1rem auto'
           }}>
             <div 
               ref={companySummaryRef} 
@@ -250,7 +253,10 @@ export default function CardsPage() {
             justifyContent: 'center', 
             alignItems: 'center',
             overflow: 'hidden',
-            marginBottom: '1rem'
+            marginBottom: '1rem',
+            width: '500px',
+            height: '280px',
+            margin: '0 auto 1rem auto'
           }}>
             <div 
               ref={etfSummaryRef} 
@@ -339,7 +345,10 @@ export default function CardsPage() {
             justifyContent: 'center', 
             alignItems: 'center',
             overflow: 'hidden',
-            marginBottom: '1rem'
+            marginBottom: '1rem',
+            width: '500px',
+            height: '280px',
+            margin: '0 auto 1rem auto'
           }}>
             <div 
               ref={ethBtcComparisonRef} 
@@ -419,7 +428,10 @@ export default function CardsPage() {
             justifyContent: 'center', 
             alignItems: 'center',
             overflow: 'hidden',
-            marginBottom: '1rem'
+            marginBottom: '1rem',
+            width: '500px',
+            height: '280px',
+            margin: '0 auto 1rem auto'
           }}>
             <div 
               ref={ethTreasuryPercentRef} 

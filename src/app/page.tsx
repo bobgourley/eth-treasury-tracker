@@ -76,35 +76,30 @@ async function getHomePageData(): Promise<HomePageData> {
       })
     ])
 
-    // Fetch news using the same reliable approach as the news page
+    // Fetch news directly using the RSS fetcher instead of API call to avoid SSR issues
     let newsResult: NewsArticle[] = []
     try {
-      console.log('🔍 Homepage: Starting news fetch via API...')
+      console.log('🔍 Homepage: Starting direct RSS news fetch...')
       
-      const baseUrl = process.env.VERCEL_URL 
-        ? `https://${process.env.VERCEL_URL}` 
-        : process.env.NODE_ENV === 'development' 
-          ? 'http://localhost:3000'
-          : 'https://ethereumlist.com'
+      // Import the RSS fetcher directly
+      const { fetchEthereumNewsMultiTopic } = await import('@/lib/googleNewsRss')
+      const rssArticles = await fetchEthereumNewsMultiTopic(5)
       
-      const response = await fetch(`${baseUrl}/api/news/google-rss?limit=5`, {
-        next: { revalidate: 300 } // Revalidate every 5 minutes for fresh news
-      })
-      
-      console.log(`📰 Homepage: API response status: ${response.status}`)
-      
-      if (response.ok) {
-        const data = await response.json()
-        if (data.success && data.articles && data.articles.length > 0) {
-          newsResult = data.articles
-          console.log(`📰 Homepage: Successfully fetched ${newsResult.length} real RSS articles`)
-          console.log(`📰 Homepage: First article URL: ${newsResult[0]?.url}`)
-        } else {
-          console.log('⚠️ Homepage: API returned no articles, using fallback news')
-          // Use fallback only if API returns no articles
-        }
+      if (rssArticles && rssArticles.length > 0) {
+        // Convert GoogleNewsItem to NewsArticle format
+        newsResult = rssArticles.map(item => ({
+          title: item.title,
+          description: item.description,
+          url: item.url,
+          publishedAt: item.publishedAt,
+          source: { name: item.source },
+          company: null,
+          ticker: null
+        }))
+        console.log(`📰 Homepage: Successfully fetched ${newsResult.length} real RSS articles`)
+        console.log(`📰 Homepage: First article URL: ${newsResult[0]?.url}`)
       } else {
-        console.log('⚠️ Homepage: API fetch failed, using fallback news')
+        console.log('⚠️ Homepage: RSS fetch returned no articles, using fallback news')
         // Use same fallback URLs as news API for consistency
         const fallbackNews = [
           {

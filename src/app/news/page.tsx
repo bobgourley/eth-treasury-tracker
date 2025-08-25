@@ -212,31 +212,40 @@ const fallbackNews = [
 // Server-side data fetching from Google News RSS
 async function getNewsData() {
   try {
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : process.env.NODE_ENV === 'development' 
-        ? 'http://localhost:3000'
-        : 'https://ethereumlist.com'
+    console.log('🔍 News Page: Starting direct RSS news fetch...')
     
-    const response = await fetch(`${baseUrl}/api/news/google-rss?limit=20`, {
-      next: { revalidate: 1800 } // Revalidate every 30 minutes
-    })
+    // Import the RSS fetcher directly to avoid SSR issues
+    const { fetchEthereumNewsMultiTopic } = await import('@/lib/googleNewsRss')
+    const rssArticles = await fetchEthereumNewsMultiTopic(20)
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch Google News RSS')
-    }
-    
-    const data = await response.json()
-    return {
-      articles: data.articles || [],
-      count: data.count || 0,
-      stats: {
-        total: data.count || 0,
-        companySpecific: 0,
-        general: data.count || 0,
-        companiesTracked: 9
-      },
-      message: data.success ? 'Live Google News RSS data' : 'Cached news data'
+    if (rssArticles && rssArticles.length > 0) {
+      // Convert GoogleNewsItem to NewsArticle format
+      const articles = rssArticles.map(item => ({
+        title: item.title,
+        description: item.description,
+        url: item.url,
+        urlToImage: null,
+        publishedAt: item.publishedAt,
+        source: { name: item.source },
+        company: null,
+        ticker: null
+      }))
+      
+      console.log(`📰 News Page: Successfully fetched ${articles.length} real RSS articles`)
+      return {
+        articles,
+        count: articles.length,
+        stats: {
+          total: articles.length,
+          companySpecific: 0,
+          general: articles.length,
+          companiesTracked: 9
+        },
+        message: 'Live Google News RSS data'
+      }
+    } else {
+      console.log('⚠️ News Page: RSS fetch returned no articles, using fallback')
+      throw new Error('No RSS articles returned')
     }
   } catch (error) {
     console.error('Error fetching Google News RSS, using fallback:', error)

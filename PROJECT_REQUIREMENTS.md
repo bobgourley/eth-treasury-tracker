@@ -42,7 +42,7 @@ A web application that displays a comprehensive list of Ethereum treasury compan
 - **Data Accuracy**: Prioritize data consistency; implement basic conflict resolution
 
 #### Architecture
-- **Hosting**: Low-cost hosting solution (e.g., Vercel, Netlify for frontend + serverless functions)
+- **Hosting**: Vercel for frontend + serverless functions
 - **Database**: Lightweight solution (SQLite, PostgreSQL on free tier, or serverless DB)
 - **Backend**: Serverless functions or minimal server footprint
 - **Frontend**: Modern web technologies (React/Vue/vanilla JS with modern CSS)
