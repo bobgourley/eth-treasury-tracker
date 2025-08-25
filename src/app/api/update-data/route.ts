@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     
     // Get last known ETH price from database as fallback
     const lastSystemMetrics = await prisma.systemMetrics.findFirst()
-    let ethPrice = lastSystemMetrics?.ethPrice || 3680.0 // Only use hardcoded if no database value exists
+    let ethPrice = lastSystemMetrics?.ethPrice // Database is single source of truth
     let ethPriceSource = 'Last known value (database)'
     let ethPriceLastUpdate = new Date()
     

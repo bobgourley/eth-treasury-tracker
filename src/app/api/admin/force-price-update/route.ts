@@ -12,10 +12,10 @@ export async function POST(request: Request) {
 
     console.log('🔄 Admin force price update started...')
     
-    // Get live ETH price from CoinGecko API
-    let ethPrice = 3680.0 // fallback
-    let btcPrice = 65000.0 // fallback
-    let ethPriceSource = 'fallback'
+    // Get live ETH price from CoinGecko API - no fallbacks
+    let ethPrice = null
+    let btcPrice = null
+    let ethPriceSource = 'unknown'
     
     try {
       const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum,bitcoin&vs_currencies=usd')
@@ -28,10 +28,16 @@ export async function POST(request: Request) {
         if (data.bitcoin?.usd) {
           btcPrice = data.bitcoin.usd
         }
-        console.log(`✅ Live prices: ETH $${ethPrice}, BTC $${btcPrice}`)
+      } else {
+        throw new Error('Failed to fetch live prices from CoinGecko')
       }
     } catch (error) {
-      console.log('⚠️ CoinGecko API failed, using fallback prices')
+      console.error('❌ Error fetching live prices:', error)
+      throw error
+    }
+    
+    if (!ethPrice || !btcPrice) {
+      throw new Error('Failed to get valid price data from API')
     }
 
     // Get current companies for calculations

@@ -61,7 +61,7 @@ export default function ChartsPage() {
         // Calculate totals using live ETH price
         const totalEthHoldings = companies.reduce((sum: number, company: CompanyData) => 
           sum + (company.ethHoldings || 0), 0)
-        const ethPrice = metricsData.ethPrice || companiesData.ethPrice || FALLBACK_ETH_PRICE // Use ETH price from either API
+        const ethPrice = metricsData.ethPrice // Database is single source of truth
         const totalEthValue = totalEthHoldings * ethPrice
 
         setData({

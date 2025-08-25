@@ -71,7 +71,7 @@ export default function OverviewPage() {
   const [totalCompanyCount, setTotalCompanyCount] = useState<number>(0)
   const [etfs, setEtfs] = useState<Etf[]>([])
   const [news, setNews] = useState<NewsArticle[]>([])
-  const [ethPrice, setEthPrice] = useState<number>(FALLBACK_ETH_PRICE)
+  const [ethPrice, setEthPrice] = useState<number>(0)
   const [ethSupply, setEthSupply] = useState<number>(FALLBACK_ETH_SUPPLY)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -107,7 +107,7 @@ export default function OverviewPage() {
         
         if (metricsResponse.ok) {
           const metricsData = await metricsResponse.json()
-          setEthPrice(metricsData.ethPrice || FALLBACK_ETH_PRICE)
+          setEthPrice(metricsData.ethPrice)
           setEthSupply(metricsData.totalEthSupply || metricsData.ethSupply || FALLBACK_ETH_SUPPLY)
         }
         

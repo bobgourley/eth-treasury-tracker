@@ -67,9 +67,9 @@ export default function CardsPage() {
         setCardData({
           companies: companiesData.companies || [],
           etfs: etfsData.etfs || [],
-          ethPrice: metricsData.ethPrice || 3680,
-          btcPrice: metricsData.bitcoinPrice || 61000,
-          totalEthSupply: metricsData.ethSupply || 120500000
+          ethPrice: metricsData.ethPrice,
+          btcPrice: metricsData.bitcoinPrice,
+          totalEthSupply: metricsData.ethSupply
         })
       } catch (err) {
         console.error('Error fetching card data:', err)

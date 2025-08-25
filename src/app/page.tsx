@@ -207,8 +207,8 @@ async function getHomePageData(): Promise<HomePageData> {
       console.error('Failed to fetch live crypto data, using database values:', error)
     }
 
-    // Use database ETH price if available, otherwise use fresh data or fallback
-    const ethPrice = systemMetrics?.ethPrice || cryptoData?.ethPrice || 3825.95
+    // Always use database ETH price - database is single source of truth
+    const ethPrice = systemMetrics?.ethPrice
     
     return {
       companies: companiesResult,
@@ -216,8 +216,8 @@ async function getHomePageData(): Promise<HomePageData> {
       news: newsResult,
       ethPrice: ethPrice,
       ethSupply: ethSupply,
-      bitcoinPrice: cryptoData?.bitcoinPrice || 61000,
-      bitcoinMarketCap: cryptoData?.bitcoinMarketCap || 1200000000000,
+      bitcoinPrice: cryptoData?.bitcoinPrice,
+      bitcoinMarketCap: cryptoData?.bitcoinMarketCap,
       ethereumMarketCap: cryptoData?.ethMarketCap || (ethPrice * ethSupply),
       ethStaked: ethStaked
     }

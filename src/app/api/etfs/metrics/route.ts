@@ -41,8 +41,8 @@ export async function GET() {
     }
     
     // Get current ETH price from database (consistent with other pages)
-    let ethPrice = FALLBACK_ETH_PRICE // Fallback
-    let ethSupply = FALLBACK_ETH_SUPPLY // Fallback ETH supply
+    let ethPrice = null // Database is single source of truth
+    let ethSupply = null // Database is single source of truth
     
     try {
       // Use database-first approach for consistency with other pages

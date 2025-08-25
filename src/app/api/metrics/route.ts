@@ -99,8 +99,7 @@ export async function GET() {
         console.log('📊 Fetched live ETH price from API:', ethPrice)
       } catch (error) {
         console.log('⚠️ Failed to fetch live ETH price, using fallback')
-        ethPrice = FALLBACK_ETH_PRICE
-        ethPriceSource = 'fallback'
+        throw new Error('No ETH price available from database or API')
       }
     }
 
@@ -211,12 +210,54 @@ export async function GET() {
       console.log('Could not fetch live companies data for fallback, using static values')
     }
     
+    // Fetch Bitcoin price from database or live API - no fallbacks
+    let bitcoinPrice = null
+    
+    // First try to get from database
+    if (systemMetrics?.bitcoinPrice) {
+      bitcoinPrice = systemMetrics.bitcoinPrice
+      console.log(`✅ Bitcoin price from database: $${bitcoinPrice.toLocaleString()}`)
+    } else {
+      // If not in database, fetch live and store
+      try {
+        const cryptoResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
+        if (cryptoResponse.ok) {
+          const cryptoData = await cryptoResponse.json()
+          if (cryptoData.bitcoin?.usd) {
+            bitcoinPrice = cryptoData.bitcoin.usd
+            console.log(`✅ Live Bitcoin price fetched: $${bitcoinPrice.toLocaleString()}`)
+            
+            // Store in database for future use
+            await prisma.systemMetrics.upsert({
+              where: { id: systemMetrics?.id || 0 },
+              update: { bitcoinPrice },
+              create: { 
+                totalEthHoldings: 0,
+                totalEthValue: 0,
+                totalMarketCap: '0',
+                ethPrice: ethPrice,
+                bitcoinPrice: bitcoinPrice,
+                ethSupplyPercent: 0,
+                totalEthSupply: 0,
+                ethSupplySource: 'unknown',
+                totalCompanies: 0
+              }
+            })
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch Bitcoin price from API:', error)
+        throw new Error('No Bitcoin price available from database or API')
+      }
+    }
+
     // Static fallback metrics for MVP (updated with live data when possible)
     const fallbackMetrics = {
       totalEthHoldings: fallbackEthHoldings,
       totalEthValue: fallbackEthHoldings * fallbackEthPrice,
       totalMarketCap: fallbackMarketCap,
       ethPrice: fallbackEthPrice,
+      bitcoinPrice: bitcoinPrice,
       ethSupplyPercent: (fallbackEthHoldings / fallbackEthSupply) * 100,
       totalEthSupply: fallbackEthSupply,
       ethSupplySource: fallbackEthSupplySource,

@@ -21,7 +21,7 @@ export async function GET(
     const systemMetrics = await prisma.systemMetrics.findFirst({
       orderBy: { lastUpdate: 'desc' }
     })
-    const ethPrice = systemMetrics?.ethPrice || 3680.0
+    const ethPrice = systemMetrics?.ethPrice
     const totalEthHoldings = systemMetrics?.totalEthHoldings || 1130020.0
 
     // Get company data from database with fresh read
