@@ -18,11 +18,6 @@ const navItems: NavItem[] = [
     icon: <span>🏠</span>
   },
   {
-    href: '/overview',
-    label: 'Dashboard',
-    icon: <span>📊</span>
-  },
-  {
     href: '/treasury-companies',
     label: 'Companies',
     icon: <span>🏢</span>

@@ -417,6 +417,7 @@
   border-radius: 8px;
   overflow: hidden;
   transition: all 0.2s ease;
+  padding: 1rem;
 }
 
 .newsTitle {
@@ -425,6 +426,8 @@
   color: var(--text-primary);
   margin-bottom: 0.5rem;
   transition: color 0.2s ease;
+  margin-left: 0;
+  text-align: left;
 }
 
 .newsDescription {
@@ -432,6 +435,8 @@
   font-size: 0.875rem;
   line-height: 1.5;
   margin-bottom: 0.75rem;
+  margin-left: 0;
+  text-align: left;
 }
 
 .newsMeta {
