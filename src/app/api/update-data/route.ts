@@ -99,6 +99,10 @@ export async function POST(request: Request) {
       sum + (company.ethHoldings || 0), 0
     )
     
+    if (!ethPrice) {
+      return NextResponse.json({ error: 'ETH price unavailable' }, { status: 503 })
+    }
+    
     const totalEthValue = totalEthHeld * ethPrice
     const totalMarketCap = updatedCompanies.reduce((sum, company) => 
       sum + Number(company.marketCap || 0), 0
